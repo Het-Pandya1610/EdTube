@@ -49,14 +49,15 @@ WhatsApp, Instagram, LinkedIn, Facebook, and direct call links.
 
 🔐 Authentication Flow
 Page	Description
-register.html	User registration form with Google/Facebook options
-register.php	Server-side validation, password hashing, and database insertion
-login.html	Login form for existing users
-login.php	Secure session-based authentication and user verification
+`register.html`	User registration form with Google/Facebook options
+`login.html`	Login form for existing users
+
+
 🗄️ Database Setup
 
 Database Name: edunex_db
 
+```
 CREATE DATABASE IF NOT EXISTS edunex_db;
 USE edunex_db;
 
@@ -67,8 +68,11 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+```
 
 🧱 Project Structure
+
+```
 EduNex/
 │
 ├── EduNex.html              # Homepage
@@ -92,9 +96,10 @@ EduNex/
 ├── footer.css               # Footer styling
 ├── EduNex.png               # Logo
 └── assets/                  # Images, icons, and media
-
+```
 ⚙️ Technologies Used
 
+```
 Frontend: HTML5, CSS3, JavaScript (vanilla)
 
 Backend: PHP (procedural)
@@ -106,6 +111,7 @@ Icons: Font Awesome 6.5
 Fonts: Poppins / Lucida Sans
 
 Hosting: XAMPP / Apache (local dev)
+```
 
 🧠 Design Philosophy
 
@@ -129,15 +135,6 @@ Enable video lectures and downloadable resources
 
 Add admin panel for content management
 
-👥 Contributors
-
-Unswerving Team
-
-UI/UX & Frontend — Het
-
-Backend & Database — Het
-
-Testing & Integration — Het
 
 “Empowering every learner — one click at a time.”
 
