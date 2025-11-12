@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduNex | Next-Gen Learning for All</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background-image: linear-gradient(to right, navy, rgb(44, 167, 50));
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: black;
+      padding: 10px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    header img {
+      width: 65px;
+      height: 65px;
+      cursor: pointer;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      color: white;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: #00c6ff;
+    }
+
+    /* HAMBURGER */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    /* MOBILE NAV DROPDOWN */
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 75px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.95);
+      border-radius: 8px;
+      width: 200px;
+      animation: fadeIn 0.3s ease-in-out;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    .mobile-nav a {
+      color: white;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+    .mobile-nav a:hover {
+      background: rgba(255,255,255,0.1);
+      color: #00c6ff;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      margin-top: 110px;
+      padding: 80px 20px;
+      background-color: rgba(211, 211, 211, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      color: white;
+      width: 90%;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+      animation: fadeIn 1.2s ease-in-out;
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: auto;
+      color: #f3f3f3;
+    }
+    .hero button {
+      margin-top: 30px;
+      padding: 12px 35px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      background-image: linear-gradient(to top, rgb(0, 0, 0), rgb(74, 74, 74));
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+    .hero button:hover {
+      transform: scale(1.05);
+    }
+
+    /* FEATURES */
+    .info-section {
+      margin-top: 60px;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .info-section h2 {
+      font-size: 2.3rem;
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 30px;
+    }
+    .feature-box {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 20px;
+      width: 280px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      transition: transform 0.5s ease, background 0.3s ease;
+    }
+    .feature-box:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .feature-box i {
+      font-size: 30px;
+      color: white;
+      margin-bottom: 10px;
+    }
+    .feature-box h4 {
+      color: white;
+      margin-bottom: 10px;
+    }
+    .feature-box p {
+      color: #e0e0e0;
+      font-size: 0.95rem;
+    }
+    /* REVIEWS REEL SECTION */
+    .reviews-reel {
+    margin: 80px 0;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+    padding: 60px 0;
+    background: rgba(255, 255, 255, 0);
+    border-top: 1px solid rgba(255, 255, 255, 0);
+    border-bottom: 1px solid rgba(255, 255, 255, 0);
+    }
+
+    .reviews-reel h2 {
+        font-size: 2rem;
+        margin-bottom: 55px;
+        background: linear-gradient(to top, white, gray);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .reviews-container {
+        display: flex;
+        gap: 40px;
+        background-color: #ffffff00;
+        animation: scrollReviews 35s linear infinite;
+        width: max-content;
+        padding: 0 40px;
+    }
+    .reviews-slider {
+    overflow: hidden;
+    position: relative;
+    }
+    .review {
+    background: rgb(255, 255, 255);
+    border-radius: 10px;
+    padding: 30px;
+    min-width: 300px;
+    max-width: 320px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+    text-align: left;
+    }
+
+    .review p {
+    font-size: 0.95rem;
+    color: black;
+    margin-bottom: 10px;
+    }
+
+    .review h4 {
+    color: #00c6ff;
+    font-size: 0.9rem;
+    margin: 0;
+    }
+
+    .stars {
+    color: gold;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    }
+
+    /* Scroll animation */
+    @keyframes scrollReviews {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+    }
+
+    /* Pause on hover */
+    .reviews-container:hover {
+    animation-play-state: paused;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 700px) {
+    .review {
+        min-width: 250px;
+    }
+    .reviews-reel h2 {
+        font-size: 1.6rem;
+    }
+    }
+
+    /* FOOTER */
+    footer {
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      padding: 60px 20px 30px;
+      margin-top: 80px;
+    }
+    .footer-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .footer-logo h2 {
+      color: #00c6ff;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    .footer-logo p {
+      color: #b0b0b0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .footer-column h3 {
+      color: #fff;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      border-bottom: 2px solid #00c6ff;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .footer-column ul li {
+      margin: 8px 0;
+      color: #b0b0b0;
+      font-size: 0.95rem;
+    }
+    .footer-column ul li a {
+      color: #b0b0b0;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .footer-column ul li a:hover {
+      color: #00c6ff;
+    }
+    .social-icons {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .social-icons a {
+      color: #fff;
+      background: #222;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+    }
+    .social-icons a:hover {
+      background: linear-gradient(45deg, #0072ff, #00c6ff);
+      transform: translateY(-4px);
+    }
+    .footer-bottom {
+      text-align: center;
+      border-top: 1px solid #222;
+      padding-top: 25px;
+      margin-top: 40px;
+      color: #9c9c9c;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav {
+        display: none;
+      }
+      .hamburger {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex; align-items:center;">
+      <img src="EduNex.png" alt="LOGO" onclick="window.location.href='EduNex.html'">
+      <h1 onclick="window.location.href='EduNex.html'">EduNex</h1>
+    </div>
+
+    <nav>
+      <a href="EduNex.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="register.html">Sign Up</a>
+      <a href="login.html">Sign In</a>
+    </nav>
+
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="mobile-nav" id="mobileNav">
+      <a href="EduNex.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="register.html">Sign Up</a>
+      <a href="login.html">Sign In</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Start Learning Today!</h1>
+    <p>Click below to begin your journey. We'll guide you from there based on your status.</p>
+    <button onclick="window.location.href='login.html'">Start Learning</button>
+  </section>
+
+  <section class="info-section">
+    <h2>Why Choose Us?</h2>
+    <div class="features">
+      <div class="feature-box">
+        <i class="fas fa-calendar-alt"></i>
+        <h4>Smart Scheduling</h4>
+        <p>Create and manage your study timetable with intelligent reminders and flexibility.</p>
+      </div>
+      <div class="feature-box">
+        <i class="fas fa-chart-line"></i>
+        <h4>Progress Tracking</h4>
+        <p>Track your learning journey with visual progress and reports on your performance.</p>
+      </div>
+      <div class="feature-box">
+        <i class="fas fa-question-circle"></i>
+        <h4>Interactive Quizzes</h4>
+        <p>Assess your knowledge with adaptive quizzes designed to test and teach simultaneously.</p>
+      </div>
+    </div>
+  </section>
+
+    <section class="reviews-reel">
+        <h2>What Our Learners Say</h2>
+        <div class="reviews-slider">
+            <div class="reviews-container">
+                <div class="review">
+                <div class="stars">★★★★★</div>
+                <p>EduNex helped me build a consistent study habit. My scores improved faster than I expected!</p>
+                <h4>— Aarav Patel</h4>
+                </div>
+                <div class="review">
+                <div class="stars">★★★★☆</div>
+                <p>The quizzes actually adapt to your progress — it feels like having a personal tutor!</p>
+                <h4>— Meera Sharma</h4>
+                </div>
+                <div class="review">
+                <div class="stars">★★★★★</div>
+                <p>Clean UI, smooth performance, and tracking features that keep you motivated every day.</p>
+                <h4>— Rohan Mehta</h4>
+                </div>
+                <div class="review">
+                <div class="stars">★★★★★</div>
+                <p>One of the best educational platforms I’ve used — simple, modern, and effective.</p>
+                <h4>— Priya Nair</h4>
+                </div>
+                <div class="review">
+                <div class="stars">★★★★☆</div>
+                <p>The scheduling and reminders make studying easier and more organized than ever.</p>
+                <h4>— Aditya Singh</h4>
+                </div>
+                <div class="review">
+                <div class="stars">★★★★★</div>
+                <p>EduNex keeps learning exciting! I can track everything I do — progress feels visible.</p>
+                <h4>— Diya Kapoor</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-logo">
+        <h2>EduNex</h2>
+        <p>Empowering every learner with personalized tools, adaptive insights, and a connected community — EduNex transforms how students grow, one step at a time.</p>
+        <div class="social-icons">
+          <a href="tel:+917383916190"><i class="fas fa-phone"></i></a>
+          <a href="https://wa.me/917383916190"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://instagram.com/"><i class="fab fa-instagram"></i></a>
+          <a href="https://facebook.com/"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://linkedin.com/"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="EduNex.html">Home</a></li>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="#">Events</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Support</h3>
+        <ul>
+          <li><a href="help-center.html">Help Center</a></li>
+          <li><a href="faqs.html">FAQs</a></li>
+          <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms & Conditions</a></li>
+          <li><a href="report-issue.html">Report an Issue</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Get in Touch</h3>
+        <ul>
+          <li><i class="fas fa-map-marker-alt"></i> Ahmedabad, India</li>
+          <li><i class="fas fa-phone"></i> Landline number</li>
+          <li><i class="fas fa-envelope"></i> <a href="mailto:info@studynest.com">info@studynest.com</a></li>
+        </ul>
+        <p style="margin-top:10px; color:#b0b0b0;">Available Mon–Sat, 9 AM–6 PM IST.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 <strong>EduNex</strong>. All rights reserved.<br>
+      Designed by <strong>Unswerving Team</strong>.
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.getElementById('mobileNav');
+      nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+    }
+  </script>
+</body>
+</html>

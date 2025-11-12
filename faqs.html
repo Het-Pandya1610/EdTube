@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQs | EduNex</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, navy, rgb(44, 167, 50));
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #000;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #00aaff;
+    }
+
+    header a {
+      color: white;
+      margin-right: 5%;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(6px);
+      padding: 120px 20px 60px;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 2.4rem;
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #cfeaff;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .category {
+      margin-bottom: 50px;
+    }
+
+    .category h3 {
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-size: 1.7rem;
+      margin-bottom: 15px;
+      border-left: 4px solid #00ccff;
+      padding-left: 10px;
+    }
+
+    details {
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    details:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    details summary {
+      font-weight: 600;
+      color: #fff;
+      outline: none;
+    }
+
+    details[open] summary {
+      color: #00ccff;
+    }
+
+    details p {
+      margin-top: 10px;
+      color: #d8ebff;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-5px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    footer {
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      padding: 60px 20px 30px;
+      margin-top: 80px;
+    }
+    .footer-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .footer-logo h2 {
+      color: #00c6ff;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    .footer-logo p {
+      color: #b0b0b0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .footer-column h3 {
+      color: #fff;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      border-bottom: 2px solid #00c6ff;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .footer-column ul li {
+      margin: 8px 0;
+      color: #b0b0b0;
+      font-size: 0.95rem;
+    }
+    .footer-column ul li a {
+      color: #b0b0b0;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .footer-column ul li a:hover {
+      color: #00c6ff;
+    }
+    .social-icons {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .social-icons a {
+      color: #fff;
+      background: #222;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+    }
+    .social-icons a:hover {
+      background: linear-gradient(45deg, #0072ff, #00c6ff);
+      transform: translateY(-4px);
+    }
+    .footer-bottom {
+      text-align: center;
+      border-top: 1px solid #222;
+      padding-top: 25px;
+      margin-top: 40px;
+      color: #9c9c9c;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .hero h2 { font-size: 2rem; }
+      .category h3 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>EduNex FAQs</h1>
+  <a href="EduNex.html">← Back to Home</a>
+</header>
+
+<section class="hero">
+  <h2>Frequently Asked Questions</h2>
+  <p>Find quick answers to the most common queries about EduNex courses, billing, accounts, and technical issues.</p>
+</section>
+
+<div class="faq-container">
+
+  <div class="category">
+    <h3>General Questions</h3>
+    <details>
+      <summary>What is EduNex?</summary>
+      <p>EduNex is an online learning platform offering courses, mentorship programs, and live sessions to help learners grow professionally.</p>
+    </details>
+    <details>
+      <summary>Who can use EduNex?</summary>
+      <p>Anyone — from students and professionals to hobbyists — can join EduNex and start learning instantly.</p>
+    </details>
+    <details>
+      <summary>Is EduNex free to use?</summary>
+      <p>EduNex offers both free and premium content. You can explore free lessons before enrolling in paid courses.</p>
+    </details>
+  </div>
+
+  <div class="category">
+    <h3>Courses & Learning</h3>
+    <details>
+      <summary>How are EduNex courses structured?</summary>
+      <p>Courses are divided into modules, each containing video lectures, notes, and quizzes for interactive learning.</p>
+    </details>
+    <details>
+      <summary>Can I access courses after completion?</summary>
+      <p>Yes. Once you purchase a course, you have lifetime access to it — including all updates.</p>
+    </details>
+    <details>
+      <summary>Do I get a certificate?</summary>
+      <p>Yes. Upon completing a course, EduNex provides a digital certificate that can be shared on LinkedIn or added to your résumé.</p>
+    </details>
+  </div>
+
+  <div class="category">
+    <h3>Account & Profile</h3>
+    <details>
+      <summary>How can I edit my profile?</summary>
+      <p>Go to your Dashboard → Profile → Edit. You can update your name, photo, and other details anytime.</p>
+    </details>
+    <details>
+      <summary>I forgot my password. What do I do?</summary>
+      <p>Use the “Forgot Password” option on the login page and follow the email reset instructions.</p>
+    </details>
+    <details>
+      <summary>Can I delete my EduNex account?</summary>
+      <p>Yes. Contact our support team at <a href="mailto:support@edunex.com">support@edunex.com</a> to permanently delete your account and data.</p>
+    </details>
+  </div>
+
+  <div class="category">
+    <h3>Payments & Refunds</h3>
+    <details>
+      <summary>What payment methods do you support?</summary>
+      <p>We support UPI, Credit/Debit Cards, PayPal, and Net Banking for secure and fast payments.</p>
+    </details>
+    <details>
+      <summary>Do you offer refunds?</summary>
+      <p>Refunds are available within 7 days of purchase if the course was not accessed or has technical issues.</p>
+    </details>
+    <details>
+      <summary>Can I get an invoice?</summary>
+      <p>Yes. After every successful payment, an invoice is automatically emailed to your registered address.</p>
+    </details>
+  </div>
+
+  <div class="category">
+    <h3>Technical Support</h3>
+    <details>
+      <summary>The video player isn't working — what should I do?</summary>
+      <p>Try clearing your browser cache or switching to a different browser. If the issue continues, contact <a href="mailto:support@edunex.com">support@edunex.com</a>.</p>
+    </details>
+    <details>
+      <summary>I’m unable to access my course.</summary>
+      <p>Ensure you’re logged into the correct account. If still inaccessible, send your order ID to our support team for help.</p>
+    </details>
+    <details>
+      <summary>Do you have a mobile app?</summary>
+      <p>Yes, EduNex mobile app is launching soon on Play Store and App Store for seamless on-the-go learning.</p>
+    </details>
+  </div>
+
+</div>
+
+<footer>
+    <div class="footer-container">
+      <div class="footer-logo">
+        <h2>EduNex</h2>
+        <p>Empowering every learner with personalized tools, adaptive insights, and a connected community — EduNex transforms how students grow, one step at a time.</p>
+        <div class="social-icons">
+          <a href="tel:+917383916190"><i class="fas fa-phone"></i></a>
+          <a href="https://wa.me/917383916190"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://instagram.com/"><i class="fab fa-instagram"></i></a>
+          <a href="https://facebook.com/"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://linkedin.com/"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="EduNex.html">Home</a></li>
+          <li><a href="#">Courses</a></li>
+          <li><a href="#">Events</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Support</h3>
+        <ul>
+          <li><a href="help-center.html">Help Center</a></li>
+          <li><a href="faqs.html">FAQs</a></li>
+          <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms & Conditions</a></li>
+          <li><a href="report-issue.html">Report an Issue</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Get in Touch</h3>
+        <ul>
+          <li><i class="fas fa-map-marker-alt"></i> Ahmedabad, India</li>
+          <li><i class="fas fa-phone"></i> Landline number</li>
+          <li><i class="fas fa-envelope"></i> <a href="mailto:info@studynest.com">info@studynest.com</a></li>
+        </ul>
+        <p style="margin-top:10px; color:#b0b0b0;">Available Mon–Sat, 9 AM–6 PM IST.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 <strong>EduNex</strong>. All rights reserved.<br>
+      Designed by <strong>Unswerving Team</strong>.
+    </div>
+  </footer>
+
+</body>
+</html>
