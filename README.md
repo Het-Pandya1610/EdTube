@@ -60,8 +60,6 @@ EduNex/
 ├── EduNex.html              # Homepage
 ├── login.html               # Login Page
 ├── register.html            # Registration Page
-├── login.php                # Handles login logic
-├── register.php             # Handles registration logic
 │
 ├── courses.html             # Course listings
 ├── events.html              # Upcoming events
@@ -79,21 +77,7 @@ EduNex/
 ├── EduNex.png               # Logo
 └── assets/                  # Images, icons, and media
 ```
-⚙️ Technologies Used
 
-```
-Frontend: HTML5, CSS3, JavaScript (vanilla)
-
-Backend: PHP (procedural)
-
-Database: MySQL
-
-Icons: Font Awesome 6.5
-
-Fonts: Poppins / Lucida Sans
-
-Hosting: XAMPP / Apache (local dev)
-```
 
 🧠 Design Philosophy
 
