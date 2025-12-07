@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{% static 'footer.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <title>About Us | EduNex</title>
+  <style>
+    header {
+      background: #000;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    header h1 {
+      color: #00aaff;
+      font-size: 1.6rem;
+      margin: 0;
+    }
+
+    header a {
+      color: #fff;
+      margin-right: 5%;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .about-container {
+      max-width: 1000px;
+      margin: 80px auto;
+      padding: 60px 50px;
+      background: rgba(255, 255, 255, 0.203);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-size: 1.5rem;
+      margin-top: 40px;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #f0f0f0;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      margin: 15px 0 30px 20px;
+      line-height: 1.8;
+      color: #e0e0e0;
+    }
+
+    ul li {
+      margin-bottom: 8px;
+    }
+    @media (max-width: 480px) {
+        header a{
+            margin-right: 20%;
+        }
+      .about-container {
+        width: 90%;
+        padding: 30px 20px;
+        margin: 60px auto;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      h2 {
+        font-size: 1.1rem;
+      }
+
+      p, ul {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+    <header>
+    <h1>EduNex Info</h1>
+    <a href="Home">← Back to Home</a>
+    </header>
+  <div class="about-container">
+    <h1>About EduNex</h1>
+    <p>
+      EduNex is a next-generation educational platform designed to enhance learning through innovation, data, and adaptability. 
+      We empower students and institutions with smart analytics, personalized recommendations, and a connected ecosystem that 
+      transforms traditional education into a more dynamic and insightful experience.
+    </p>
+
+    <h2>Our Vision</h2>
+    <p>
+      To make learning intelligent, accessible, and engaging for everyone — by merging technology with education in ways that 
+      truly make a difference. We envision a future where learners can understand, apply, and evolve at their own pace, supported 
+      by AI-powered insights and an intuitive digital environment.
+    </p>
+
+    <h2>Our Mission</h2>
+    <p>
+      EduNex is committed to redefining digital learning. Our mission is to:
+    </p>
+    <ul>
+      <li>Provide learners with personalized growth pathways.</li>
+      <li>Empower educators with real-time data-driven insights.</li>
+      <li>Bridge the gap between knowledge and application.</li>
+      <li>Foster a collaborative, innovative, and inspiring community of learners.</li>
+    </ul>
+
+    <h2>Our Values</h2>
+    <ul>
+      <li><strong>Integrity:</strong> We believe in transparency, accountability, and building trust through our actions.</li>
+      <li><strong>Innovation:</strong> We constantly evolve with technology to create smarter learning systems.</li>
+      <li><strong>Excellence:</strong> We aim for the highest quality in everything we build.</li>
+      <li><strong>Inclusivity:</strong> Education should be accessible, equitable, and empowering for everyone.</li>
+    </ul>
+
+    <h2>Why Choose EduNex?</h2>
+    <p>
+      With an intuitive interface, AI-powered analytics, and a deep understanding of learning psychology, EduNex is built not 
+      just for academics, but for real growth. We don’t just teach — we transform how you learn, adapt, and achieve success.
+    </p>
+  </div>
+
+
+  {% include 'footer.html' %}
+</body>
+</html>

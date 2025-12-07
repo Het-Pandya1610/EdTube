@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduNex | Blog</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'footer.css' %}">
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      color: #fff;
+      background: linear-gradient(-45deg, navy, rgb(44, 167, 50), navy, rgb(44, 167, 50));
+      background-size: 300% 300%;
+      animation: gradientShift 10s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: black;
+      padding: 10px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+header img {
+      width: 65px;
+      height: 65px;
+      cursor: pointer;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      color: white;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+header a { color: #fff; text-decoration: none; margin-right: 5%; }
+
+    .blog-container {
+        margin-top: 5%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      padding: 60px 10%;
+      flex: 1;
+    }
+
+    .blog-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .blog-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .blog-content {
+      padding: 20px;
+    }
+
+    .blog-content h3 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .blog-content p {
+      font-size: 0.95rem;
+      color: #ddd;
+      margin-bottom: 15px;
+    }
+
+    .read-more {
+      text-decoration: none;
+      background: #00c6ff;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .read-more:hover {
+      background: #0072ff;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      .blog-content h3 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div style="display:flex; align-items:center;">
+        <img src="{% static 'assets/EduNex.png' %}" alt="LOGO" onclick="window.location.href='Home'">
+        <h1 onclick="window.location.href='Home'">EduNex Blogs</h1>
+    </div>
+    <a href="Home">← Home</a>
+    </header>
+
+  <section class="blog-container">
+    <div class="blog-card">
+      <img src="{% static 'assets/blog1.jpeg' %}" alt="Blog 1">
+      <div class="blog-content">
+        <h3>5 Smart Study Tips for Students</h3>
+        <p>Discover how to boost your productivity and retain more knowledge with these proven techniques for smarter studying.</p>
+        <a href="blog-details" class="read-more">Read More</a>
+      </div>
+    </div>
+
+    <div class="blog-card">
+      <img src="{% static 'assets/blog2.jpeg' %}" alt="Blog 2">
+      <div class="blog-content">
+        <h3>How to Stay Consistent with Learning</h3>
+        <p>Learn the psychology behind consistency and how to make learning a lifelong habit that sticks with you.</p>
+        <a href="blog2-details" class="read-more">Read More</a>
+      </div>
+    </div>
+
+    <div class="blog-card">
+      <img src="{% static 'assets/blog3.jpg' %}" alt="Blog 3">
+      <div class="blog-content">
+        <h3>Top 10 Online Courses in 2025</h3>
+        <p>Check out the trending courses that are shaping the future — from AI to creative design and entrepreneurship.</p>
+        <a href="blog3-details" class="read-more">Read More</a>
+      </div>
+    </div>
+  </section>
+
+  {%include 'footer.html'%}
+</html>
