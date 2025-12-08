@@ -7,8 +7,101 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="{% static 'footer.css' %}">
   <style>
+    * { box-sizing: border-box; }
 
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background-image: linear-gradient(to right, navy, rgb(44, 167, 50));
+      overflow-x: hidden;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: black;
+      padding: 10px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    header img {
+      margin-left: -20px;
+      width: 65px;
+      height: 65px;
+      cursor: pointer;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      color: white;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+
+    nav {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #00c6ff;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 75px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.95);
+      border-radius: 8px;
+      width: 200px;
+      animation: fadeIn 0.3s ease-in-out;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    .mobile-nav a {
+      color: white;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .mobile-nav a:hover {
+      background: rgba(255,255,255,0.1);
+      color: #00c6ff;
+    }
     h1 {
+      margin-top: 15%;
       text-align: center;
       margin-bottom: 20px;
       background-image: linear-gradient(to top, white, gray);
@@ -117,10 +210,18 @@
     button:hover {
       background: #2a5298;
     }
+    @media (max-width: 900px) {
+      nav {
+        display: none;
+      }
+      .hamburger {
+        display: flex;
+      }
+    }
   </style>
 </head>
 <body>
-
+  {%include 'navbar.html'%}
   <h1>Student Reviews</h1>
 
   <div class="review-container" id="reviewsList"></div>
@@ -146,7 +247,7 @@
 
     <button onclick="addReview()">Submit Review</button>
   </div>
-
+  {%include 'footer.html'%}
   <script>
     // Your exact reviews from homepage
     const defaultReviews = [
