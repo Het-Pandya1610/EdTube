@@ -285,35 +285,7 @@
   </style>
 </head>
 <body>
-  <header>
-    <div style="display:flex; align-items:center;">
-      <img src="{% static 'assets/EduNex.png' %}" alt="LOGO" onclick="window.location.href='Home'">
-      <h1 onclick="window.location.href='Home'">EduNex</h1>
-    </div>
-
-    <nav>
-      <a href="Home">Home</a>
-      <a href="dashboard">Dashboard</a>
-      <a href="register">Sign Up</a>
-      <a href="login">Sign In</a>
-      <a href="reviews">Reviews</a>
-    </nav>
-
-    <div class="hamburger" onclick="toggleMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-
-    <div class="mobile-nav" id="mobileNav">
-      <a href="Home">Home</a>
-      <a href="dashboard">Dashboard</a>
-      <a href="register">Sign Up</a>
-      <a href="login">Sign In</a>
-      <a href="reviews">Reviews</a>
-    </div>
-  </header>
-
+  {%include 'navbar.html'%}
   <section class="hero">
     <h1>Start Learning Today!</h1>
     <p>Click below to begin your journey. We'll guide you from there based on your status.</p>
@@ -411,11 +383,6 @@
 
   {% include 'footer.html' %}
 
-  <script>
-    function toggleMenu() {
-      const nav = document.getElementById('mobileNav');
-      nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-    }
-  </script>
+
 </body>
 </html>
