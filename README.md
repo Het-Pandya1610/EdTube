@@ -56,26 +56,33 @@ Page	Description
 
 ```
 EduNex/
+├── templates/
+├──── EduNex.html              # Homepage
+├──── login.html               # Login Page
+├──── register.html            # Registration Page
 │
-├── EduNex.html              # Homepage
-├── login.html               # Login Page
-├── register.html            # Registration Page
+├──── courses.html             # Course listings
+├──── events.html              # Upcoming events
+├──── blog.html                # Articles and updates
+├──── about.html               # About EduNex
+├──── contact.html             # Contact page
+├──── footer.html              # Using footer for all using single file
+├──── navbar.html              # Using navbar for all related pages using single file
+├──── help-center.html         # Support and resources
+├──── faqs.html                # Frequently Asked Questions
+├──── privacy-policy.html      # Privacy Policy
+├──── terms.html               # Terms & Conditions
+├──── report-issue.html        # Bug or issue report page
 │
-├── courses.html             # Course listings
-├── events.html              # Upcoming events
-├── blog.html                # Articles and updates
-├── about.html               # About EduNex
-├── contact.html             # Contact page
-│
-├── help-center.html         # Support and resources
-├── faqs.html                # Frequently Asked Questions
-├── privacy-policy.html      # Privacy Policy
-├── terms.html               # Terms & Conditions
-├── report-issue.html        # Bug or issue report page
-│
-├── footer.css               # Footer styling
-├── EduNex.png               # Logo
-└── assets/                  # Images, icons, and media
+├──static/
+└──── assets/            
+├─────── EduNex.png            # Logo
+├─────── blog1.jpeg            # Images, icons, and media
+├─────── blog2.jpeg            # Images, icons, and media
+├─────── blog3.jpg             # Images, icons, and media
+└─────── blog4.jpeg            # Images, icons, and media
+└──── footer.css
+
 ```
 
 
