@@ -1,0 +1,105 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}">
+    <style>
+        .history-container {
+            margin-top: 80px;
+            padding: 40px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            color: var(--text-color);
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .video-card {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s;
+        }
+
+        .video-card:hover {
+            transform: scale(1.02);
+        }
+
+        .thumbnail-box {
+            position: relative;
+            aspect-ratio: 16/9;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #2a2a2a;
+        }
+
+        .thumbnail-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            padding: 10px 0;
+        }
+
+        .video-title {
+            font-weight: 600;
+            font-size: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            font-size: 0.85rem;
+            color: gray;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="history-container">
+        <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 30px;">Watch History</h2>
+
+        {% if videos %}
+            <div class="history-grid">
+                {% for video in videos %}
+                    <a href="{% url 'watch_video' %}?v={{ video.video_id }}" class="video-card">
+                        <div class="thumbnail-box">
+                            {% if video.thumbnail %}
+                                <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+                            {% else %}
+                                <img src="https://img.youtube.com/vi/{{ video.youtube_id }}/maxresdefault.jpg" alt="Thumbnail">
+                            {% endif %}
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">{{ video.title }}</div>
+                            <div class="video-meta">
+                                {{ video.teacher.user.first_name }} {{ video.teacher.user.last_name }}<br>
+                                {{ video.subject }} • {{ video.created_at|date:"M d, Y" }}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; margin-top: 100px;">
+                <i class="bi bi-clock-history" style="font-size: 4rem; color: gray;"></i>
+                <p style="margin-top: 20px; color: gray;">You haven't watched any videos yet.</p>
+                <a href="{% url 'index' %}" style="color: #3ea6ff; text-decoration: none;">Browse videos</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

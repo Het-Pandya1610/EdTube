@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy | EdTube</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'footer.css' %}">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, rgb(68, 68, 180), grey);
+      color: #fff;
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    header {
+      background: #000;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #00aaff;
+    }
+
+    header a {
+      color: white;
+      margin-right: 5%;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(6px);
+      padding: 120px 20px 60px;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 2.4rem;
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #cfeaff;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 25px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    h3 {
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-top: 40px;
+      font-size: 1.5rem;
+    }
+
+    p {
+      color: #dceaff;
+      font-size: 1rem;
+      margin: 10px 0;
+    }
+
+    ul {
+      margin-left: 20px;
+      color: #cfeaff;
+    }
+
+    ul li {
+      margin: 8px 0;
+    }
+
+    @media (max-width: 768px) {
+      .hero h2 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1 >EdTube Privacy Policy</h1>
+  <a href="{%url 'index'%}">← Back to Home</a>
+</header>
+
+<section class="hero">
+  <h2 style="color: black;">Privacy Policy</h2>
+  <p>Your privacy matters to us. This page explains how EdTube collects, uses, and protects your personal information.</p>
+</section>
+
+<div class="content">
+  <h3 style="color: black;">1. Introduction</h3>
+  <p>At <strong>EdTube</strong>, we respect your privacy and are committed to safeguarding your personal data. This policy outlines our practices regarding the collection, storage, and sharing of your information when you use our website, mobile app, or related services.</p>
+
+  <h3 style="color: black;">2. Information We Collect</h3>
+  <p>We collect the following types of information to improve user experience and provide personalized learning:</p>
+  <ul>
+    <li><strong>Personal details : </strong> Name, email address, contact number, and password during registration.</li>
+    <li><strong>Usage data : </strong> IP address, browser type, device information, and activity logs for analytics.</li>
+    <li><strong>Payment information : </strong> Only through secure payment gateways. EdTube does not store full card details.</li>
+    <li><strong>Cookies : </strong> Small data files used to enhance usability and remember preferences.</li>
+  </ul>
+
+  <h3 style="color: black;">3. How We Use Your Information</h3>
+  <ul>
+    <li>To provide course access and manage user accounts.</li>
+    <li>To personalize recommendations and improve learning outcomes.</li>
+    <li>To send notifications, updates, and promotional content (only with your consent).</li>
+    <li>To monitor usage, detect fraud, and ensure platform security.</li>
+  </ul>
+
+  <h3 style="color: black;">4. Data Protection & Security</h3>
+  <p>We use SSL encryption, firewalls, and secure servers to protect your personal data. Access is strictly limited to authorized personnel only. However, please note that no online transmission is 100% secure, and you share information at your own risk.</p>
+
+  <h3 style="color: black;">5. Sharing of Information</h3>
+  <p>EdTube does <strong>not</strong> sell or rent personal data to third parties. We may share limited data only when:</p>
+  <ul>
+    <li>Required by law or governmental authorities.</li>
+    <li>Partnering with trusted service providers (e.g., payment gateways, cloud hosting).</li>
+    <li>Analyzing usage trends via anonymized data for internal improvement.</li>
+  </ul>
+
+  <h3 style="color: black;">6. Your Rights</h3>
+  <p>You have full control over your information. You can:</p>
+  <ul>
+    <li>Access or update your personal data anytime from your profile settings.</li>
+    <li>Request deletion of your account and stored data.</li>
+    <li>Opt out of promotional communications by clicking “unsubscribe.”</li>
+  </ul>
+
+  <h3 style="color: black;">7. Cookies Policy</h3>
+  <p>Cookies are small files stored on your device to enhance experience. You can choose to disable cookies through your browser settings, but some features of EdTube may not function properly without them.</p>
+
+  <h3 style="color: black;">8. Third-Party Links</h3>
+  <p>Our platform may include links to external websites. EdTube is not responsible for the privacy practices or content of these third-party sites. We recommend reviewing their respective privacy policies before sharing personal data.</p>
+
+  <h3 style="color: black;">9. Data Retention</h3>
+  <p>We retain your information only as long as necessary to provide our services and comply with legal obligations. Once your account is deleted, associated personal data is permanently removed within 30 days.</p>
+
+  <h3 style="color: black;">10. Updates to This Policy</h3>
+  <p>EdTube reserves the right to modify this Privacy Policy at any time. Updates will be reflected on this page with a revised “Last Updated” date.</p>
+
+  <h3 style="color: black;">11. Contact Us</h3>
+  <p>If you have questions about this Privacy Policy or wish to exercise your data rights, please contact us:</p>
+  <ul>
+    <li><strong>Email : </strong> <a href="mailto:privacy@edtube.com"style="color: black;">privacy@edtube.com</a></li>
+    <li><strong>Address : </strong> EdTube HQ, Ahmedabad, India</li>
+    <li><strong>Working Hours : </strong> Mon–Sat, 9 AM–6 PM IST</li>
+  </ul>
+
+  <p style="margin-top: 30px; color:#9ecfff; font-size: 0.9rem;">Last Updated: January 2025</p>
+</div>
+
+ 
+</body>
+</html>

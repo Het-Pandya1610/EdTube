@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Settings | EdTube</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body{
+            background: var(--bg-color) !important;
+        }
+        .settings-container {
+            margin-top: 80px;
+            padding: 20px;
+            width: 85%;
+            margin-left: auto;
+            margin-right: auto;
+            color: var(--text-color);
+        }
+        hr{
+            margin-top: 35px;
+        }
+        /* Container for the header section */
+        .account-overview-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: transparent;
+            padding: 0px;
+            border-radius: 12px;
+            margin-bottom: 0px !important;
+            gap: 20px;
+        }
+
+        h3 {
+            font-size: 1rem !important;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: var(--text-color);
+        }
+
+        .header-content .subtitle {
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--text-color);
+            margin-top: 15px;
+            margin-bottom: 0px;
+        }
+
+        .user-badge {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.9rem;
+        }
+
+        .email-label {
+            color: #7e7e7e;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Image styling */
+        .header-image img {
+            width: 130px;
+            height: 130px;
+            object-fit: contain;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .account-overview-card {
+                flex-direction: column-reverse; /* Put image on top on mobile */
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .header-image img {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        .channel-card {
+            background: transparent;
+        }
+        .channel-card .subtitle {
+            font-size: 0.8rem;
+            color: gray;
+            margin-top: 8px;
+            margin-bottom: 0px;
+        }
+        .channel-card .title{
+            margin-top: 20px;
+        }
+        .account-subcard .avatar-mid{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            border: 2px solid var(--text-color);
+            margin-top: 40px;
+            margin-left: 180px;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .account-card .subtitle {
+            font-size: 0.9rem;
+            color: gray;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {%if request.user.is_authenticated%}
+        <div id="pageContent">
+            <div class="settings-container">
+                <div class="account-overview-card">
+                    <div class="header-content">
+                        <h3 style="margin-bottom: 40px;">Account</h3>
+                        <p class="subtitle">Choose how you appear on EdTube</p>
+                        <div class="user-badge">
+                            <span class="email-label">Signed in as {{ user.email }}</span>
+                        </div>
+                    </div>
+                    <div class="header-image">
+                        <img src="{% static 'assets/choose.png' %}" alt="Account Illustration">
+                    </div>
+                </div>
+                <hr></hr>
+                <div class="channel-card">
+                    <h3 style="font-size: 1.6rem !important; font-weight: 700;">Your EdTube channel</h3>
+                    <p class="subtitle">This is your public presence on EdTube. You need a channel to upload your own videos, comment on videos or create playlists.</p>
+                    
+                    <div class="account-subcard" style="display: flex; align-items: flex-start; margin-top: 30px;">
+                        
+                        <p class="title" style="width: 200px; margin: 0;">Your Channel</p>
+
+                        <div class="content-wrapper" style="display: flex; flex-direction: column; gap: 15px;">
+                            
+                            <div class="profile-detail" onclick="window.location.href='{% url 'user_profile' username=request.user.username %}'" style="display: flex; align-items: center; cursor: pointer;">
+                                {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
+                                    <img src="{{ request.user.teacher.pfp.url }}" alt="Profile" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--text-color); object-fit: cover;">
+                                {% elif request.user.profile.role == "student" and request.user.student.pfp %}
+                                    <img src="{{ request.user.student.pfp.url }}" alt="Profile" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--text-color); object-fit: cover;">
+                                {% else %}
+                                    <div class="avatar-mid" style="margin: 0;">
+                                        {{ request.user.first_name|first }}{{ request.user.last_name|first }}
+                                    </div>
+                                {% endif %}
+                                <strong style="margin-left: 15px; font-size: 1.1rem;">{{request.user.first_name}} {{request.user.last_name}}</strong>
+                            </div>
+
+                            <div class="choices" style="display: flex; flex-direction: column; gap: 10px; margin-left: 0px;">
+                                <a href="" style="text-decoration: none; color: #3ea6ff; font-size: 0.9rem;">Create a new channel</a>
+                                <a href="" style="text-decoration: none; color: #3ea6ff; font-size: 0.9rem;">View advanced settings</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr></hr>
+                <div class="account-card">
+                    <h3 style="font-size: 1.6rem !important; font-weight: 700">Your Account</h3>
+                    <p class="subtitle">You sign in to EdTube with your Google Account</p>
+                </div>
+            </div>
+        </div>
+    {%endif%}
+</body>
+</html>

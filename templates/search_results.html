@@ -1,0 +1,260 @@
+{% load teacher_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}">
+  <title>EdTube | Search Results For {{ query }}</title>
+  
+  <style>
+    .search-container {
+        width: 100%; 
+        max-width: 100%; 
+        margin: 20px auto; 
+        padding: 0 15px;
+        background: var(--bg-color);
+    }
+    .results-heading { 
+        font-size: 16px; 
+        margin-bottom: 20px; 
+        color: var(--text-color);
+    }
+
+    /* Video Card Layout */
+    .video-result-card {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 8px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    /* Left Side: Thumbnail */
+    .thumbnail-container {
+      flex: 0 0 360px; /* Fixed width for the image */
+      position: relative;
+    }
+
+    .thumbnail-container img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .duration-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Right Side: Meta Data */
+    .video-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+    .video-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-color);
+      margin: 0;
+      line-height: 26px;
+    }
+
+    .meta-line { color: var(--text-color); font-size: 12px; }
+
+    .teacher-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .teacher-img { width: 24px; height: 24px; border-radius: 50%; }
+    .teacher-name { color: var(--text-color); font-size: 12px; }
+
+    .badge-container { display: flex; gap: 8px; }
+    .meta-badge {
+      background:  rgba(79, 70, 229, 0.2);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #818cf8;
+    }
+
+    .description-text {
+      color: var(--text-color);
+      font-size: 12px;
+      margin-top: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .profile-header img, .avatar-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--text-color);
+    }
+
+    .avatar-circle {
+      background: linear-gradient(135deg, #4f46e5, #9333ea);
+      color: white;
+      font-size: 2.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .teacher-result-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 16px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .teacher-info-large {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .teacher-name-large {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    .teacher-meta-large {
+        color: var(--text-color);
+        font-size: 0.9rem;
+    }
+
+    .follow-btn-search {
+        background: var(--primary-col);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    /* Responsive for mobile */
+    @media (max-width: 768px) {
+      .video-result-card { flex-direction: column; }
+      .thumbnail-container { flex: 0 0 auto; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="search-container">
+        <h5 class="results-heading">Search results for: "{{ query }}"</h5>
+
+        {% if videos%}
+            {% for video in videos %}
+            <a href="{% url 'watch_video'%}?v={{video.video_id}}" class="video-result-card">
+                <div class="thumbnail-container">
+                    {% if video.thumbnail %}
+                    <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+                    {% elif video.youtube_id %}
+                    <img src="https://img.youtube.com/vi/{{ video.youtube_id }}/maxresdefault.jpg" 
+                        onerror="this.src='https://img.youtube.com/vi/{{ video.youtube_id }}/0.jpg';">
+                    {% else %}
+                    <div class="avatar-circle" style="width:100%; height:100%; border-radius:0;">
+                        <i class="bi bi-play-circle"></i>
+                    </div>
+                    {% endif %}
+                    <span class="duration-badge">{{ video.duration|default:"10:00" }}</span>
+                </div>
+
+                <div class="video-info">
+                    <h4 class="video-title">{{ video.title }}</h4>
+                    
+                    <div class="meta-line">
+                        {{ video.like_count }} <i class="bi bi-hand-thumbs-up"></i> • {{ video.created_at|timesince }} ago
+                    </div>
+
+                    <div class="teacher-section" onclick="window.location.href='{% url 'user_profile' username=video.teacher.username %}'">
+                        {% if video.teacher.pfp %}
+                            <img src="{{ video.teacher.pfp.url }}" alt="Profile">
+                        {% else %}
+                            <div class="avatar-small">
+                                {{ video.teacher.name|initials }}
+                            </div>
+                        {% endif %}
+                        <span class="teacher-name">{{ video.teacher.name }}</span>
+                    </div>
+
+                    <div class="badge-container">
+                        <span class="meta-badge">{{ video.subject }}</span>
+                        <span class="meta-badge">{{ video.language|default:"English" }}</span>
+                    </div>
+
+                    <p class="description-text">
+                        {{ video.description|truncatewords:25 }}
+                    </p>
+                </div>
+            </a>
+            {% endfor %}
+        {%elif teachers %}
+            {% for teacher in teachers %}
+            <div class="teacher-result-card">
+                <div class="avatar-container">
+                    {% if teacher.pfp %}
+                        <img src="{{ teacher.pfp.url }}" class="profile-header" alt="{{ teacher.name }}">
+                    {% else %}
+                        <div class="avatar-circle">
+                            {{ teacher.name|initials }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="teacher-info-large">
+                    <h3 class="teacher-name-large">{{ teacher.name }}</h3>
+                    <div class="teacher-meta-large">
+                        @{{ teacher.username }} • {{ teacher.nos }} Followers
+                    </div>
+                    <p class="description-text" style="-webkit-line-clamp: 1;">
+                        {{ teacher.bio|default:"No bio available." }}
+                    </p>
+                </div>
+
+                <div class="action-section" onclick="window.location.href='{% url 'user_profile' username=teacher.username %}'">
+                    <button class="follow-btn-search">View Profile</button>
+                </div>
+            </div>
+            {% endfor %}
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px;">
+        {% else %}
+            <div style="text-align: center; margin-top: 50px; color: var(--text-muted);">
+                <p>No videos found for "{{ query }}".</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

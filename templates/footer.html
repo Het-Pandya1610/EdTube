@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="{% static 'js/themes.js' %}"></script>
+  <title>Document</title>
+  <style>
+    :root{
+      --text-color: #000;
+      --bg-color: #fff;
+      --p-color: #212121ff;
+      --a-bg-color: #b4b4b4ff;
+      --h2-color: #007899ff;
+    }
+
+    body.dark-mode{
+      --text-color: #fff;
+      --bg-color: #000;
+      --p-color: #b0b0b0;
+      --a-bg-color: #222;
+      --h2-color: #00c6ff;
+    }
+    footer {
+      background-color: var(--bg-color) !important;
+      color: var(--text-color) !important;
+      padding: 60px 20px 30px !important;
+      margin-top: 30px !important;
+      {% comment %} height: 100vh; {% endcomment %}
+    }
+    .footer-container {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)) !important;
+      gap: 10px !important;
+      max-width: 1200px !important;
+      margin: auto !important;
+    }
+    .footer-logo h2 {
+      color: var(--h2-color) !important;
+      font-size: 1.8rem !important;
+      margin-bottom: 10px !important;
+    }
+    .footer-logo p {
+      color: var(--p-color) !important;
+      font-size: 0.95rem !important;
+      line-height: 1.6 !important;
+    }
+    .footer-column h3 {
+      color: var(--text-color) !important;
+      margin-bottom: 15px !important;
+      font-size: 1.1rem !important;
+      border-bottom: 2px solid var(--h2-color) !important;
+      display: inline-block !important;
+      padding-bottom: 5px !important;
+    }
+    .footer-column ul {
+      list-style: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      padding-top: -10px !important;
+      padding-bottom: -10px !important;
+    }
+    .footer-column ul li {
+      margin: 0px 0 !important;
+      color: var(--p-color) !important;
+    }
+    .footer-column ul li a {
+      color: var(--p-color) !important;
+      margin: 0 !important;
+      padding: 4px !important;
+      text-decoration: none !important;
+      transition: color 0.3s ease !important;
+    }
+    .footer-column ul li a:hover {
+      color: var(--h2-color) !important;
+    }
+    .social-icons {
+      display: flex !important;
+      gap: 5px !important;
+      margin-top: 15px !important;
+    }
+    .social-icons a {
+      color: var(--text-color) !important;
+      background: var(--a-bg-color) ;
+      border-radius: 50% !important;
+      width: 40px !important;
+      height: 40px !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      text-decoration: none !important;
+      transition: all 0.3s ease !important;
+      font-size: 1.1rem !important;
+    }
+    {% comment %} .social-icons a:hover {
+      background: linear-gradient(45deg, #0072ff, var(--h2-color)) !important;
+      transform: translateY(-4px) !important;
+    } {% endcomment %}
+    .social-icons a.phoneIcon:hover {
+      background: linear-gradient(45deg, #009E60, #88e788);
+      transform: translateY(-4px);
+    }
+
+    .social-icons a.waIcon:hover {
+      background: linear-gradient(45deg, #25D366, #128C7E);
+      transform: translateY(-4px);
+    }
+
+    .social-icons a.igIcon:hover {
+      {% comment %} background: linear-gradient(40deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5); {% endcomment %}
+      background: radial-gradient(
+        circle farthest-corner at 30% 107%,
+        #fdf497 0%, #fdf497 5%,
+        #fd5949 45%,
+        #d6249f 60%,
+        #285AEB 90%
+      );
+      transform: translateY(-4px);
+    }
+
+    .social-icons .fbIcon:hover {
+      background: linear-gradient(45deg, #1877f2, #0a58ca);
+      transform: translateY(-4px);
+    }
+
+    .social-icons a.liIcon:hover {
+      background: linear-gradient(45deg, #0a66c2, #004182);
+      transform: translateY(-4px);
+    }
+
+
+    .footer-bottom { 
+      text-align: center !important;
+      border-top: 1px solid var(--a-bg-color) !important;
+      padding-top: 5px !important;
+      margin-bottom: 60px !important;
+      color: var(--text-color) !important;
+      font-size: 0.9rem !important;
+      line-height: 2 !important;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media(max-width: 480px){
+      .footer-column h3{
+        font-size: 0.7rem;
+      }
+      .footer-bottom { 
+        text-align: center !important;
+        border-top: 1px solid var(--a-bg-color) !important;
+        padding-top: 5px !important;
+        margin-bottom: 80px !important;
+        color: var(--text-color) !important;
+        font-size: 0.7rem !important;
+        line-height: 2 !important;
+      }
+    }
+  </style>
+</head>
+  <footer>
+    <div class="footer-container">
+      <div class="footer-logo">
+        <h2>EdTube</h2>
+        <p>Empowering every learner with personalized tools, adaptive insights, and a connected community — EduNex transforms how students grow, one step at a time.</p>
+        <div class="social-icons">
+          <a href="tel:+917383916190" class="phoneIcon"><i class="fas fa-phone"></i></a>
+          <a href="https://wa.me/917383916190" class="waIcon"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://instagram.com/" class="igIcon"><i class="fab fa-instagram"></i></a>
+          <a href="https://facebook.com/" class="fbIcon"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://linkedin.com/" class="liIcon"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="{%url 'courses'%}">Courses</a></li>
+          <li><a href="#">Events</a></li>
+          <li><a href="blog/">Blog</a></li>
+          <li><a href="{%url 'AboutUs'%}">About Us</a></li>
+          <li><a href="{%url 'contact'%}">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Support</h3>
+        <ul>
+          <li><a href="{%url 'help'%}">Help Center</a></li>
+          <li><a href="{%url 'faqs'%}">FAQs</a></li>
+          <li><a href="{%url 'policy'%}">Privacy Policy</a></li>
+          <li><a href="{%url 'terms'%}">Terms & Conditions</a></li>
+          <li><a href="{%url 'reportIssue'%}">Report an Issue</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Get in Touch</h3>
+        <ul>
+          <li><i class="fas fa-map-marker-alt"></i> Ahmedabad, India</li>
+          <li><i class="fas fa-phone"></i> Landline number</li>
+          <li style="display: inline-flex !important;"><i class="fas fa-envelope" style="margin-top: 5px !important"></i> <a href="mailto:info@studynest.com" style="padding-top: 0px !important">info@edtube.com</a></li>
+        </ul>
+        <p style="margin-top:10px; color: var(--p-color);">Available Mon–Sat, 9 AM–6 PM IST.</p>
+      </div>
+    </div>
+    <div class="footer-bottom" style="display: block !important">
+      &copy; 2025 <strong>EdTube</strong>. All rights reserved.<br>
+      Designed by <strong>Unswerving Team</strong>.
+    </div>
+  </footer>
+</html>

@@ -1,0 +1,338 @@
+C:Users:Het:Desktop:EdTube
+|   .env
+|   .gitignore
+|   db.sqlite3
+|   manage.py
+|   Requirements.txt
+|   structure.txt
+|   user_history.json
+|   
++---.idea
+|   |   .gitignore
+|   |   EduNex.iml
+|   |   misc.xml
+|   |   modules.xml
+|   |   workspace.xml
+|   |   
+|   \---inspectionProfiles
+|           profiles_settings.xml
+|           Project_Default.xml
+|           
++---.vscode
+|       launch.json
+|       
++---accounts
+|   |   admin.py
+|   |   apps.py
+|   |   mail_utils.py
+|   |   models.py
+|   |   signals.py
+|   |   tests.py
+|   |   urls.py
+|   |   utils.py
+|   |   views.py
+|   |   __init__.py
+|   |   
+|   +---data
+|   |       surnames.csv
+|   |       
+|   +---migrations
+|   |   |   0001_initial.py
+|   |   |   0002_profile_is_email_verified_emailverification.py
+|   |   |   0003_alter_emailverification_otp.py
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           0001_initial.cpython-310.pyc
+|   |           0002_profile_is_email_verified_emailverification.cpython-310.pyc
+|   |           0003_alter_emailverification_otp.cpython-310.pyc
+|   |           __init__.cpython-310.pyc
+|   |           
+|   \---__pycache__
+|           admin.cpython-310.pyc
+|           apps.cpython-310.pyc
+|           mail_utils.cpython-310.pyc
+|           models.cpython-310.pyc
+|           signals.cpython-310.pyc
+|           urls.cpython-310.pyc
+|           utils.cpython-310.pyc
+|           views.cpython-310.pyc
+|           __init__.cpython-310.pyc
+|           
++---blog
+|   |   admin.py
+|   |   apps.py
+|   |   models.py
+|   |   tests.py
+|   |   urls.py
+|   |   views.py
+|   |   __init__.py
+|   |   
+|   +---migrations
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           __init__.cpython-310.pyc
+|   |           
+|   \---__pycache__
+|           admin.cpython-310.pyc
+|           apps.cpython-310.pyc
+|           models.cpython-310.pyc
+|           urls.cpython-310.pyc
+|           views.cpython-310.pyc
+|           __init__.cpython-310.pyc
+|           
++---courses
+|   |   admin.py
+|   |   apps.py
+|   |   models.py
+|   |   tests.py
+|   |   urls.py
+|   |   views.py
+|   |   __init__.py
+|   |   
+|   +---migrations
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           __init__.cpython-310.pyc
+|   |           
+|   \---__pycache__
+|           admin.cpython-310.pyc
+|           apps.cpython-310.pyc
+|           models.cpython-310.pyc
+|           urls.cpython-310.pyc
+|           views.cpython-310.pyc
+|           __init__.cpython-310.pyc
+|           
++---EdTube
+|   |   asgi.py
+|   |   settings.py
+|   |   urls.py
+|   |   wsgi.py
+|   |   __init__.py
+|   |   
+|   +---migrations
+|   |   |   0001_initial.py
+|   |   |   0002_delete_profile.py
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           0001_initial.cpython-310.pyc
+|   |           0002_delete_profile.cpython-310.pyc
+|   |           __init__.cpython-310.pyc
+|   |           
+|   \---__pycache__
+|           admin.cpython-310.pyc
+|           apps.cpython-310.pyc
+|           models.cpython-310.pyc
+|           settings.cpython-310.pyc
+|           signals.cpython-310.pyc
+|           urls.cpython-310.pyc
+|           views.cpython-310.pyc
+|           wsgi.cpython-310.pyc
+|           __init__.cpython-310.pyc
+|           
++---media
+|   +---teacher_profiles
+|   +---videos
+|   +---video_notes
+|   +---video_quizzes
+|   \---video_thumbnails
++---pages
+|   |   admin.py
+|   |   apps.py
+|   |   models.py
+|   |   tests.py
+|   |   urls.py
+|   |   views.py
+|   |   __init__.py
+|   |   
+|   +---migrations
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           __init__.cpython-310.pyc
+|   |           
+|   \---__pycache__
+|           admin.cpython-310.pyc
+|           apps.cpython-310.pyc
+|           models.cpython-310.pyc
+|           urls.cpython-310.pyc
+|           views.cpython-310.pyc
+|           __init__.cpython-310.pyc
+|           
++---static
+|   |   footer.css
+|   |   
+|   +---assets
+|   |       AI Chatbot.gif
+|   |       BG.jpeg
+|   |       BG.jpg
+|   |       blog1.jpeg
+|   |       blog2.jpeg
+|   |       blog3.jpg
+|   |       blog4.jpeg
+|   |       choose.png
+|   |       default-banner.jpg
+|   |       default.jpeg
+|   |       EdTube logo 2.png
+|   |       EdTube logo dark copy.png
+|   |       EdTube logo dark.png
+|   |       EdTube logo light.png
+|   |       EdTube logo.png
+|   |       EdTube-Dark.png
+|   |       EdTube-Light.png
+|   |       EduNex.png
+|   |       favicon.png
+|   |       history dark.png
+|   |       history light.png
+|   |       
+|   +---js
+|   |       themes.js
+|   |       
+|   \---sounds
+|           mic-error.mp3
+|           mic-off.mp3
+|           mic-on.mp3
+|           
++---student
+|   |   admin.py
+|   |   apps.py
+|   |   models.py
+|   |   tests.py
+|   |   utils.py
+|   |   views.py
+|   |   __init__.py
+|   |   
+|   +---migrations
+|   |   |   0001_initial.py
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           0001_initial.cpython-310.pyc
+|   |           __init__.cpython-310.pyc
+|   |           
+|   \---__pycache__
+|           admin.cpython-310.pyc
+|           apps.cpython-310.pyc
+|           models.cpython-310.pyc
+|           utils.cpython-310.pyc
+|           __init__.cpython-310.pyc
+|           
++---teacher
+|   |   admin.py
+|   |   apps.py
+|   |   models.py
+|   |   tests.py
+|   |   urls.py
+|   |   utils.py
+|   |   views.py
+|   |   __init__.py
+|   |   
+|   +---migrations
+|   |   |   0001_initial.py
+|   |   |   0002_teacher_pfp.py
+|   |   |   0003_rename_t_id_teacher_teacher_id.py
+|   |   |   0004_follower.py
+|   |   |   0005_teacher_banner_img.py
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           0001_initial.cpython-310.pyc
+|   |           0002_teacher_pfp.cpython-310.pyc
+|   |           0003_rename_t_id_teacher_teacher_id.cpython-310.pyc
+|   |           0004_follower.cpython-310.pyc
+|   |           0005_teacher_banner_img.cpython-310.pyc
+|   |           __init__.cpython-310.pyc
+|   |           
+|   +---templatetags
+|   |   |   teacher_tags.py
+|   |   |   __init__.py
+|   |   |   
+|   |   \---__pycache__
+|   |           teacher_tags.cpython-310.pyc
+|   |           __init__.cpython-310.pyc
+|   |           
+|   \---__pycache__
+|           admin.cpython-310.pyc
+|           apps.cpython-310.pyc
+|           models.cpython-310.pyc
+|           urls.cpython-310.pyc
+|           utils.cpython-310.pyc
+|           views.cpython-310.pyc
+|           __init__.cpython-310.pyc
+|           
++---templates
+|       about-us.html
+|       account_settings.html
+|       add.txt
+|       app.py
+|       blog.html
+|       blog1-details.html
+|       blog2-details.html
+|       blog3-details.html
+|       blog4-details.html
+|       contact.html
+|       courses.html
+|       dashboard.html
+|       db.sqlite3
+|       EdTube.html
+|       faqs.html
+|       footer.html
+|       help-center.html
+|       login.html
+|       navbar.html
+|       privacy-policy.html
+|       profile.html
+|       register.html
+|       report-issue.html
+|       reviews.html
+|       search_results.html
+|       terms.html
+|       verify_email.html
+|       video_history.html
+|       video_player.html
+|       video_upload.html
+|       
+|
+|           
+\---video
+    |   admin.py
+    |   apps.py
+    |   models.py
+    |   tests.py
+    |   urls.py
+    |   utils.py
+    |   views.py
+    |   __init__.py
+    |   
+    +---migrations
+    |   |   0001_initial.py
+    |   |   0002_video_likes.py
+    |   |   0003_video_duration.py
+    |   |   __init__.py
+    |   |   
+    |   \---__pycache__
+    |           0001_initial.cpython-310.pyc
+    |           0002_video_likes.cpython-310.pyc
+    |           0003_video_duration.cpython-310.pyc
+    |           __init__.cpython-310.pyc
+    |           
+    +---templatetags
+    |   |   hashtag_helper.py
+    |   |   __init__.py
+    |   |   
+    |   \---__pycache__
+    |           hashtag_helper.cpython-310.pyc
+    |           __init__.cpython-310.pyc
+    |           
+    \---__pycache__
+            admin.cpython-310.pyc
+            apps.cpython-310.pyc
+            models.cpython-310.pyc
+            urls.cpython-310.pyc
+            utils.cpython-310.pyc
+            views.cpython-310.pyc
+            __init__.cpython-310.pyc
+            

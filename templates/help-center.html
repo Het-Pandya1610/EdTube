@@ -1,0 +1,252 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help Center | EdTube</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'footer.css' %}">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, rgb(68, 68, 180), grey);
+
+      color: #fff;
+      min-height: 100vh;
+    }
+    header {
+      background: #000;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #00aaff;
+    }
+    header a {
+      color: white;
+      margin-right: 5%;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .hero {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(6px);
+      padding: 120px 20px 60px;
+      text-align: center;
+    }
+    .hero h2 {
+      font-size: 2.4rem;
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      color: #cfeaff;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .help-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .category {
+      margin-bottom: 40px;
+    }
+
+    .category h3 {
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-size: 1.6rem;
+      margin-bottom: 15px;
+      border-left: 4px solid #00ccff;
+      padding-left: 10px;
+    }
+
+    details {
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    details:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    details summary {
+      font-weight: 600;
+      color: #fff;
+      outline: none;
+    }
+
+    details[open] summary {
+      color: #00ccff;
+    }
+
+    details p {
+      margin-top: 10px;
+      color: #d8ebff;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .contact-box {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .contact-box h3 {
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .contact-box p {
+      color: #bcdcff;
+      margin-bottom: 20px;
+    }
+
+    .contact-box a {
+      display: inline-block;
+      padding: 10px 20px;
+      background-image: linear-gradient(to top, rgb(0, 0, 0), rgb(74, 74, 74));
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.7s ease;
+    }
+
+    .contact-box a:hover {
+        transform: scale(1.1);
+    }
+
+
+    @media (max-width: 768px) {
+      .hero h2 {
+        font-size: 1.9rem;
+      }
+      .category h3 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  {%include 'navbar.html'}
+<header>
+  <h1>EdTube Help Center</h1>
+  <a href="{%url 'index'%}">← Back to Home</a>
+</header>
+
+<section class="hero">
+  <h2 style="color: black;">How can we help you?</h2>
+  <p >Welcome to the EdTube Help Center. Browse through common queries, troubleshooting tips, and platform guidance. If you can’t find what you’re looking for, our support team is always ready to assist.</p>
+</section>
+
+<div class="help-container">
+  <div class="category">
+    <h3 style="color: black;">Account & Login</h3>
+    <details>
+      <summary>How do I create a new EdTube account?</summary>
+      <p>Click the “Sign Up” button on our homepage and complete the registration form using your email or Google account.</p>
+    </details>
+    <details>
+      <summary>I forgot my password — what should I do?</summary>
+      <p>Click “Forgot Password” on the login page and follow the instructions to reset it securely through your email.</p>
+    </details>
+    <details>
+      <summary>Can I change my registered email ID?</summary>
+      <p>Yes. Go to Account Settings → Profile → Change Email. You’ll receive a verification link on your new address.</p>
+    </details>
+  </div>
+
+  <div class="category">
+    <h3 style="color: black;">Courses & Learning</h3>
+    <details>
+      <summary>How do I enroll in a new course?</summary>
+      <p>From your dashboard, click “Browse Courses,” select your desired topic, and press “Enroll.”</p>
+    </details>
+    <details>
+      <summary>Can I access my courses offline?</summary>
+      <p>Offline access is currently in development, but you can download notes and resources in PDF format.</p>
+    </details>
+    <details>
+      <summary>Are live sessions recorded?</summary>
+      <p>Yes. All live classes are recorded and uploaded to your course library within 24 hours.</p>
+    </details>
+  </div>
+
+  <div class="category">
+    <h3 style="color: black;">Technical Support</h3>
+    <details>
+      <summary>The website is not loading properly — what should I do?</summary>
+      <p>Clear your browser cache and try again. If the issue persists, contact <a href="mailto:support@edunex.com" style="text-decoration: none;color: white;font-weight: bolder;">support@edunex.com</a>.</p>
+    </details>
+    <details>
+      <summary>Video playback is buffering or lagging.</summary>
+      <p>Try switching video quality or using a stable Wi-Fi connection. You can also use our mobile app for smoother streaming.</p>
+    </details>
+  </div>
+
+  <div class="category">
+    <h3 style="color: black;">Payments & Billing</h3>
+    <details>
+      <summary>What payment methods are accepted?</summary>
+      <p>We accept UPI, debit/credit cards, PayPal, and Net Banking. EMI options are available for selected courses.</p>
+    </details>
+    <details>
+      <summary>Can I get a refund?</summary>
+      <p>Refunds are applicable within 7 days of purchase for incomplete or faulty course access. Terms apply.</p>
+    </details>
+  </div>
+
+  <div class="category">
+    <h3 style="color: black;">General Help</h3>
+    <details>
+      <summary>How do I contact my instructor?</summary>
+      <p>Navigate to your enrolled course → Instructor tab → “Message Instructor.”</p>
+    </details>
+    <details>
+      <summary>Can I suggest a new feature or improvement?</summary>
+      <p>Absolutely! Use our <a href="{%url 'reportIssue'%}" style="text-decoration: none;color: white;font-weight: bolder;">Report an Issue</a> form or email <a href="mailto:feedback@edtube.com" style="text-decoration: none;color: white;font-weight: bolder;">feedback@edtube.com</a>.</p>
+    </details>
+  </div>
+
+  <div class="contact-box">
+    <h3 style="color: black;">Need more help?</h3>
+    <p>Our support team is available Monday–Saturday, 9 AM to 6 PM IST.</p>
+    <a href="mailto:support@edtube.com"><i class="fa-solid fa-envelope"></i> Contact Support</a>
+  </div>
+</div>
+
+  
+
+</body>
+</html>

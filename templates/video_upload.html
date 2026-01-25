@@ -1,0 +1,435 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EdTube | Upload Video</title>
+  <style>
+
+    .container {
+      margin-top: 120px;
+      background: rgba(255, 255, 255, 0.37);
+      margin-left: auto;
+      margin-right: auto;
+      padding: 40px;
+      border-radius: 15px;
+      width: 60% !important;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+      {% comment %} text-align: center; {% endcomment %}
+      backdrop-filter: blur(6px);
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    .tab {
+      display: flex;
+      justify-content: center;
+      gap: 100px;
+      margin-bottom: 20px;
+    }
+
+    .tab a {
+      cursor: pointer;
+      padding-bottom: 6px;
+      font-weight: 600;
+      color: var(--text-color) !important;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .tab a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background: #f5f5f7;
+      transition: width 0.3s ease;
+    }
+
+    .tab a.active {
+      color: #ffffff;
+    }
+
+    .tab a.active::after {
+      width: 100%;
+    }
+
+    .content {
+      display: none;
+      animation: fade 0.3s ease-in-out;
+    }
+
+    .content.active {
+      display: block;
+    }
+
+    label {
+      display: block;
+      margin-top: 32px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: white !important;
+    }
+
+    .required {
+      color: red;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+    #upload-button{
+      width: ;
+      border-radius: 8px;
+      margin: 30px auto 0;
+      display: block;
+      color: white;
+      padding: 12px 35px;
+      font-weight: 600;
+      background-color: #1a73e8;
+      outline: none;
+      border: none;
+    }
+    #upload-button i{
+      margin-right: 20px;
+      font-weight: 600;
+    }
+    #upload-button:hover{
+      background: #1558b0;
+    }
+    textarea {
+      resize: none;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .video-url-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .video-url-wrapper input {
+      width: 100%;
+      padding: 12px 90px 12px 14px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .paste-btn {
+      position: absolute;
+      right: 0px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 14px 25px;
+      font-size: 0.9rem;
+      border-radius: 0px 6px 6px 0px;
+      border: none;
+      cursor: pointer;
+      background: #1a73e8;
+      color: #fff;
+    }
+
+    .paste-btn:hover {
+      background: #1558b0;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 90px; /* before Paste button */
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #888;
+      cursor: pointer;
+      display: none;
+    }
+
+    .video-url-wrapper input:not(:placeholder-shown) + .clear-btn {
+      display: block;
+    }
+    .uploads, .sublan {
+      display: flex !important;
+      gap: 20px;
+      margin-top: 20px;
+      align-items: flex-start;
+    }
+
+    .input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group label {
+      margin-top: 12px;
+      margin-bottom: 8px;
+    }
+
+    .input-group input, 
+    .input-group select {
+      width: 100% !important;
+      margin-top: 0;
+      height: 45px;
+      border-radius: 8px !important;
+      border: 1px solid #ccc;
+      background: var(--bg-color);
+      color: var(--text-color);
+      outline: none;
+    }
+    @media(max-width: 780px){
+      .container{
+        width: 100% !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+{%include 'navbar.html'%}
+<div class="container">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="tab">
+      <a id="tabUrl" class="active">Video By URL</a>
+      <a id="tabMedia">Video By Media</a>
+    </div>
+    <div id="videoByUrl" class="content active">
+      <label>Video Link <span class="required">*</span></label>
+      <div class="video-url-wrapper">
+        <input
+          type="url"
+          name="video_url"
+          id="videoUrlInput"
+          placeholder="Enter YouTube URL"
+        >
+        <span class="clear-btn" onclick="clearVideoInput()">&times;</span>
+        <button type="button" class="paste-btn" onclick="pasteFromClipboard()">
+          Paste
+        </button>
+      </div>
+
+      <label>Title <span class="required">*</span></label>
+      <input type="text" name="title" placeholder="Enter Video Title" id="titleUrl" required>
+
+      <label>Description</label>
+      <textarea name="description" id="desUrl" rows="3"></textarea>
+
+      <div class="uploads">
+        <div class="input-group">
+          <label>Notes</label>
+          <input type="file" name="notes">
+        </div>
+
+        <div class="input-group">
+          <label>Quiz</label>
+          <input type="file" name="quiz">
+        </div>
+      </div>
+
+      <div class="sublan">
+        <div class="input-group">
+          <label>Language <span class="required">*</span></label>
+          <select name="language" id="langUrl" required>
+            <option value="" hidden>Select Language</option>
+            <option>English</option>
+            <option>Hindi</option>
+            <option>Gujarati</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Subject <span class="required">*</span></label>
+          <input type="text" name="subject" id="subUrl" required>
+        </div>
+      </div>
+
+      <button type="submit" id="upload-button">
+        <i class="bi bi-upload"></i> Upload
+      </button>
+    </div>
+    <div id="videoByMedia" class="content">
+
+      <label>Video File (MP4) <span class="required">*</span></label>
+      <input type="file" name="video_file" accept="video/mp4" required>
+
+      <label>Thumbnail <span class="required">*</span></label>
+      <input type="file" name="thumbnail" accept="image/*" required>
+
+      <label>Title <span class="required">*</span></label>
+      <input type="text" name="title" placeholder="Enter Video Title" id="titleMedia" required>
+
+      <label>Description</label>
+      <textarea name="description" id="desMedia" rows="3"></textarea>
+
+      <div class="uploads">
+        <div class="input-group">
+          <label>Notes</label>
+          <input type="file" name="notes">
+        </div>
+
+        <div class="input-group">
+          <label>Quiz</label>
+          <input type="file" name="quiz">
+        </div>
+      </div>
+
+      <div class="sublan">
+        <div class="input-group">
+          <label>Language <span class="required">*</span></label>
+          <select name="language" id="langMedia" required >
+            <option value="" hidden>Select Language</option>
+            <option>English</option>
+            <option>Hindi</option>
+            <option>Gujarati</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Subject <span class="required">*</span></label>
+          <input type="text" name="subject" id="subMedia" required>
+        </div>
+      </div>
+
+      <button type="submit" id="upload-button">
+        <i class="bi bi-upload"></i> Upload
+      </button>
+    </div>
+  </form>
+
+</div>
+
+<script>
+  const tabUrl = document.getElementById("tabUrl");
+  const tabMedia = document.getElementById("tabMedia");
+  const videoByUrl = document.getElementById("videoByUrl");
+  const videoByMedia = document.getElementById("videoByMedia");
+
+  const videoUrlInput = document.querySelector('input[name="video_url"]');
+  const videoFileInput = document.querySelector('input[name="video_file"]');
+  const thumbnailInput = document.querySelector('input[name="thumbnail"]');
+  const languageUrl = document.getElementById('langUrl')
+  const subjectUrl = document.getElementById('subUrl')
+  const titleUrl = document.getElementById('titleUrl')
+  const desUrl = document.getElementById('desUrl')
+  const languageMedia = document.getElementById('langMedia')
+  const subjectMedia = document.getElementById('subMedia')
+  const titleMedia = document.getElementById('titleMedia')
+  const desMed = document.getElementById('desMedia')
+
+  window.addEventListener('DOMContentLoaded', () => {
+    titleMedia.disabled = true;
+    languageMedia.disabled = true;
+    subjectMedia.disabled = true;
+    desMed.disabled = true;
+
+    titleUrl.disabled = false;
+    languageUrl.disabled = false;
+    subjectUrl.disabled = false;
+    desUrl.disabled = false;
+  });
+
+  // DEFAULT STATE (Video by URL)
+  videoUrlInput.required = true;
+  titleUrl.required = true;
+  languageUrl.required = true;
+  subjectUrl.required = true;
+  if (videoFileInput) videoFileInput.required = false;
+  if (thumbnailInput) thumbnailInput.required = false;
+  if (titleMedia) titleMedia.required = false;
+  if (languageMedia) languageMedia.required = false;
+  if (subjectMedia) subjectMedia.required = false;
+
+
+  tabUrl.addEventListener("click", () => {
+    tabUrl.classList.add("active");
+    tabMedia.classList.remove("active");
+
+    videoByUrl.classList.add("active");
+    videoByMedia.classList.remove("active");
+
+    // REQUIRED TOGGLES
+    videoUrlInput.required = true;
+    titleUrl.required = true;
+    languageUrl.required = true;
+    subjectUrl.required = true;
+    if (videoFileInput) videoFileInput.required = false;
+    if (thumbnailInput) thumbnailInput.required = false;
+    if (titleMedia) titleMedia.required = false;
+    if (languageMedia) languageMedia.required = false;
+    if (subjectMedia) subjectMedia.required = false;
+
+
+    titleUrl.disabled = false;
+    languageUrl.disabled = false;
+    subjectUrl.disabled = false;
+    desUrl.disabled = false;
+    titleMedia.disabled = true;
+    languageMedia.disabled = true;
+    subjectMedia.disabled = true;
+    desMed.disabled = true
+  });
+
+  tabMedia.addEventListener("click", () => {
+    tabMedia.classList.add("active");
+    tabUrl.classList.remove("active");
+
+    videoByMedia.classList.add("active");
+    videoByUrl.classList.remove("active");
+
+    // REQUIRED TOGGLES
+    videoUrlInput.required = false;
+    titleUrl.required = false;
+    languageUrl.required = false;
+    subjectUrl.required = false;
+    if (videoFileInput) videoFileInput.required = true;
+    if (thumbnailInput) thumbnailInput.required = true;
+    if (titleMedia) titleMedia.required = true;
+    if (languageMedia) languageMedia.required = true;
+    if (subjectMedia) subjectMedia.required = true;
+
+
+    titleUrl.disabled = true;
+    languageUrl.disabled = true;
+    subjectUrl.disabled = true;
+    desUrl.disabled = true;
+    titleMedia.disabled = false;
+    languageMedia.disabled = false;
+    subjectMedia.disabled = false;
+    desMed.disabled = false;
+});
+</script>
+<script>
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById("videoUrlInput").value = text;
+  } catch (err) {
+    alert("Clipboard access denied. Please paste manually.");
+  }
+}
+function clearVideoInput() {
+  const input = document.getElementById("videoUrlInput");
+  input.value = "";
+  input.focus();
+}
+</script>
+
+</body>
+</html>

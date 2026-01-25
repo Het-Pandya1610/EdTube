@@ -1,0 +1,215 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | EdTube</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'footer.css' %}" />
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background-image: linear-gradient(to right, navy, rgb(44, 167, 50));
+      overflow-x: hidden;
+    }
+
+    .register-container {
+      margin-top: 120px;
+      background: rgba(255, 255, 255, 0.08);
+      margin-left: auto;
+      margin-right: auto;
+      padding: 40px;
+      border-radius: 15px;
+      width: 45%;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      backdrop-filter: blur(6px);
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    .register-container h2 {
+      margin-bottom: 10px;
+      font-size: 2.3rem;
+      color: var(--text-color);
+    }
+
+    p {
+      color: #cfeaff;
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
+
+    input[name="fullname"],input[name="email"],input[name="password"],input[name="confirm_password"] {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.42);
+      color: #000;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    button {
+      width: 40%;
+      background-image: linear-gradient(to top, rgb(0, 0, 0), rgb(74, 74, 74));
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      padding: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+    }
+
+    .social-login {
+      margin: 13px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .social-login button {
+      width: 39%;
+      background-image: linear-gradient(to top, rgb(0, 0, 0), rgb(74, 74, 74));
+      color: #fff;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      border-radius: 20px !important;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .social-login button i {
+      font-size: 1rem;
+    }
+
+    p a {
+      color: #00cfff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    p a:hover {
+      border-bottom: 2px solid #00cfff;
+    }
+    
+    @media (max-width: 450px){
+      .register-container h2 {
+        font-size: 1.3rem;
+      }
+      button {
+        font-size: 0.6rem;
+      }
+      .social-login button {
+        font-size: 0.6rem;
+      }
+    }
+    .password-box {
+        position: relative;
+    }
+    .password-box input {
+        width: 100%;
+        padding-right: 45px;
+    }
+
+    .password-box .toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: #555;
+    }
+
+  </style>
+</head>
+<body>
+  {%include 'navbar.html'%}
+  
+  <div class="register-container">
+    <h2>Create Your Account</h2>
+    <p>Join EdTube today and start your personalized learning journey!</p>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="text" name="fullname" placeholder="Full Name" required />
+      <input type="email" name="email" placeholder="Email Address" required />
+
+      <div class="password-box">
+        <input type="password" name="password" id="password" placeholder="Password" required>
+        <i class="bi bi-eye toggle" style="margin-top: -6px !important;color: var(--text-color) !important;" onclick="togglePassword('password', this)"></i>
+      </div>
+
+      <div class="password-box">
+        <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" required>
+        <i class="bi bi-eye toggle" style="margin-top: -6px !important;color: var(--text-color) !important;" onclick="togglePassword('confirm_password', this)"></i>
+      </div>
+
+      <select name="role" id="role" required>
+        <option value="" selected hidden>Select Role</option>
+        <option value="student">Student</option>
+        <option value="tutor">Tutor</option>
+      </select>
+      <button type="submit" style="border-radius: 20px !important;margin-top: 10px;">Register</button>
+      {% if error %}
+        <p style="color: rgba(60, 0, 0, 1);font-size: 20px;background-color: rgba(216, 147, 147, 1);border: 2px solid red;border-radius: 10px;width: 40%;margin-left: auto;margin-right: auto;min-height: 40px;padding-top: 7px">{{ error }}</p>
+      {% endif %}
+    </form>
+
+    <div class="social-login">
+      <button><a href="https://accounts.google.com/v3/signin/accountchooser?access_type=online&client_id=775850403491-cp1lors9l3pmpr2bok00hrbqng7rgqmb.apps.googleusercontent.com&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Faccounts%2Fgoogle%2Flogin%2Fcallback%2F&response_type=code&scope=email+profile&state=nKV09kcaSZwRXBu2&dsh=S-231968954%3A1769079246592497&o2v=2&service=lso&flowName=GeneralOAuthFlow&opparams=%253F&continue=https%3A%2F%2Faccounts.google.com%2Fsignin%2Foauth%2Fconsent%3Fauthuser%3Dunknown%26part%3DAJi8hAODkQtSTdmKy6cz5Uvv_v3NBNrBvR0sWL26U3QM4wb5g5dTwHk-dXlfTMkS17qu0zEZ6eID3SmegfAJCe8kAn_vv5fmWrlCzdBnH0dO-TUBZt5TU_B2uN4EoTXjwpw3J9aKzSfdl60EEISkULidPB9csONJDOQ5ZRuQ8Z1gDSbSJ7BiK4suY5g-nTlSNB1uTUcAyKaVw1vXpVOkbT-xTieqDKbHz76nh-Cp1u9jQjPmsx2oqS8MED43h8hXXKu9YauqWgJAIAt09GJueW4xMcs7iOof8LBbSrUdK8nK0P3q3ACVyJp1xsZilL26yptEkE5KpIqx2DvA3ivsHGYg6k96hfiGPPi2QD8WdoO8R-XDJvWH6Hedn4yUR4I1hXCqVrRCQoK29N6q4TANAhnlr5_BgQnlnJnrLpn4F5v5Ws57vA-j-iHYaTWlUcwPlZgqUvMOfCLvEBnb8hAPCZ6wl_IKE4Fk0A%26flowName%3DGeneralOAuthFlow%26as%3DS-231968954%253A1769079246592497%26client_id%3D775850403491-cp1lors9l3pmpr2bok00hrbqng7rgqmb.apps.googleusercontent.com%26requestPath%3D%252Fsignin%252Foauth%252Fconsent%23&app_domain=http%3A%2F%2F127.0.0.1%3A8000" style="text-decoration: none;color: white;"><i class="fab fa-google"></i> Google</a></button>
+      <button><i class="fab fa-facebook-f"></i> Facebook</button>
+    </div>
+
+    <p>Already have an account? <a href="{%url 'login'%}">Login</a></p>
+  </div>
+
+  {%include 'footer.html'%}
+  <script>
+  function togglePassword(inputId, icon) {
+      const input = document.getElementById(inputId);
+
+      if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove("bi-eye");
+          icon.classList.add("bi-eye-slash");
+      } else {
+          input.type = "password";
+          icon.classList.remove("bi-eye-slash");
+          icon.classList.add("bi-eye");
+      }
+  }
+  </script>
+
+</body>
+</html>
