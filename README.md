@@ -3,16 +3,16 @@
 A Django-based platform for sharing and watching educational videos with YouTube-like interface.
 
 ## 📋 Table of Contents
-- [Features]
-- [Installation]
-- [Project Structure]
-- [Usage]
-- [Configuration]
-- [Development]
-- [Deployment]
-- [Contributing]
-- [License]
-- [Contact]
+- Features
+- Installation
+- Project Structure
+- Usage
+- Configuration
+- Development
+- Deployment
+- Contributing
+- License
+- Contact
 
 ## ✨ Features
 
