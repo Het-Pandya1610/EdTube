@@ -94,7 +94,7 @@ Open browser and visit: `http://localhost:8000`
 
 ```
 EdTube/
-├── accounts/                 # User authentication
+├── accounts/                # User authentication
 │   ├── models.py            # User & Profile models
 │   ├── views.py             # Auth views
 │   └── urls.py              # Auth URLs
@@ -117,6 +117,17 @@ EdTube/
 │   └── views.py             # Blog views
 ├── pages/                   # Static pages
 │   └── views.py             # Static page views
+├── security_tests/          # Dedicated Security Testing Suite
+|   ├── __init__.py
+|   ├── security_summary.py
+|   ├── test_api_security.py
+|   ├── test_authentication.py
+|   ├── test_configuration.py
+|   ├── test_csrf.py
+|   ├── test_data_exposure.py
+|   ├── test_file_upload.py
+|   ├── test_sql_injection.py
+|   └── test_xss.py
 ├── templates/               # HTML templates
 │   ├── video_player.html    # Video player template
 │   ├── search_results.html  # Search results template
@@ -135,14 +146,17 @@ EdTube/
 │   └── video_quizzes/       # Video quizzes
 ├── EdTube/                  # Project settings
 │   ├── settings.py          # Django settings
+|   ├── test_runner.py       # test case checking
 │   ├── urls.py              # Main URLs
 │   ├── wsgi.py              # WSGI config
 │   └── asgi.py              # ASGI config
 ├── manage.py                # Django management script
 ├── requirements.txt         # Python dependencies
 ├── .env.example             # Environment template
-├── .gitignore              # Git ignore rules
-└── README.md               # This file
+├── factories.py             # Factory Boy classes for generating test data
+├── test_search.py           # Root level search functionality tests
+├── .gitignore               # Git ignore rules
+└── README.md                # This file
 ```
 
 ## ⚙️ Configuration
@@ -207,6 +221,11 @@ python manage.py test accounts
 
 # Run with verbose output
 python manage.py test --verbosity=2
+```
+
+### Security Test
+```bash
+python manage.py test --testrunner=EdTube.test_runner.SecurityTestRunner
 ```
 
 ### Creating Migrations
@@ -397,7 +416,7 @@ SOFTWARE.
 ---
 
 <div align="center">
-  Made with ❤️ by <a href="https://github.com/Het-Pandya1610">Het Pandya</a><br>
+  Made with ❤️ by <a href="https://github.com/Het-Pandya1610">Het Pandya</a>, <a href="https://github.com/dakshgadhiya0">Daksh Gadhiya</a> and <a href="https://github.com/priyaldholakiya21">Priyal Dholakiya</a><br>
   If you find this project useful, please give it a ⭐
 </div>
 ```
