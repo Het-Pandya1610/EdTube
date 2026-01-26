@@ -201,15 +201,15 @@
       {% if not request.user.is_authenticated %}
         <h1>Haven't Started Yet ??</h1>
         <p>Click below to begin your journey. We'll guide you from there based on your status.</p>
-        <button onclick="window.location.href=''">Let's get Started</button>
+        <a href="{%url 'register'%}" style="text-decoration: none"><button>Let's get Started</button></a>
       {% else %}
         <h1>Hello {{ request.user.first_name }}</h1>
         {% if request.user.profile.role == 'student' %}
           <p>Click below to begin your journey. Start learning from our tutors.</p>
-          <button onclick="window.location.href=''">Start Learning</button>
+          <a href="{%url 'dashboard'%}" style="text-decoration: none"><button>Start Learning</button></a>
         {%else%}
           <p>Click below to begin your journey. Start uploading videos for your .</p>
-          <button onclick="window.location.href=''">Start Teaching</button>
+          <a href="{%url 'videoUpload'%}" style="text-decoration: none"><button>Start Teaching</button></a>
         {% endif %}
       {% endif %}
       

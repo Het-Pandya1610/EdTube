@@ -160,21 +160,24 @@ CONTENT_SECURITY_POLICY = {
 
         "script-src": (
             "'self'",
+            "https://cdn.jsdelivr.net",   # ✅ Bootstrap JS
         ),
 
         "style-src": (
             "'self'",
-            "'unsafe-inline'",  # required for inline styles
+            "'unsafe-inline'",            # required for Bootstrap CSS
+            "https://cdn.jsdelivr.net",   # if Bootstrap CSS is CDN
+        ),
+
+        "font-src": (
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "data:",
         ),
 
         "img-src": (
             "'self'",
             "https://img.youtube.com",
-            "data:",
-        ),
-
-        "font-src": (
-            "'self'",
             "data:",
         ),
 
@@ -184,6 +187,7 @@ CONTENT_SECURITY_POLICY = {
         ),
     }
 }
+
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"

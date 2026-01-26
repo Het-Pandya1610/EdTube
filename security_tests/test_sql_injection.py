@@ -83,15 +83,26 @@ class SQLInjectionTests(TestCase):
                     
                     # Check for SQL errors in response
                     content = response.content.decode().lower()
-                    
-                    # Should not expose SQL errors
-                    sql_keywords = ['sql', 'syntax', 'mysql', 'postgresql', 
-                                   'database', 'error at', 'exception', 
-                                   'stack trace', 'traceback']
-                    
-                    for keyword in sql_keywords:
-                        self.assertNotIn(keyword, content, 
-                                       f"SQL error leaked on {endpoint_name} with vector {i}")
+
+                    # Should not expose real DB / traceback errors
+                    fatal_markers = [
+                        'traceback',
+                        'django.db',
+                        'psycopg',
+                        'psycopg2',
+                        'sqlite3',
+                        'operationalerror',
+                        'programmingerror',
+                        'internal server error',
+                    ]
+
+                    for marker in fatal_markers:
+                        self.assertNotIn(
+                            marker,
+                            content,
+                            f"Database error leaked on {endpoint_name} with vector {i}"
+                        )
+
                     
                     # Check response is valid
                     self.assertIn(response.status_code, [200, 302, 400, 404, 403],

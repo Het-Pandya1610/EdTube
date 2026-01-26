@@ -5,12 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{% static 'footer.css' %}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  {% comment %} <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"> {% endcomment %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-  <script src="{% static 'js/themes.js' %}"></script>
+  <script src="{% static 'js/themes.js' %}" defer></script>
   <title>Document</title>
   <style>
     :root{
@@ -567,17 +566,17 @@
 <body>
   <header>
     <div class="header-left">
-      <div class="hamburger" onclick="toggleMenu()">
+      <div class="hamburger" id="hamburgerBtn">
         <span></span>
         <span></span>
         <span></span>
       </div>
 
-      <div class="mobile-nav scrollable" id="mobileNav">
+      <div class="mobile-nav" id="mobileNav">
         <a href="/"><i class="bi bi-house-door-fill"></i>Home</a>
         <a href="{%url 'dashboard'%}"><i class="bi bi-person-video"></i>Video Lectures</a>
         <a href="{%url 'register'%}"><i class="bi bi-person-fill-add"></i>Sign Up</a>
-        <a href="{%url 'login'%}"><i class="fa fa-sign-in"></i>Sign In</a>
+        <a href="{%url 'login'%}"><i class="bi bi-box-arrow-in-right"></i>Sign In</a>
         <a href="{%url 'reviews'%}"><i class="bi bi-star-fill"></i>Reviews</a>
         {% if request.user.is_authenticated %}
           {%if request.user.profile.role == "student"%}
@@ -599,10 +598,9 @@
         {%include 'footer.html'%}
       </div>
       <div style="display:flex; align-items:center;">
-        <img id="theme-logo" src="{% static 'assets/EdTube logo dark copy.png' %}" alt="LOGO" onclick="window.location.href='/'"/>
-        {% comment %} <h1 onclick="window.location.href='/'">EduNex</h1> {% endcomment %}
+        <img id="theme-logo" src="{% static 'assets/EdTube logo dark copy.png' %}" alt="LOGO"/>
       </div>
-      <div class="mobile-search-icon" onclick="toggleSearch()">
+      <div class="mobile-search-icon" id="searchToggleBtn">
         <i class="bi bi-search"></i>
       </div>
     </div>
@@ -621,7 +619,7 @@
         <button type="submit" class="search-btn">
           <i class="bi bi-search"></i>
         </button>
-        <button type="button" class="mic-btn" onclick="openVoiceSearch()">
+        <button type="button" class="mic-btn" id="voiceSearchBtn">
           <i class="bi bi-mic-fill"></i>
         </button>
       </form>
@@ -661,24 +659,6 @@
     {% endif %}
     
   </header>
-  <script>
-    function toggleMenu() {
-      const nav = document.getElementById('mobileNav');
-      const isOpen = nav.style.display === 'flex';
-
-      nav.style.display = isOpen ? 'none' : 'flex';
-
-      // Desktop push effect
-      if (window.innerWidth >= 992) {
-        document.body.classList.toggle('nav-open', !isOpen);
-      }
-    }
-  </script>
-  <script>
-    function toggleSearch() {
-      document.body.classList.toggle('mobile-search-active');
-    }
-  </script>
 <div id="voiceOverlay" class="voice-overlay d-none">
   <div class="voice-box">
     <div class="voice-mic" id="voiceMic">
@@ -690,209 +670,9 @@
 <audio id="micOnSound" src="{% static 'sounds/mic-on.mp3' %}" preload="auto"></audio>
 <audio id="micOffSound" src="{% static 'sounds/mic-off.mp3' %}" preload="auto"></audio>
 <audio id="micErrorSound" src="{% static 'sounds/mic-error.mp3' %}" preload="auto"></audio>
-<script>
-let recognition;
-const micOnSound  = document.getElementById("micOnSound");
-const micOffSound = document.getElementById("micOffSound");
-const micErrorSound = document.getElementById("micErrorSound");
 
-function playSound(audio) {
-  audio.currentTime = 0;
-  audio.play().catch(() => {}); // prevent autoplay errors
-}
+  <script src="{% static 'js/navbar.js' %}" defer></script>
 
-function openVoiceSearch() {
-  playSound(micOnSound)
-  const overlay = document.getElementById("voiceOverlay");
-  const voiceText = document.getElementById("voiceText");
-  const input = document.querySelector(".search-bar input");
-  
-  overlay.classList.remove("d-none");
-
-  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-    voiceText.textContent = "Voice not supported";
-    playSound(micErrorSound)
-    return;
-  }
-
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  recognition = new SpeechRecognition();
-  recognition.lang = "en-IN";
-  recognition.interimResults = false;
-
-  recognition.start();
-
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    input.value = transcript;
-    closeVoiceSearch();
-  };
-
-  recognition.onerror = () => {
-    playSound(micErrorSound)
-    voiceText.textContent = "Try again";
-  };
-
-  recognition.onend = () => {
-    playSound(micOffSound);
-  };
-}
-
-function closeVoiceSearch() {
-  document.getElementById("voiceOverlay").classList.add("d-none");
-  if (recognition) recognition.stop();
-}
-
-/* Close on background click */
-document.getElementById("voiceOverlay").addEventListener("click", (e) => {
-  if (e.target.id === "voiceOverlay") {
-    playSound(micOffSound)
-    closeVoiceSearch();
-  }
-});
-</script>
-<script>
-const voiceMic = document.getElementById("voiceMic");
-const canvas = document.getElementById("voiceCanvas");
-const ctx = canvas.getContext("2d");
-
-let audioContext, analyser, dataArray, source;
-let isListening = false;
-
-voiceMic.onclick = async () => {
-  if (isListening) {
-    audioContext.close();
-    canvas.style.display = "none";
-    isListening = false;
-    return;
-  }
-
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-  audioContext = new AudioContext();
-  analyser = audioContext.createAnalyser();
-  source = audioContext.createMediaStreamSource(stream);
-
-  source.connect(analyser);
-  analyser.fftSize = 256;
-
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-  canvas.width = 300;
-  canvas.height = 80;
-  canvas.style.display = "block";
-  isListening = true;
-
-  draw();
-};
-
-function draw() {
-  if (!isListening) return;
-
-  requestAnimationFrame(draw);
-  analyser.getByteFrequencyData(dataArray);
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const barWidth = canvas.width / dataArray.length;
-  let x = 0;
-
-  for (let i = 0; i < dataArray.length; i++) {
-    const barHeight = dataArray[i] / 2;
-    ctx.fillStyle = "rgb(0,0,255)";
-    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-    x += barWidth + 1;
-  }
-}
-</script>
-
-<script>
-  const searchInput = document.getElementById("searchInput");
-  const suggestionsBox = document.querySelector(".search-suggestions");
-  const isDark = localStorage.getItem("theme") === "dark";
-
-  async function getHistoryFromServer() {
-      try {
-          const response = await fetch('/api/search-suggestions/');
-          if (!response.ok) return [];
-          return await response.json();
-      } catch (error) {
-          console.error("History fetch failed", error);
-          return [];
-      }
-  }
-
-  async function showSuggestions(value = "") {
-    const history = await getHistoryFromServer();
-    suggestionsBox.innerHTML = "";
-
-    const filtered = history.filter(item =>
-        item.toLowerCase().includes(value.toLowerCase())
-    );
-
-    if (!filtered.length) {
-        suggestionsBox.style.display = "none";
-        return;
-    }
-
-    filtered.forEach(item => {
-      const div = document.createElement("div");
-      div.innerHTML = `
-      <span class="s-text" style="display:flex; align-items:center; gap:10px; flex-grow:1;">
-        <img class="history-icon" src="/static/assets/history ${isDark ? "dark" : "light"}.png" style="width: 30px !important; height: 30px !important; margin-left: 5px !important;">
-        ${item}
-      </span>
-      <i class="bi bi-x-lg remove-history" style="padding: 5px; font-size: 12px;"></i>`;
-      
-      // Click text to search
-      div.querySelector(".s-text").onclick = () => {
-          searchInput.value = item;
-          suggestionsBox.style.display = "none";
-          searchInput.closest('form').submit(); 
-      };
-
-      // Click X to remove from history
-      div.querySelector(".remove-history").onclick = async (e) => {
-          e.stopPropagation(); // Prevents the search from triggering when clicking 'X'
-          
-          const response = await fetch('/api/delete-search-history/', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': '{{ csrf_token }}' // Ensure CSRF token is available
-              },
-              body: JSON.stringify({ 'query': item })
-          });
-
-          if (response.ok) {
-              div.remove(); // Remove from UI only if server confirms
-              
-              // Hide the box if it's now empty
-              if (suggestionsBox.querySelectorAll('div').length === 0) {
-                  suggestionsBox.style.display = "none";
-              }
-          }
-      };
-
-      suggestionsBox.appendChild(div);
-    });
-
-    suggestionsBox.style.display = "block";
-  }
-
-  searchInput.addEventListener("focus", () => showSuggestions(searchInput.value));
-  searchInput.addEventListener("input", e => showSuggestions(e.target.value));
-
-  document.addEventListener("click", e => {
-      if (!e.target.closest(".search-bar")) {
-          suggestionsBox.style.display = "none";
-      }
-  });
-</script>
-
-
-<script src="{% static 'js/themes.js' %}"></script>
+<script src="{% static 'js/themes.js' %}" defer></script>
 </body>
 </html>

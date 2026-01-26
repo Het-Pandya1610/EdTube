@@ -78,7 +78,7 @@ def reg(request):
             profile.save()
 
             del request.session["pending_email"]
-            auth_login(request, user)
+            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
             messages.success(request, "Email verified successfully!")
             return redirect("index")
@@ -199,7 +199,7 @@ def login_view(request):
 
         user = authenticate(request, username=username, password=password)
         if user:
-            auth_login(request, user)
+            auth_login(request, user, backend=user.backend)
             return redirect("index")
 
         return render(request, "login.html", {"error": "Invalid password"})
