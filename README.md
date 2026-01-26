@@ -416,7 +416,7 @@ SOFTWARE.
 ---
 
 <div align="center">
-  Made with ❤️ by <a href="https://github.com/Het-Pandya1610">Het Pandya</a><br>
+  Made with ❤️ by <a href="https://github.com/Het-Pandya1610">Het Pandya</a>, <a href="https://github.com/dakshgadhiya0">Daksh Gadhiya</a> and <a href="https://github.com/priyaldholakiya21">Priyal Dholakiya</a><br>
   If you find this project useful, please give it a ⭐
 </div>
 ```
