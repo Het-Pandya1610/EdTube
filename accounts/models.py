@@ -22,9 +22,12 @@ class Profile(models.Model):
 
 class EmailVerification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    otp = models.CharField(max_length=4)
+    otp = models.CharField(max_length=6)  # Changed from 4 to 6
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f'OTP for {self.user.email}'
     
     def is_expired(self):
         # OTP valid for 15 minutes
@@ -32,4 +35,4 @@ class EmailVerification(models.Model):
     
     @classmethod
     def generate_otp(cls):
-        return ''.join(random.choices(string.digits, k=4))
+        return ''.join(random.choices(string.digits, k=6))

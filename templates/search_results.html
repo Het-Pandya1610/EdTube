@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}">
-  <title>EdTube | Search Results For {{ query }}</title>
+  <title>EdTube | Search Results</title>
   
   <style>
     .search-container {
@@ -173,7 +173,7 @@
     {% include 'navbar.html' %}
 
     <div class="search-container">
-        <h5 class="results-heading">Search results for: "{{ query }}"</h5>
+        <h5 class="results-heading">Search results : </h5>
 
         {% if videos%}
             {% for video in videos %}
@@ -182,8 +182,11 @@
                     {% if video.thumbnail %}
                     <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
                     {% elif video.youtube_id %}
-                    <img src="https://img.youtube.com/vi/{{ video.youtube_id }}/maxresdefault.jpg" 
-                        onerror="this.src='https://img.youtube.com/vi/{{ video.youtube_id }}/0.jpg';">
+                        <img
+                        class="yt-thumbnail"
+                        src="https://img.youtube.com/vi/{{ video.youtube_id }}/maxresdefault.jpg"
+                        data-fallback="https://img.youtube.com/vi/{{ video.youtube_id }}/0.jpg"
+                        alt="Video thumbnail">
                     {% else %}
                     <div class="avatar-circle" style="width:100%; height:100%; border-radius:0;">
                         <i class="bi bi-play-circle"></i>
@@ -198,18 +201,18 @@
                     <div class="meta-line">
                         {{ video.like_count }} <i class="bi bi-hand-thumbs-up"></i> • {{ video.created_at|timesince }} ago
                     </div>
-
-                    <div class="teacher-section" onclick="window.location.href='{% url 'user_profile' username=video.teacher.username %}'">
-                        {% if video.teacher.pfp %}
-                            <img src="{{ video.teacher.pfp.url }}" alt="Profile">
-                        {% else %}
-                            <div class="avatar-small">
-                                {{ video.teacher.name|initials }}
-                            </div>
-                        {% endif %}
-                        <span class="teacher-name">{{ video.teacher.name }}</span>
-                    </div>
-
+                    <a href="{% url 'user_profile' username=video.teacher.username %}" style="text-decoration: none !important;">
+                        <div class="teacher-section">
+                            {% if video.teacher.pfp %}
+                                <img src="{{ video.teacher.pfp.url }}" alt="Profile">
+                            {% else %}
+                                <div class="avatar-small">
+                                    {{ video.teacher.name|initials }}
+                                </div>
+                            {% endif %}
+                            <span class="teacher-name">{{ video.teacher.name }}</span>
+                        </div>
+                    </a>
                     <div class="badge-container">
                         <span class="meta-badge">{{ video.subject }}</span>
                         <span class="meta-badge">{{ video.language|default:"English" }}</span>
@@ -243,18 +246,28 @@
                         {{ teacher.bio|default:"No bio available." }}
                     </p>
                 </div>
-
-                <div class="action-section" onclick="window.location.href='{% url 'user_profile' username=teacher.username %}'">
-                    <button class="follow-btn-search">View Profile</button>
-                </div>
+                <a href="{% url 'user_profile' username=teacher.username %}" style="text-decoration: none !important;">
+                    <div class="action-section">
+                        <button class="follow-btn-search">View Profile</button>
+                    </div>
+                </a>
             </div>
             {% endfor %}
             <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px;">
         {% else %}
             <div style="text-align: center; margin-top: 50px; color: var(--text-muted);">
-                <p>No videos found for "{{ query }}".</p>
+                <p>No videos found for your search.</p>
             </div>
         {% endif %}
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".yt-thumbnail").forEach(img => {
+            img.addEventListener("error", () => {
+            img.src = img.dataset.fallback;
+            });
+        });
+        });
+    </script>
 </body>
 </html>

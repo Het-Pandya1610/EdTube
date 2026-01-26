@@ -201,7 +201,7 @@
       {% if not request.user.is_authenticated %}
         <h1>Haven't Started Yet ??</h1>
         <p>Click below to begin your journey. We'll guide you from there based on your status.</p>
-        <button onclick="window.location.href='login'">Let's get Started</button>
+        <button onclick="window.location.href=''">Let's get Started</button>
       {% else %}
         <h1>Hello {{ request.user.first_name }}</h1>
         {% if request.user.profile.role == 'student' %}

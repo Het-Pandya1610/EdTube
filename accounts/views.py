@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.db import transaction
@@ -40,6 +40,9 @@ def split_name(fullname):
             return " ".join(parts[:i]), " ".join(parts[i:])
     return parts[0], parts[-1]
 
+
+def register_view(request):
+    return reg(request) 
 
 @transaction.atomic
 def reg(request):
@@ -167,10 +170,18 @@ def login_view(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-        username = email.split("@")[0]
+        
+
+        if not email or not password:
+            return render(request, "login.html", {"error": "Email and password are required"})
+        
+
         user = User.objects.filter(email=email).first()
         if not user:
             return render(request, "login.html", {"error": "Email not found"})
+
+        username = email.split("@")[0]
+        
 
         profile = user.profile
         if not profile.is_email_verified:
@@ -194,6 +205,11 @@ def login_view(request):
         return render(request, "login.html", {"error": "Invalid password"})
 
     return render(request, "login.html")
+
+
+def logout_view(request):
+    auth_logout(request)
+    return redirect('login')
 
 
 @login_required

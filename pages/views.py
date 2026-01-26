@@ -7,6 +7,7 @@ import json, os
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from video.utils import HISTORY_FILE, file_lock
+from django.utils.html import escape
 
 def index(request):
     return render(request, "EdTube.html")
@@ -49,7 +50,8 @@ def aboutUs(request):
 
 
 def search(request):
-    query = request.GET.get("q", "").strip()
+    raw_query = request.GET.get("q", "").strip()
+    query = escape(raw_query)
     
     videos = []
     teachers = []
@@ -58,13 +60,37 @@ def search(request):
         if request.user.is_authenticated:
             save_to_history("search", request.user.email, query)
         
-        # Check if query starts with # (hashtag search)
-        if query.startswith('#'):
-            # Remove the # for the search
-            tag_query = query[1:]  # Remove the # character
-            
-            # Search for hashtags in description
-            # Using regex for more accurate hashtag matching
+        # Check for "subject by teacher" pattern (e.g., "Math by John")
+        if ' by ' in raw_query.lower():
+            parts = raw_query.lower().split(' by ')
+            if len(parts) == 2:
+                subject_part = parts[0].strip()
+                teacher_part = parts[1].strip()
+                
+                # Search for videos with subject and teacher name
+                videos = Video.objects.filter(
+                    Q(subject__icontains=subject_part) &
+                    Q(teacher__name__icontains=teacher_part)
+                ).select_related("teacher")
+                teachers = Teacher.objects.filter(
+                    Q(name__icontains=teacher_part) |
+                    Q(username__icontains=teacher_part)
+                )
+            else:
+                videos = Video.objects.filter(
+                    Q(title__icontains=raw_query) |
+                    Q(subject__icontains=raw_query) |
+                    Q(description__icontains=raw_query)
+                ).select_related("teacher")
+                
+                teachers = Teacher.objects.filter(
+                    Q(name__icontains=raw_query) |
+                    Q(username__icontains=raw_query)
+                )
+                
+        elif raw_query.startswith('#'):
+            tag_query = query[1:]
+
             videos = Video.objects.filter(
                 Q(description__icontains=f" #{tag_query} ") |  # Hashtag with spaces around
                 Q(description__icontains=f" #{tag_query}\n") |  # Hashtag followed by newline
@@ -83,14 +109,14 @@ def search(request):
         else:
             # Normal search (existing logic)
             videos = Video.objects.filter(
-                Q(title__icontains=query) |
-                Q(subject__icontains=query) |
-                Q(description__icontains=query)
+                Q(title__icontains=raw_query) |
+                Q(subject__icontains=raw_query) |
+                Q(description__icontains=raw_query)
             ).select_related("teacher")
 
             teachers = Teacher.objects.filter(
-                Q(name__icontains=query) |
-                Q(username__icontains=query)
+                Q(name__icontains=raw_query) |
+                Q(username__icontains=raw_query)
             )
     
     return render(request, "search_results.html", {
@@ -99,6 +125,7 @@ def search(request):
         "teachers": teachers,
     })
     
+       
 def get_search_suggestions(request):
     if not request.user.is_authenticated or not os.path.exists(HISTORY_FILE):
         return JsonResponse([], safe=False)

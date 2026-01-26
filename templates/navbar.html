@@ -576,7 +576,7 @@
       <div class="mobile-nav scrollable" id="mobileNav">
         <a href="/"><i class="bi bi-house-door-fill"></i>Home</a>
         <a href="{%url 'dashboard'%}"><i class="bi bi-person-video"></i>Video Lectures</a>
-        <a href="{%url 'reg'%}"><i class="bi bi-person-fill-add"></i>Sign Up</a>
+        <a href="{%url 'register'%}"><i class="bi bi-person-fill-add"></i>Sign Up</a>
         <a href="{%url 'login'%}"><i class="fa fa-sign-in"></i>Sign In</a>
         <a href="{%url 'reviews'%}"><i class="bi bi-star-fill"></i>Reviews</a>
         {% if request.user.is_authenticated %}
@@ -612,7 +612,7 @@
           type="text"
           name="q"
           id="searchInput"
-          value="{{ query }}"
+          value="{{ query|escape }}"
           placeholder="Search"
           aria-label="Search"
         />
@@ -631,7 +631,7 @@
 
     {% if not request.user.is_authenticated %}
       <div class="auth-buttons">
-        <a href="{%url 'reg'%}" class="btn signup">Sign Up</a>
+        <a href="{%url 'register'%}" class="btn signup">Sign Up</a>
         <a href="{%url 'login'%}" class="btn login">Log In</a>
       </div>
     {% else %}

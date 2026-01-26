@@ -51,10 +51,12 @@ INSTALLED_APPS = [
     'teacher.apps.TeacherConfig',
     'student',
     'video',
+    'csp',
     # 'app',  # if you create an app
 ]
 
 MIDDLEWARE = [
+    "csp.middleware.CSPMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -146,3 +148,43 @@ SOCIALACCOUNT_PROVIDERS = {
 
 LOGIN_REDIRECT_URL = '/profile/'
 LOGOUT_REDIRECT_URL = '/'
+
+TEST_RUNNER = 'EdTube.test_runner.SecurityTestRunner'
+
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ("'self'",),
+
+        "script-src": (
+            "'self'",
+        ),
+
+        "style-src": (
+            "'self'",
+            "'unsafe-inline'",  # required for inline styles
+        ),
+
+        "img-src": (
+            "'self'",
+            "https://img.youtube.com",
+            "data:",
+        ),
+
+        "font-src": (
+            "'self'",
+            "data:",
+        ),
+
+        "frame-src": (
+            "'self'",
+            "https://www.youtube.com",
+        ),
+    }
+}
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_BROWSER_XSS_FILTER = True
