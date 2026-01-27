@@ -6,33 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{% static 'footer.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <title>About Us | EduNex</title>
+  <title>About Us | EdTube</title>
   <style>
-    header {
-      background: #000;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-    }
-
-    header h1 {
-      color: #00aaff;
-      font-size: 1.6rem;
-      margin: 0;
-    }
-
-    header a {
-      color: #fff;
-      margin-right: 5%;
-      text-decoration: none;
-      font-weight: 500;
-    }
     .about-container {
       max-width: 1000px;
       margin: 80px auto;
@@ -111,14 +86,11 @@
   </style>
 </head>
 <body>
-    <header>
-    <h1>EduNex Info</h1>
-    <a href="Home">← Back to Home</a>
-    </header>
+  {%include 'navbar.html'%}
   <div class="about-container">
-    <h1>About EduNex</h1>
+    <h1>About EdTube</h1>
     <p>
-      EduNex is a next-generation educational platform designed to enhance learning through innovation, data, and adaptability. 
+      EdTube is a next-generation educational platform designed to enhance learning through innovation, data, and adaptability. 
       We empower students and institutions with smart analytics, personalized recommendations, and a connected ecosystem that 
       transforms traditional education into a more dynamic and insightful experience.
     </p>
@@ -132,7 +104,7 @@
 
     <h2>Our Mission</h2>
     <p>
-      EduNex is committed to redefining digital learning. Our mission is to:
+      EdTube is committed to redefining digital learning. Our mission is to:
     </p>
     <ul>
       <li>Provide learners with personalized growth pathways.</li>
@@ -149,9 +121,9 @@
       <li><strong>Inclusivity:</strong> Education should be accessible, equitable, and empowering for everyone.</li>
     </ul>
 
-    <h2>Why Choose EduNex?</h2>
+    <h2>Why Choose EdTube?</h2>
     <p>
-      With an intuitive interface, AI-powered analytics, and a deep understanding of learning psychology, EduNex is built not 
+      With an intuitive interface, AI-powered analytics, and a deep understanding of learning psychology, EdTube is built not 
       just for academics, but for real growth. We don’t just teach — we transform how you learn, adapt, and achieve success.
     </p>
   </div>

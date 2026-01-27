@@ -149,10 +149,7 @@
   </style>
 </head>
 <body>
-<header>
-  <h1>EdTube Support</h1>
-  <a href="{%url 'index'%}">← Back to Home</a>
-</header>
+{%include 'navbar.html'%}
 
 <section class="hero">
   <h2 style="color: black;">Report an Issue</h2>
@@ -170,10 +167,10 @@
     <label for="category" style="color: black;">Issue Category</label>
     <select id="category" name="category" required>
       <option value="" selected hidden>Select a category</option>
-      <option value="bug">🐞 Bug or Technical Issue</option>
-      <option value="payment">💳 Payment Related</option>
-      <option value="account">👤 Account Access</option>
-      <option value="other">📝 Other</option>
+      <option value="bug">Bug or Technical Issue</option>
+      <option value="payment">Payment Related</option>
+      <option value="account">Account Access</option>
+      <option value="other">Other</option>
     </select>
 
     <label for="description" style="color: black;">Describe the Issue</label>
