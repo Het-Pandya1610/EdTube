@@ -161,17 +161,20 @@ CONTENT_SECURITY_POLICY = {
         "script-src": (
             "'self'",
             "https://cdn.jsdelivr.net",   # ✅ Bootstrap JS
+            "https://cdnjs.cloudflare.com",
         ),
 
         "style-src": (
             "'self'",
             "'unsafe-inline'",            # required for Bootstrap CSS
             "https://cdn.jsdelivr.net",   # if Bootstrap CSS is CDN
+            "https://cdnjs.cloudflare.com",
         ),
 
         "font-src": (
             "'self'",
             "https://cdn.jsdelivr.net",
+            "https://cdnjs.cloudflare.com",
             "data:",
         ),
 

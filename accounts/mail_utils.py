@@ -55,8 +55,8 @@ def send_otp_email(email, otp, purpose="registration"):
             <p style="color:#555;font-size:16px;line-height:1.6;text-align:center;">{message}</p>
 
             <div style="
-                font-size:36px;
-                letter-spacing:8px;
+                font-size:32px;
+                letter-spacing:6px;
                 font-weight:bold;
                 color:{color};
                 background:#f8f9fa;
@@ -65,7 +65,6 @@ def send_otp_email(email, otp, purpose="registration"):
                 text-align:center;
                 margin:30px 0;
                 border-radius:8px;
-                font-family:'Courier New', monospace;
             ">
                 {otp}
             </div>
