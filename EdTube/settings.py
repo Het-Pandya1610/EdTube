@@ -46,8 +46,6 @@ INSTALLED_APPS = [
     'EdTube',
     'accounts',
     'pages',
-    'blog',
-    'courses',
     'teacher.apps.TeacherConfig',
     'student',
     'video',
