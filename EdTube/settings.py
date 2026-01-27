@@ -46,8 +46,6 @@ INSTALLED_APPS = [
     'EdTube',
     'accounts',
     'pages',
-    'blog',
-    'courses',
     'teacher.apps.TeacherConfig',
     'student',
     'video',
@@ -156,7 +154,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": ("'self'",),
+        "default-src": ("'self'", "mailto:","tel:"),
 
         "script-src": (
             "'self'",
