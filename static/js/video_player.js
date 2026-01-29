@@ -665,3 +665,155 @@ document.getElementById('videoDescription').addEventListener('click', function (
         }
     }
 });
+
+// Add this function to format the description with timestamps
+function formatDescriptionWithTimestamps(description) {
+    // This function will be called after updating description
+    return description;
+}
+
+// Edit description functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const editBtn = document.getElementById('editBtn');
+    const doneBtn = document.getElementById('doneBtn');
+    // FIXED: Use querySelector to get the first element with class 'desc-display'
+    const displayDiv = document.querySelector('.desc-display');
+    const editArea = document.getElementById('descEdit');
+    
+    if (editBtn && doneBtn && displayDiv && editArea) {
+        editBtn.addEventListener('click', () => {
+            editBtn.style.display = 'none';
+            doneBtn.style.display = 'block';
+            displayDiv.style.display = 'none';
+            editArea.style.display = 'block';
+            
+            // Get the plain text from the display div (strip HTML tags)
+            let plainText = displayDiv.textContent || displayDiv.innerText;
+            // Clean up extra whitespace
+            plainText = plainText.replace(/\s+/g, ' ').trim();
+            editArea.value = plainText;
+            editArea.focus();
+        });
+
+        doneBtn.addEventListener('click', () => {
+            const newDesc = editArea.value.trim();
+            const csrfToken = getCookie('csrftoken');
+
+            if (!newDesc) {
+                alert('Description cannot be empty');
+                return;
+            }
+
+            // Show loading state
+            doneBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+            doneBtn.disabled = true;
+
+            // Update Database via AJAX
+            fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ 
+                    'action': 'update_description',
+                    'description': newDesc 
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update the display with formatted content
+                    displayDiv.innerHTML = data.formatted_description || newDesc.replace(/\n/g, '<br>');
+                    
+                    // Reset UI
+                    editBtn.style.display = 'block';
+                    doneBtn.style.display = 'none';
+                    doneBtn.innerHTML = 'Done';
+                    doneBtn.disabled = false;
+                    displayDiv.style.display = 'block';
+                    editArea.style.display = 'none';
+                    
+                    // Re-apply timestamp functionality
+                    convertTimestamps(displayDiv);
+                    
+                    // Update show more/less button if needed
+                    const showMoreBtn = document.querySelector('.showMoreLess');
+                    if (showMoreBtn) {
+                        if (newDesc.length > 120) {
+                            showMoreBtn.style.display = 'inline-block';
+                        } else {
+                            showMoreBtn.style.display = 'none';
+                        }
+                    }
+                    
+                    // Show success message
+                    showStatusIcon('bi-check-circle-fill');
+                    
+                    // Re-attach timestamp click event
+                    displayDiv.addEventListener('click', function(e) {
+                        if (e.target.classList.contains('timestamp')) {
+                            e.preventDefault();
+                            const time = Number(e.target.dataset.time);
+                            if (player && !isNaN(time)) {
+                                player.seekTo(time, true);
+                                showStatusIcon('bi-play-fill');
+                            }
+                        }
+                    });
+                } else {
+                    throw new Error(data.message || 'Update failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating description:', error);
+                alert('Failed to update description. Please try again.');
+                
+                // Reset button state
+                doneBtn.innerHTML = 'Done';
+                doneBtn.disabled = false;
+            });
+        });
+
+        // Escape key to cancel editing
+        editArea.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                editBtn.style.display = 'block';
+                doneBtn.style.display = 'none';
+                displayDiv.style.display = 'block';
+                editArea.style.display = 'none';
+            }
+        });
+        
+        // Ctrl+Enter to save
+        editArea.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                doneBtn.click();
+            }
+        });
+    }
+});
+
+// Helper function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
