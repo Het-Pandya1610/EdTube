@@ -345,7 +345,6 @@ let clickTimer;
 
     function loadThumbnail(urls, index = 0) {
         if (index >= urls.length) {
-            // If no thumbnail works, show placeholder
             hoverPreview.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#333;color:white;">
                 <i class="bi bi-play-btn" style="font-size:2rem;"></i>
             </div>`;
@@ -509,8 +508,10 @@ document.addEventListener('DOMContentLoaded', function() {
     settingsBtn.addEventListener('click',toggleQualityMenu);
     muteBtn.addEventListener('click', toggleMute);
     fullScreen.addEventListener('click', toggleFullscreen);
+    playBtn.addEventListener('click', togglePlay);
     
     function handleSingleTap(e) {
+
         if (clickTimer) {
             clearTimeout(clickTimer);
             clickTimer = null;
@@ -554,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showStatusIcon(iconClass) {
         statusIcon.className = `bi ${iconClass} center-icon show-icon`;
-        setTimeout(() => statusIcon.classList.remove('show-icon'), 500);
+        setTimeout(() => statusIcon.classList.remove('show-icon'), 1000);
     }
 
     function toggleQualityMenu() {
@@ -624,8 +625,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Description element not found');
             return;
         }
-        
-        // Toggle the expanded class
+        convertTimestamps(desc);
         desc.classList.toggle("expanded");
         
         // Update the button text
@@ -633,6 +633,35 @@ document.addEventListener('DOMContentLoaded', function() {
             el.textContent = "Show less";
         } else {
             el.textContent = "Show more";
+        }
+    }
+
+    function convertTimestamps(container) {
+        const timestampRegex = /\b(\d{1,2}:)?(\d{1,2}:\d{2})\b/g;
+
+        container.innerHTML = container.innerHTML.replace(timestampRegex, match => {
+            const seconds = timeToSeconds(match);
+            return `<a href="#" class="timestamp" data-time="${seconds}">${match}</a>`;
+        });
+    }
+
+    function timeToSeconds(time) {
+        const parts = time.split(':').map(Number);
+        if (parts.length === 3) {
+            return parts[0] * 3600 + parts[1] * 60 + parts[2];
+        }
+        return parts[0] * 60 + parts[1];
+    }
+
+});
+
+document.getElementById('videoDescription').addEventListener('click', function (e) {
+    if (e.target.classList.contains('timestamp')) {
+        e.preventDefault();
+        const time = Number(e.target.dataset.time);
+        if (player && !isNaN(time)) {
+            player.seekTo(time, true);
+            showStatusIcon('bi-play-fill');
         }
     }
 });

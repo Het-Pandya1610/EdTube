@@ -456,6 +456,24 @@
             transition: all 0.3s ease;
         }
 
+        .timestamp {
+            color: #3ea6ff;
+            background: #0300b5a7;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-decoration: none;
+            padding-left: 3px;
+            padding-right: 3px;
+            border-radius: 5px;
+            width: 40px !important;
+            margin-right: 15px;
+            gap: 8px;
+            display: inline-block; /* This is the key */
+            text-align: center; /* Optional for better appearance */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
         .yt-desc-text.expanded {
             -webkit-line-clamp: unset;
             display: block;
@@ -709,7 +727,7 @@
                         </div>
                         
                         <div class="player-overlay" id="singleDouble">
-                            <i class="bi bi-play-fill center-icon" id="statusIcon"></i>
+                            <i id="statusIcon" class="bi bi-play-fill center-icon"></i>
                         </div>
                     </div>
 
@@ -741,13 +759,13 @@
                             </div>
                         </div>
 
-                        <div class="yt-desc-box">
+                        <div class="yt-desc-box" id="videoDescription">
                             <div class="yt-desc-text" id="desc-{{ video.id }}">
                                 {{ video.description|hashtag_links|linebreaks|urlize }}
                             </div>
 
                             {% if video.description|length > 120 %}
-                                <button class="yt-desc-toggle" id="showMoreLess" data-id="{{ video.id }}">
+                                <button class="yt-desc-toggle showMoreLess" data-id="{{ video.id }}">
                                     Show more
                                 </button>
                             {% endif %}
