@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 {% load teacher_tags %}
 {% load hashtag_helper %}
 <!DOCTYPE html>
@@ -447,13 +448,14 @@
             line-height: 1.5;
             /* Show only 2-3 lines initially */
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 5;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: pre-wrap;
-            max-height: 4.5em;
+            max-height: 6.5em;
             transition: all 0.3s ease;
+            margin-top: -40px;
         }
 
         .timestamp {
@@ -485,9 +487,9 @@
         .yt-desc-toggle {
             display: inline-block;
             margin-top: 0px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #3b82f6;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-color);
             cursor: pointer;
             user-select: none;
             background: none;
@@ -495,10 +497,19 @@
             padding: 0;
         }
 
-        .yt-desc-toggle:hover {
-            text-decoration: underline;
+        .comment{
+            background: var(--srch-bg-color);
+            padding: 15px;
+            border-radius: 12px;
         }
-
+        #postBtn{
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
         /* RESPONSIVE BREAKPOINTS */
         @media (max-width: 1100px) {
             .main-layout { 
@@ -760,10 +771,18 @@
                         </div>
 
                         <div class="yt-desc-box" id="videoDescription">
-                            <div class="yt-desc-text" id="desc-{{ video.id }}">
+                            <span style="font-weight: 500;font-size: 0.9rem;">{{ video.views_count }} views</span>
+                            <span style="font-weight: 500;font-size: 0.9rem;">{{ video.created_at|date:"d M Y" }}</span>
+                            {% if video.teacher.user == request.user %}
+                                <button id="editBtn" style="float: right; color: var(--text-color); text-decoration: none; font-size: 0.85rem;background: none;border: none;"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                <button id="doneBtn" style="float: right; display:none; border-radius: 20px;">Done</button>
+                            {% endif %}
+                            <div class="yt-desc-text desc-display" id="desc-{{ video.id }}">
                                 {{ video.description|hashtag_links|linebreaks|urlize }}
                             </div>
-
+                            {% if video.teacher.user == request.user %}
+                                    <textarea id="descEdit" style="display: none; width: 100%; min-height: 150px; background: transparent; color: var(--text-color); border: none; border-radius: 8px; padding: 10px; font-family: inherit; font-size: 0.95rem; margin-top: 10px;">{{ video.description }}</textarea>
+                            {% endif %}
                             {% if video.description|length > 120 %}
                                 <button class="yt-desc-toggle showMoreLess" data-id="{{ video.id }}">
                                     Show more
@@ -772,9 +791,45 @@
                         </div>
 
                         
-                        <div style="margin-top:30px;">
+                        <div class="comment-section" style="margin-top:30px;">
+                            {% for comment in comments %}
                             <div style="font-weight:600; margin-bottom:15px;">Comments</div>
-                            <div style="display:flex; gap:15px; align-items:center;">
+                            <div class="comment">
+                                <a href="{% url 'user_profile' username=comment.author.username %}" style="text-decoration: none;color: var(--text-color)">
+                                {% if comment.author.profile.role == "tutor" and comment.author.teacher.pfp %}
+                                        <img src="{{ comment.author.teacher.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+
+                                    {% elif comment.author.profile.role == "student" and comment.author.student.pfp %}
+                                        <img src="{{ comment.author.student.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+
+                                    {% else %}
+                                        <div class="avatar-small" style="width:40px; height:40px;display: inline-flex;">
+                                        {{ comment.author.first_name|first }}{{ comment.author.last_name|first }}
+                                        </div>
+                                    {% endif %}
+                                <strong>@{{ comment.author.username }}</strong> </a><small>{{ comment.created_at|naturaltime }}</small>
+                                <p style="margin-left: 40px;">{{ comment.content }}</p>
+                                
+
+
+                                <!-- Replies -->
+                                {% for reply in comment.replies.all %}
+                                <div class="reply">
+                                    <strong>{{ reply.author.username }}</strong>
+                                    <p>{{ reply.content }}</p>
+                                </div>
+                                {% endfor %}
+
+                                <!-- Reply form -->
+                                {% comment %} <form method="post" action="{% url 'add_reply' comment.id %}">
+                                {% csrf_token %}
+                                <input type="text" name="reply" placeholder="Reply..." required>
+                                <button type="submit">Reply</button>
+                                </form> {% endcomment %}
+                            </div>
+                            {% endfor %}
+                            <div style="font-weight:600; margin-bottom:15px;">Write a comment</div>
+                            <div style="display:flex; gap:15px; align-items:center;margin-top: 30px;">
                                 <div class="comment_user">
                                     {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
                                         <img src="{{ request.user.teacher.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
@@ -788,7 +843,11 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                <input type="text" placeholder="Add a comment..." style="flex:1; background:none; border:none; border-bottom:1px solid #444; color: var(--text-color); padding:10px 0;">
+                                <form method="POST" style="display: flex; flex: 1;">
+                                    {% csrf_token %}
+                                    <input type="text" placeholder="Add a comment..." style="flex:1; background:none; border:none; border-bottom:1px solid #444; color: var(--text-color); padding:10px 0;" name="comment">
+                                    <button type="submit" id="postBtn"><i class="fa-solid fa-paper-plane"></i></button>
+                                </form>
                             </div>
                         </div>
                     </div>
