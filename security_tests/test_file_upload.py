@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 import os
-import imghdr
 
 class FileUploadSecurityTests(TestCase):
     """Test file upload security - Safer version"""

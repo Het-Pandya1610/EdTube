@@ -160,6 +160,9 @@ CONTENT_SECURITY_POLICY = {
             "'self'",
             "https://cdn.jsdelivr.net",   # ✅ Bootstrap JS
             "https://cdnjs.cloudflare.com",
+            "https://www.youtube.com",
+            "https://www.youtube-nocookie.com",
+            "https://s.ytimg.com",
         ),
 
         "style-src": (
@@ -183,6 +186,11 @@ CONTENT_SECURITY_POLICY = {
         ),
 
         "frame-src": (
+            "'self'",
+            "https://www.youtube.com",
+            "https://www.youtube-nocookie.com",
+        ),
+        "connect-src": (
             "'self'",
             "https://www.youtube.com",
         ),

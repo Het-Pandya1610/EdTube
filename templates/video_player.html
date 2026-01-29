@@ -663,7 +663,7 @@
 
     </style>
 </head>
-<body>
+<body data-youtube-id="{{video.youtube_id}}">
     {% include 'navbar.html' %}
     <div id="pageContent">
         <div class="back-container">
@@ -688,27 +688,27 @@
                             <div class="buttons-row">
                                 <div class="left-controls">
                                     <button class="btn-ctrl" title="Previous"><i class="bi bi-skip-start-fill"></i></button>
-                                    <button class="btn-ctrl" onclick="rewind()"><i class="bi bi-arrow-counterclockwise"></i></button>
-                                    <button class="btn-ctrl" onclick="togglePlay()" id="playBtn"><i class="bi bi-play-fill"></i></button>
-                                    <button class="btn-ctrl" onclick="forward()"><i class="bi bi-arrow-clockwise"></i></button>
+                                    <button class="btn-ctrl" id="rewind"><i class="bi bi-arrow-counterclockwise"></i></button>
+                                    <button class="btn-ctrl" id="playBtn"><i class="bi bi-play-fill"></i></button>
+                                    <button class="btn-ctrl" id="forward"><i class="bi bi-arrow-clockwise"></i></button>
                                     <button class="btn-ctrl" title="Next"><i class="bi bi-skip-end-fill"></i></button>
                                     <span class="time-text" id="timeDisplay">0:00 / {{video.duration}}</span>
                                 </div>
 
                                 <div class="right-controls">
                                     <div class="settings-container">
-                                        <button class="btn-ctrl" onclick="toggleQualityMenu()" title="Settings">
+                                        <button class="btn-ctrl" id="settingsBtn" title="Settings">
                                             <i class="bi bi-gear-fill"></i>
                                         </button>
                                         <div id="qualityMenu"></div>
                                     </div>
-                                    <button class="btn-ctrl" onclick="toggleMute()" id="muteBtn"><i class="bi bi-volume-up-fill"></i></button>
-                                    <button class="btn-ctrl" onclick="toggleFullscreen()"><i class="bi bi-fullscreen"></i></button>
+                                    <button class="btn-ctrl" id="muteBtn"><i class="bi bi-volume-up-fill"></i></button>
+                                    <button class="btn-ctrl" id="fullScreen"><i class="bi bi-fullscreen"></i></button>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="player-overlay" onclick="handleSingleTap(event)" ondblclick="handleDoubleTap(event)">
+                        <div class="player-overlay" id="singleDouble">
                             <i class="bi bi-play-fill center-icon" id="statusIcon"></i>
                         </div>
                     </div>
@@ -716,19 +716,22 @@
                     <div class="video-info">
                         <h1>{{ video.title }}</h1>
                         <div class="interaction-bar">
-                            <div style="display:flex; align-items:center; gap:12px;cursor: pointer;" onclick="window.location.href='{% url 'user_profile' username=video.teacher.username %}'">
-                                {% if video.teacher.pfp %}
-                                    <img src="{{ video.teacher.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-                                {% else %}
-                                    <div class="avatar-small" style="width:40px; height:40px;">
-                                        {{ video.teacher.name|initials }}
+                            <a href="{% url 'user_profile' username=video.teacher.username %}" style="text-decoration: none;">
+                                <div style="display:flex; align-items:center; gap:12px;cursor: pointer;">
+                                    
+                                    {% if video.teacher.pfp %}
+                                        <img src="{{ video.teacher.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                                    {% else %}
+                                        <div class="avatar-small" style="width:40px; height:40px;color: var(--text-color)!important">
+                                            {{ video.teacher.name|initials }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div style="font-weight:600;color: var(--text-color)!important">{{ video.teacher.name }}</div>
+                                        <div style="font-size:0.8rem; color:#aaa;">{{ video.teacher.nos }} followers</div>
                                     </div>
-                                {% endif %}
-                                <div>
-                                    <div style="font-weight:600;">{{ video.teacher.name }}</div>
-                                    <div style="font-size:0.8rem; color:#aaa;">{{ video.teacher.nos }} followers</div>
                                 </div>
-                            </div>
+                            </a>
                             <div class="action-btns">
                                 <button class="action-btn"><i class="bi bi-hand-thumbs-up"></i> {{ video.like_count }}</button>
                                 <button class="action-btn"><i class="bi bi-share"></i> Share</button>
@@ -744,7 +747,7 @@
                             </div>
 
                             {% if video.description|length > 120 %}
-                                <button class="yt-desc-toggle" onclick="toggleDesc('{{ video.id }}', this)">
+                                <button class="yt-desc-toggle" id="showMoreLess" data-id="{{ video.id }}">
                                     Show more
                                 </button>
                             {% endif %}
@@ -796,619 +799,6 @@
         </div>
     </div>
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
-        let player;
-        let timer;
-        const statusIcon = document.getElementById('statusIcon');
-        const qualityMenu = document.getElementById('qualityMenu');
-        const playBtn = document.getElementById('playBtn');
-        const videoProgressBar = document.getElementById('videoProgressBar');
-        const scrubberDot = document.getElementById('scrubberDot');
-        const hoverPreview = document.getElementById('hoverPreview');
-        const previewTime = document.getElementById('previewTime');
-        const dragPreviewLine = document.getElementById('dragPreviewLine');
-        const progressArea = document.getElementById('progressArea');
-        const timeDisplay = document.getElementById('timeDisplay');
-        const muteBtn = document.getElementById('muteBtn');
-        const bufferProgress = document.getElementById('bufferProgress');
-        
-        let isDragging = false;
-        let isDraggingScrubber = false;
-        let showControlsTimeout;
-        const playerWrapper = document.getElementById('playerWrapper');
-        const youtubeId = '{{ video.youtube_id }}';
-        let videoDuration = 0;
-
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                videoId: youtubeId,
-                playerVars: { 
-                    'controls': 0,
-                    'disablekb': 1,
-                    'rel': 0, 
-                    'modestbranding': 1, 
-                    'iv_load_policy': 3 
-                },
-                events: { 
-                    'onReady': onPlayerReady, 
-                    'onStateChange': onPlayerStateChange 
-                }
-            });
-        }
-
-        function onPlayerReady() {
-            updateTimer();
-            videoDuration = player.getDuration();
-            
-            // Listen for keyboard events
-            window.addEventListener('keydown', handleKeyboard);
-            
-            // Initialize video controls
-            initVideoControls();
-            
-            // Show controls on mouse move
-            playerWrapper.addEventListener('mousemove', showVideoControls);
-            playerWrapper.addEventListener('mouseleave', hideVideoControls);
-            
-            // Keep controls visible when interacting with them
-            document.querySelector('.video-controls-overlay').addEventListener('mousemove', (e) => {
-                e.stopPropagation();
-                showVideoControls();
-            });
-        }
-
-        function initVideoControls() {
-            // Scrubber dot drag functionality
-            scrubberDot.addEventListener('mousedown', startScrubberDrag);
-            progressArea.addEventListener('mousedown', startProgressAreaDrag);
-            
-            // Mouse move for hover preview
-            progressArea.addEventListener('mousemove', handleHoverPreview);
-            progressArea.addEventListener('mouseleave', hideHoverPreview);
-            
-            // Global mouse events for dragging
-            document.addEventListener('mousemove', handleDragMove);
-            document.addEventListener('mouseup', stopDragging);
-            
-            // Touch events
-            scrubberDot.addEventListener('touchstart', startScrubberDragTouch);
-            progressArea.addEventListener('touchstart', startProgressAreaDragTouch);
-            document.addEventListener('touchmove', handleTouchMove, { passive: false });
-            document.addEventListener('touchend', stopDragging);
-            
-            // Always show scrubber dot when controls are visible
-            progressArea.addEventListener('mouseenter', () => {
-                if (!isDragging && !isDraggingScrubber) {
-                    scrubberDot.style.opacity = '1';
-                }
-            });
-            
-            progressArea.addEventListener('mouseleave', () => {
-                if (!isDragging && !isDraggingScrubber) {
-                    scrubberDot.style.opacity = '0';
-                }
-            });
-        }
-
-        function startScrubberDrag(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            isDraggingScrubber = true;
-            progressArea.classList.add('dragging');
-            scrubberDot.style.cursor = 'grabbing';
-            dragPreviewLine.style.display = 'block';
-            setTimeout(() => {
-                dragPreviewLine.classList.add('visible');
-            }, 10);
-            
-            // Show hover preview during drag
-            handleDragMove(e);
-        }
-
-        function startScrubberDragTouch(e) {
-            if (e.touches.length === 1) {
-                e.preventDefault();
-                isDraggingScrubber = true;
-                progressArea.classList.add('dragging');
-                dragPreviewLine.style.display = 'block';
-                setTimeout(() => {
-                    dragPreviewLine.classList.add('visible');
-                }, 10);
-                handleTouchMove(e);
-            }
-        }
-
-        function startProgressAreaDrag(e) {
-            // Only start drag if not clicking on scrubber dot
-            if (e.target !== scrubberDot) {
-                e.preventDefault();
-                isDragging = true;
-                progressArea.classList.add('dragging');
-                updateProgressFromEvent(e);
-            }
-        }
-
-        function startProgressAreaDragTouch(e) {
-            if (e.touches.length === 1 && e.target !== scrubberDot) {
-                e.preventDefault();
-                isDragging = true;
-                progressArea.classList.add('dragging');
-                updateProgressFromTouch(e);
-            }
-        }
-
-        function handleDragMove(e) {
-            if (isDraggingScrubber) {
-                // Drag scrubber dot
-                const rect = progressArea.getBoundingClientRect();
-                const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-                const percentage = x / rect.width;
-                
-                // Update preview line position
-                dragPreviewLine.style.left = x + 'px';
-                
-                // Update preview time display
-                if (player && player.getDuration) {
-                    const duration = player.getDuration();
-                    const previewTimeValue = duration * percentage;
-                    previewTime.textContent = formatTime(previewTimeValue);
-                    
-                    // Update hover preview position
-                    const previewX = Math.max(80, Math.min(x, rect.width - 80));
-                    hoverPreview.style.left = previewX + 'px';
-                    hoverPreview.style.display = 'block';
-                    setTimeout(() => {
-                        hoverPreview.classList.add('visible');
-                    }, 10);
-                    
-                    // Show thumbnail preview
-                    updateThumbnailPreview(previewTimeValue);
-                }
-                
-                // Update scrubber dot position visually
-                videoProgressBar.style.width = (percentage * 100) + '%';
-                
-                e.preventDefault();
-            } else if (isDragging) {
-                // Regular progress bar drag
-                updateProgressFromEvent(e);
-                e.preventDefault();
-            }
-        }
-
-        function handleTouchMove(e) {
-            if (isDraggingScrubber && e.touches.length === 1) {
-                e.preventDefault();
-                const rect = progressArea.getBoundingClientRect();
-                const x = Math.max(0, Math.min(e.touches[0].clientX - rect.left, rect.width));
-                const percentage = x / rect.width;
-                
-                dragPreviewLine.style.left = x + 'px';
-                
-                if (player && player.getDuration) {
-                    const duration = player.getDuration();
-                    const previewTimeValue = duration * percentage;
-                    previewTime.textContent = formatTime(previewTimeValue);
-                    
-                    // Update scrubber position visually
-                    videoProgressBar.style.width = (percentage * 100) + '%';
-                }
-            } else if (isDragging && e.touches.length === 1) {
-                e.preventDefault();
-                updateProgressFromTouch(e);
-            }
-        }
-
-        function stopDragging(e) {
-            if (isDraggingScrubber) {
-                // Hide preview with animation
-                dragPreviewLine.classList.remove('visible');
-                setTimeout(() => {
-                    dragPreviewLine.style.display = 'none';
-                }, 200);
-                
-                hoverPreview.classList.remove('visible');
-                setTimeout(() => {
-                    hoverPreview.style.display = 'none';
-                }, 200);
-                
-                // Finalize scrubber drag
-                const rect = progressArea.getBoundingClientRect();
-                const x = e.clientX ? Math.max(0, Math.min(e.clientX - rect.left, rect.width)) : 
-                          (e.changedTouches ? Math.max(0, Math.min(e.changedTouches[0].clientX - rect.left, rect.width)) : 0);
-                const percentage = x / rect.width;
-                
-                if (player && player.getDuration) {
-                    const duration = player.getDuration();
-                    const newTime = duration * percentage;
-                    
-                    // Seek to the dropped position
-                    player.seekTo(newTime, true);
-                    
-                    // Update progress bar with animation
-                    videoProgressBar.style.transition = 'width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                    videoProgressBar.style.width = (percentage * 100) + '%';
-                    setTimeout(() => {
-                        videoProgressBar.style.transition = 'width 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                    }, 300);
-                    
-                    updateTimeDisplay(newTime, duration);
-                    
-                    // Show status icon for seek
-                    showStatusIcon('bi-play-fill');
-                }
-                
-                // Reset states
-                isDraggingScrubber = false;
-                scrubberDot.style.cursor = 'grab';
-                
-                setTimeout(() => {
-                    progressArea.classList.remove('dragging');
-                }, 300);
-                
-            } else if (isDragging) {
-                // Finalize regular drag
-                if (e.clientX) {
-                    updateProgressFromEvent(e);
-                } else if (e.changedTouches) {
-                    updateProgressFromTouch(e);
-                }
-                isDragging = false;
-                progressArea.classList.remove('dragging');
-            }
-        }
-
-        function updateProgressFromEvent(e) {
-            const rect = progressArea.getBoundingClientRect();
-            const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-            const percentage = x / rect.width;
-            
-            if (player && player.getDuration) {
-                const duration = player.getDuration();
-                const newTime = duration * percentage;
-                
-                player.seekTo(newTime, true);
-                videoProgressBar.style.width = (percentage * 100) + '%';
-                updateTimeDisplay(newTime, duration);
-            }
-        }
-
-        function updateProgressFromTouch(e) {
-            const rect = progressArea.getBoundingClientRect();
-            const x = Math.max(0, Math.min(e.touches[0].clientX - rect.left, rect.width));
-            const percentage = x / rect.width;
-            
-            if (player && player.getDuration) {
-                const duration = player.getDuration();
-                const newTime = duration * percentage;
-                
-                player.seekTo(newTime, true);
-                videoProgressBar.style.width = (percentage * 100) + '%';
-                updateTimeDisplay(newTime, duration);
-            }
-        }
-
-        function handleHoverPreview(e) {
-            if (isDragging || isDraggingScrubber) return;
-            
-            const rect = progressArea.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const percentage = Math.max(0, Math.min(1, x / rect.width));
-            
-            if (player && player.getDuration) {
-                const duration = player.getDuration();
-                const previewTimeValue = duration * percentage;
-                
-                // Update preview time display
-                previewTime.textContent = formatTime(previewTimeValue);
-                
-                // Show preview with correct positioning
-                const previewX = Math.max(80, Math.min(x, rect.width - 80));
-                hoverPreview.style.left = previewX + 'px';
-                hoverPreview.style.display = 'block';
-                setTimeout(() => {
-                    hoverPreview.classList.add('visible');
-                }, 10);
-                
-                // Update thumbnail preview
-                updateThumbnailPreview(previewTimeValue);
-            }
-        }
-
-        function updateThumbnailPreview(time) {
-            // Try multiple YouTube thumbnail formats
-            const thumbnailUrls = [
-                `https://img.youtube.com/vi/${youtubeId}/0.jpg`,
-                `https://img.youtube.com/vi/${youtubeId}/1.jpg`,
-                `https://img.youtube.com/vi/${youtubeId}/2.jpg`,
-                `https://img.youtube.com/vi/${youtubeId}/3.jpg`,
-                `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`,
-                `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`,
-                `https://img.youtube.com/vi/${youtubeId}/sddefault.jpg`,
-                `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
-            ];
-            
-            loadThumbnail(thumbnailUrls);
-        }
-
-        function loadThumbnail(urls, index = 0) {
-            if (index >= urls.length) {
-                // If no thumbnail works, show placeholder
-                hoverPreview.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#333;color:white;">
-                    <i class="bi bi-play-btn" style="font-size:2rem;"></i>
-                </div>`;
-                hoverPreview.appendChild(previewTime);
-                return;
-            }
-            
-            const img = new Image();
-            img.onload = function() {
-                hoverPreview.innerHTML = `<img src="${urls[index]}" alt="Preview">`;
-                hoverPreview.appendChild(previewTime);
-            };
-            img.onerror = function() {
-                // Try next thumbnail
-                loadThumbnail(urls, index + 1);
-            };
-            img.src = urls[index];
-            // Add cache busting parameter
-            img.src += '?t=' + new Date().getTime();
-        }
-
-        function hideHoverPreview() {
-            if (!isDragging && !isDraggingScrubber) {
-                hoverPreview.classList.remove('visible');
-                setTimeout(() => {
-                    hoverPreview.style.display = 'none';
-                }, 200);
-            }
-        }
-
-        function showVideoControls() {
-            playerWrapper.classList.add('show-controls');
-            clearTimeout(showControlsTimeout);
-            
-            showControlsTimeout = setTimeout(() => {
-                if (!isDragging && !isDraggingScrubber) {
-                    playerWrapper.classList.remove('show-controls');
-                }
-            }, 3000);
-        }
-
-        function hideVideoControls() {
-            if (!isDragging && !isDraggingScrubber) {
-                playerWrapper.classList.remove('show-controls');
-            }
-        }
-
-        function updateTimeDisplay(currentTime, duration) {
-            if (timeDisplay) {
-                timeDisplay.textContent = formatTime(currentTime) + ' / ' + formatTime(duration);
-            }
-        }
-
-        // 1. Unified Play/Pause Logic
-        function togglePlay() {
-            const state = player.getPlayerState();
-            if (state === YT.PlayerState.PLAYING) {
-                player.pauseVideo();
-                showStatusIcon('bi-pause-fill');
-            } else {
-                player.playVideo();
-                showStatusIcon('bi-play-fill');
-            }
-        }
-
-        // 2. Click & Double Click Logic
-        let clickTimer;
-        function handleSingleTap(e) {
-            if (clickTimer) {
-                clearTimeout(clickTimer);
-                clickTimer = null;
-            } else {
-                clickTimer = setTimeout(() => {
-                    togglePlay();
-                    clickTimer = null;
-                }, 250);
-            }
-        }
-
-        function handleDoubleTap(e) {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            if (x < rect.width / 2) {
-                rewind();
-            } else {
-                forward();
-            }
-        }
-
-        // 3. Keyboard Controls
-        function handleKeyboard(e) {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-            switch(e.code) {
-                case 'Space':
-                case 'KeyK':
-                    e.preventDefault();
-                    togglePlay();
-                    break;
-                case 'ArrowRight':
-                case 'KeyL':
-                    forward();
-                    break;
-                case 'ArrowLeft':
-                case 'KeyJ':
-                    rewind();
-                    break;
-                case 'KeyF':
-                    toggleFullscreen();
-                    break;
-                case 'KeyM':
-                    toggleMute();
-                    break;
-            }
-        }
-
-        function forward() { 
-            player.seekTo(player.getCurrentTime() + 10, true); 
-            showStatusIcon('bi-fast-forward-fill'); 
-        }
-
-        function rewind() { 
-            player.seekTo(player.getCurrentTime() - 10, true); 
-            showStatusIcon('bi-rewind-fill'); 
-        }
-
-        function showStatusIcon(iconClass) {
-            statusIcon.className = `bi ${iconClass} center-icon show-icon`;
-            setTimeout(() => statusIcon.classList.remove('show-icon'), 500);
-        }
-
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING) {
-                playBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
-                timer = setInterval(updateTimer, 100);
-            } else {
-                playBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
-                clearInterval(timer);
-            }
-        }
-
-        function updateTimer() {
-            if (player && player.getDuration) {
-                const cur = player.getCurrentTime();
-                const dur = player.getDuration();
-                const percentage = (cur / dur) * 100;
-                
-                // Update progress bar smoothly
-                if (!isDraggingScrubber) {
-                    videoProgressBar.style.width = percentage + '%';
-                }
-                
-                // Update time display
-                updateTimeDisplay(cur, dur);
-                
-                // Update buffer progress
-                if (player.getVideoLoadedFraction) {
-                    const bufferPercentage = player.getVideoLoadedFraction() * 100;
-                    bufferProgress.style.width = bufferPercentage + '%';
-                }
-            }
-        }
-
-        function formatTime(s) { 
-            s = Math.round(s); 
-            const hours = Math.floor(s / 3600);
-            const minutes = Math.floor((s % 3600) / 60);
-            const seconds = s % 60;
-            
-            if (hours > 0) {
-                return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            }
-            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        }
-
-        function toggleFullscreen() {
-            const el = document.getElementById('playerWrapper');
-            if (!document.fullscreenElement) {
-                el.requestFullscreen();
-                setTimeout(() => {
-                    playerWrapper.classList.add('show-controls');
-                }, 100);
-            } else {
-                document.exitFullscreen();
-            }
-        }
-
-        function toggleMute() {
-            if (player.isMuted()) { 
-                player.unMute(); 
-                muteBtn.innerHTML = '<i class="bi bi-volume-up-fill"></i>';
-            } else { 
-                player.mute(); 
-                muteBtn.innerHTML = '<i class="bi bi-volume-mute-fill"></i>';
-            }
-        }
-
-        function toggleQualityMenu() {
-            qualityMenu.style.display = qualityMenu.style.display === 'block' ? 'none' : 'block';
-            
-            if(qualityMenu.style.display === 'block') {
-                const levels = player.getAvailableQualityLevels();
-                const currentQuality = player.getPlaybackQuality();
-                
-                const qualityLabels = {
-                    'highres': '4K',
-                    'hd2160': '2160p (4K)',
-                    'hd1440': '1440p (HD)',
-                    'hd1080': '1080p (HD)',
-                    'hd720': '720p (HD)',
-                    'large': '480p',
-                    'medium': '360p',
-                    'small': '240p',
-                    'tiny': '144p',
-                    'auto': 'Auto'
-                };
-
-                qualityMenu.innerHTML = '<div style="padding: 8px 15px; font-size: 0.75rem; color: #888; border-bottom: 1px solid #444; font-weight: bold;">Quality</div>';
-                
-                levels.reverse().forEach(level => {
-                    const item = document.createElement('div');
-                    item.className = 'quality-item';
-                    if (level === currentQuality) item.classList.add('active');
-                    
-                    item.innerText = qualityLabels[level] || level.toUpperCase();
-                    
-                    item.onclick = () => {
-                        player.setPlaybackQuality(level);
-                        const now = player.getCurrentTime();
-                        player.seekTo(now, true); 
-                        qualityMenu.style.display = 'none';
-                    };
-                    qualityMenu.appendChild(item);
-                });
-            }
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.bi-gear-fill') && !event.target.matches('.btn-ctrl')) {
-                qualityMenu.style.display = 'none';
-            }
-        }
-        
-        // Handle responsive quality menu on mobile
-        window.addEventListener('resize', function() {
-            if (window.innerWidth <= 480 && qualityMenu.style.display === 'block') {
-                qualityMenu.style.display = 'none';
-            }
-        });
-        
-        // Fullscreen change listener
-        document.addEventListener('fullscreenchange', function() {
-            if (document.fullscreenElement) {
-                playerWrapper.classList.add('show-controls');
-            }
-        });
-
-        function toggleDesc(id, el) {
-            const desc = document.getElementById(`desc-${id}`);
-            
-            if (!desc) {
-                console.error('Description element not found');
-                return;
-            }
-            
-            // Toggle the expanded class
-            desc.classList.toggle("expanded");
-            
-            // Update the button text
-            if (desc.classList.contains("expanded")) {
-                el.textContent = "Show less";
-            } else {
-                el.textContent = "Show more";
-            }
-        }
-    </script>
+    <script src="{%static 'js/video_player.js'%}" defer></script>
 </body>
 </html>
