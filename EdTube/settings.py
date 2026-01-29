@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -86,12 +87,12 @@ WSGI_APPLICATION = 'EdTube.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'edtube',
-        'USER': 'root',
-        'PASSWORD': '',
+        'USER': config(DB_USER),
+        'PASSWORD': config(DB_PASS),
         'HOST': 'localhost',
-        'PORT': '3306',
+        'PORT': '5432',
     }
 }
 
@@ -154,7 +155,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": ("'self'", "mailto:","tel:"),
+        "default-src": ("'self'", "mailto:", "tel:"),
 
         "script-src": (
             "'self'",
