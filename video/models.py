@@ -45,11 +45,11 @@ class Video(models.Model):
     # Engagement
     likes = models.ManyToManyField(User, related_name="video_likes", blank=True)
     like_count = models.PositiveIntegerField(default=0)
-
+    comment_count = models.PositiveIntegerField(default=0)
     # Resources
     notes = models.FileField(upload_to="video_notes/", blank=True, null=True)
     quiz = models.FileField(upload_to="video_quizzes/", blank=True, null=True)
-    
+    views_count = models.PositiveIntegerField(default=0)
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -123,3 +123,49 @@ class Video(models.Model):
 
     def __str__(self):
         return f"{self.video_id} - {self.title}"
+    
+class Comment(models.Model):
+    video = models.ForeignKey(
+        'video.video',
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+
+    content = models.TextField(max_length=2000)
+
+    is_reply = models.BooleanField(default=False)
+
+    likes_count = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.author} on {self.video}"
+    
+class CommentReply(models.Model):
+    parent_comment = models.ForeignKey(
+        Comment,
+        on_delete=models.CASCADE,
+        related_name='replies'
+    )
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comment_replies'
+    )
+
+    content = models.TextField(max_length=2000)
+
+    likes_count = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Reply by {self.author}"
