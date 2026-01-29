@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from .models import Video
+from django.http import HttpResponseForbidden, JsonResponse
+from .models import Video,Comment, CommentReply
 from teacher.models import Teacher
 from .utils import save_to_history 
 from .utils import HISTORY_FILE
@@ -51,8 +51,76 @@ def watchVideo(request):
 
     if request.user.is_authenticated:
         save_to_history("video", request.user.email, video_id)
+        
+        session_key = f'viewed_video_{video_id}'
+        if not request.session.get(session_key):
+            video.views_count += 1
+            video.save()
+            request.session[session_key] = True
     
-    return render(request, 'video_player.html', {'video': video})
+    if request.method == "POST" and request.user.is_authenticated:
+        content = request.POST.get("comment")
+
+        if content and request.user.profile.role in ["student", "tutor"]:
+            Comment.objects.create(
+                video=video,
+                author=request.user,
+                content=content
+            )
+            video.comment_count+=1
+            video.save(update_field=["comment_count"])
+            return redirect(request.path + f'?v={video_id}')
+        
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        try:
+            data = json.loads(request.body)
+            
+            # Check if it's a description update request
+            if data.get('action') == 'update_description':
+                # Verify user owns the video
+                if video.teacher.user != request.user:
+                    return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+                
+                # Update description
+                video.description = data.get('description', '')
+                video.save()
+                
+                # Return formatted description
+                from django.utils.html import linebreaks, urlize
+                formatted_desc = linebreaks(urlize(video.description))
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'formatted_description': formatted_desc
+                })
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+    comments = Comment.objects.filter(
+        video=video,
+        is_reply=False
+    ).select_related('author').prefetch_related('replies').order_by('-created_at')
+
+    return render(request, 'video_player.html', {
+        'video': video,
+        'comments': comments
+    })
+
+@login_required
+def add_reply(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.method == "POST":
+        content = request.POST.get("reply")
+
+        if content and request.user.profile.role in ["student", "tutor"]:
+            CommentReply.objects.create(
+                comment=comment,
+                author=request.user,
+                content=content
+            )
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 def searchVideos(request):
     query = request.GET.get('q')
