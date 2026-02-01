@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
+from cloudinary_storage.validators import validate_image
 
 class Teacher(models.Model):
     teacher_id = models.CharField(max_length=20, primary_key=True)
@@ -7,14 +9,20 @@ class Teacher(models.Model):
     name = models.CharField(max_length=100)
     username = models.CharField(max_length=50, unique=True)
     pfp = models.ImageField(
-        upload_to="teacher_profiles/",
-        null=True,
-        blank=True
+        upload_to="teacher_profiles/", 
+        null=True, 
+        blank=True,
+        storage=RawMediaCloudinaryStorage(),
+        validators=[validate_image],
+        help_text="Profile picture (max 10MB - Cloudinary Free limit)"
     )
     banner_img = models.ImageField(
-        upload_to="teacher_banner/",
-        null=True,
-        blank=True
+        upload_to="teacher_banner/", 
+        null=True, 
+        blank=True,
+        storage=RawMediaCloudinaryStorage(),
+        validators=[validate_image],
+        help_text="Profile picture (max 10MB - Cloudinary Free limit)"
     )
     bio = models.TextField(blank=True)
     nos = models.IntegerField(default=0)

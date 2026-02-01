@@ -11,8 +11,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
+import os
 
+from dotenv import load_dotenv
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,13 +27,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG')
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = []
 
+
+# Cloudinary Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'SECURE': True,
+}
+
+# Configure Cloudinary SDK
+cloudinary.config(
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET'],
+    secure=True
+)
+
+# Set Cloudinary as default file storage
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Application definition
 
@@ -51,6 +76,9 @@ INSTALLED_APPS = [
     'student',
     'video',
     'csp',
+    # Cloudinary apps
+    'cloudinary',
+    'cloudinary_storage',
     # 'app',  # if you create an app
 ]
 
@@ -88,11 +116,18 @@ WSGI_APPLICATION = 'EdTube.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'edtube',
-        'USER': config(DB_USER),
-        'PASSWORD': config(DB_PASS),
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+        'OPTIONS': {
+            'sslmode': 'require',
+            'sslrootcert': '',  
+            'sslcert': '',      
+            'sslkey': '',       
+            'channel_binding': 'require',
+        },
     }
 }
 
@@ -116,16 +151,21 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Media settings (now handled by Cloudinary)
+MEDIA_URL = '/media/'  # Cloudinary will handle media URLs
+MEDIA_ROOT = BASE_DIR / 'media'  # Local fallback (not used for Cloudinary storage)
+
+# File upload settings optimized for Cloudinary free tier
+FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB - Cloudinary video limit
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 AUTHENTICATION_BACKENDS = (
@@ -153,6 +193,7 @@ TEST_RUNNER = 'EdTube.test_runner.SecurityTestRunner'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
+# Update CSP to allow Cloudinary domains
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ("'self'", "mailto:", "tel:"),
@@ -164,6 +205,7 @@ CONTENT_SECURITY_POLICY = {
             "https://www.youtube.com",
             "https://www.youtube-nocookie.com",
             "https://s.ytimg.com",
+            "https://widget.cloudinary.com",  # Cloudinary widgets
         ),
 
         "style-src": (
@@ -183,6 +225,7 @@ CONTENT_SECURITY_POLICY = {
         "img-src": (
             "'self'",
             "https://img.youtube.com",
+            "https://res.cloudinary.com",  # Cloudinary images
             "data:",
         ),
 
@@ -191,9 +234,18 @@ CONTENT_SECURITY_POLICY = {
             "https://www.youtube.com",
             "https://www.youtube-nocookie.com",
         ),
+        
         "connect-src": (
             "'self'",
             "https://www.youtube.com",
+            "https://api.cloudinary.com",  # Cloudinary API
+            "https://res.cloudinary.com",  # Cloudinary resources
+        ),
+        
+        "media-src": (
+            "'self'",
+            "https://res.cloudinary.com",  # Cloudinary videos
+            "blob:",
         ),
     }
 }
