@@ -22,6 +22,7 @@ let videoDuration = 0;
 let clickTimer;
 
     function onYouTubeIframeAPIReady() {
+        console.log(youtubeId)
         player = new YT.Player('player', {
             videoId: youtubeId,
             playerVars: { 
@@ -800,6 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
 
 // Helper function to get CSRF token from cookies
 function getCookie(name) {

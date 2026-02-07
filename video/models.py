@@ -1,5 +1,4 @@
-import os
-import cv2
+import cloudinary.api as api
 import yt_dlp
 import urllib.parse as urlparse
 from django.db import models
@@ -8,7 +7,7 @@ from teacher.models import Teacher
 from cloudinary_storage.storage import VideoMediaCloudinaryStorage, RawMediaCloudinaryStorage
 from cloudinary_storage.validators import validate_video, validate_image
 from django.core.exceptions import ValidationError
-import tempfile
+
 
 class Video(models.Model):
     # Identification
@@ -81,14 +80,14 @@ class Video(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        # 1. Generate Custom Video ID (VID-INITIALS-SUBJECT-0001)
+        # 1. Generate Custom Video ID
         if not self.video_id:
             teacher_name = self.teacher.name.strip().split()
             initials = "".join([n[0].upper() for n in teacher_name[:2]])
             subject_code = self.subject.strip()[:2].upper()
 
             last_video = Video.objects.order_by("created_at").last()
-            if last_video and "-" in last_video.video_id:
+            if last_video and last_video.video_id:
                 try:
                     last_num = int(last_video.video_id.split("-")[-1])
                     new_num = last_num + 1
@@ -99,76 +98,54 @@ class Video(models.Model):
 
             self.video_id = f"VID-{initials}-{subject_code}-{new_num:04d}"
 
-        # 2. Validate file sizes for Cloudinary free tier limits
-        try:
-            # Video file validation (max 100MB)
-            if self.video_file and hasattr(self.video_file, 'size'):
-                max_video_size = 100 * 1024 * 1024  # 100MB Cloudinary limit
-                if self.video_file.size > max_video_size:
-                    raise ValidationError(
-                        f"Video file must be under 100MB. Current: {self.video_file.size/(1024*1024):.1f}MB"
-                    )
-            
-            # Thumbnail validation (max 10MB)
-            if self.thumbnail and hasattr(self.thumbnail, 'size'):
-                max_image_size = 10 * 1024 * 1024  # 10MB Cloudinary limit
-                if self.thumbnail.size > max_image_size:
-                    raise ValidationError(
-                        f"Thumbnail must be under 10MB. Current: {self.thumbnail.size/1024:.1f}KB"
-                    )
-            
-            # Document validation (max 10MB)
-            for field in [self.notes, self.quiz]:
-                if field and hasattr(field, 'size'):
-                    max_doc_size = 10 * 1024 * 1024  # 10MB Cloudinary limit
-                    if field.size > max_doc_size:
-                        field_name = "Notes" if field == self.notes else "Quiz"
-                        raise ValidationError(
-                            f"{field_name} must be under 10MB. Current: {field.size/1024:.1f}KB"
-                        )
-        except AttributeError:
-            pass  # Skip validation if file doesn't have size attribute yet
+        # 2. File size validation
+        if self.video_file and hasattr(self.video_file, "size"):
+            if self.video_file.size > 100 * 1024 * 1024:
+                raise ValidationError("Video file must be under 100MB")
 
-        # 3. FIRST save the object to upload files to Cloudinary
+        if self.thumbnail and hasattr(self.thumbnail, "size"):
+            if self.thumbnail.size > 10 * 1024 * 1024:
+                raise ValidationError("Thumbnail must be under 10MB")
+
+        for field, name in [(self.notes, "Notes"), (self.quiz, "Quiz")]:
+            if field and hasattr(field, "size"):
+                if field.size > 10 * 1024 * 1024:
+                    raise ValidationError(f"{name} must be under 10MB")
+
+        # 3. FIRST save → upload files to Cloudinary
         super().save(*args, **kwargs)
-        
-        # 4. NOW extract Duration (AFTER files are uploaded to Cloudinary)
-        if self.duration == "0:00":
+
+        # 4. Duration extraction (ONLY if not set)
+        if not self.duration or self.duration == "0:00":
             try:
-                # Option A: YouTube Link
+                # Option A: YouTube link
                 if self.video_link:
-                    ydl_opts = {'quiet': True, 'noplaylist': True}
+                    ydl_opts = {"quiet": True, "noplaylist": True}
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                         info = ydl.extract_info(self.video_link, download=False)
-                        self.duration = self.format_seconds(info.get('duration', 0))
-                        # Save again with duration
-                        super().save(update_fields=['duration'])
+                        seconds = info.get("duration")
+                        if seconds:
+                            self.duration = self.format_seconds(seconds)
+                            super().save(update_fields=["duration"])
 
-                # Option B: Cloudinary Media File
+                # Option B: Cloudinary video file
                 elif self.video_file:
-                    # Wait a moment for Cloudinary processing
-                    import time
-                    time.sleep(1)  # Brief pause for upload to complete
-                    
-                    # Try to get duration from Cloudinary metadata if available
-                    try:
-                        # Cloudinary sometimes provides duration in response
-                        # We need to handle this differently
-                        self.duration = "N/A"  # Default placeholder
-                        
-                        # Alternative: Use a separate async task to calculate duration
-                        # For now, save without duration
-                        super().save(update_fields=['duration'])
-                        
-                    except Exception as e:
-                        print(f"Could not extract duration: {e}")
-                        self.duration = "N/A"
-                        super().save(update_fields=['duration'])
-                        
+                    resource = api.resource(
+                        self.video_file.name,
+                        resource_type="video",
+                        type="upload",
+                        media_metadata=True
+                    )
+
+                    seconds = resource.get("duration")
+                    if seconds:
+                        self.duration = self.format_seconds(seconds)
+                        super().save(update_fields=["duration"])
+
             except Exception as e:
-                print(f"Error extracting duration: {e}")
+                print("Duration extraction error:", e)
                 self.duration = "N/A"
-                super().save(update_fields=['duration'])
+                super().save(update_fields=["duration"])
 
     def format_seconds(self, seconds):
         """Helper to turn 125 seconds into '2:05'"""

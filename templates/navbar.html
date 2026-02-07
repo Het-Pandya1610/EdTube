@@ -579,8 +579,10 @@
       <div class="mobile-nav" id="mobileNav">
         <a href="/"><i class="bi bi-house-door-fill"></i>Home</a>
         <a href="{%url 'dashboard'%}"><i class="bi bi-person-video"></i>Video Lectures</a>
-        <a href="{%url 'register'%}"><i class="bi bi-person-fill-add"></i>Sign Up</a>
-        <a href="{%url 'login'%}"><i class="bi bi-box-arrow-in-right"></i>Sign In</a>
+        {% if not request.user.is_authenticated %}
+          <a href="{%url 'register'%}"><i class="bi bi-person-fill-add"></i>Sign Up</a>
+          <a href="{%url 'login'%}"><i class="bi bi-box-arrow-in-right"></i>Sign In</a>
+        {% endif %}
         <a href="{%url 'reviews'%}"><i class="bi bi-star-fill"></i>Reviews</a>
         {% if request.user.is_authenticated %}
           {%if request.user.profile.role == "student"%}
