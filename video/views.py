@@ -4,6 +4,7 @@ from django.http import HttpResponseForbidden, JsonResponse
 from .models import Video,Comment, CommentReply
 from teacher.models import Teacher
 from .utils import save_to_history 
+from django.utils.html import linebreaks, urlize
 from .utils import HISTORY_FILE
 import json, os
 
@@ -74,27 +75,34 @@ def watchVideo(request):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             data = json.loads(request.body)
-            
-            # Check if it's a description update request
+
             if data.get('action') == 'update_description':
-                # Verify user owns the video
                 if video.teacher.user != request.user:
-                    return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
-                
-                # Update description
+                    return JsonResponse(
+                        {'status': 'error', 'message': 'Permission denied'},
+                        status=403
+                    )
+
                 video.description = data.get('description', '')
                 video.save()
-                
-                # Return formatted description
-                from django.utils.html import linebreaks, urlize
+
                 formatted_desc = linebreaks(urlize(video.description))
-                
+
                 return JsonResponse({
                     'status': 'success',
                     'formatted_description': formatted_desc
                 })
+
+            return JsonResponse(
+                {'status': 'error', 'message': 'Invalid action'},
+                status=400
+            )
+
         except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+            return JsonResponse(
+                {'status': 'error', 'message': 'Invalid JSON'},
+                status=400
+            )
 
     comments = Comment.objects.filter(
         video=video,

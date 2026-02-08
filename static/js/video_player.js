@@ -721,11 +721,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     'description': newDesc 
                 })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+            .then(async response => {
+                const text= await response.text();
+                try{
+                    return JSON.parse(text)
                 }
-                return response.json();
+                catch{
+                    console.error("Non-JSON response:",text)
+                    throw new Error("Invalid JSON response")
+                }
             })
             .then(data => {
                 if (data.status === 'success') {
