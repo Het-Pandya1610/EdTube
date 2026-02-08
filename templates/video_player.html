@@ -7,6 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}?v=1">
     <title>{{ video.title }} | EdTube Player</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -792,8 +793,8 @@
 
                         
                         <div class="comment-section" style="margin-top:30px;">
-                            {% for comment in comments %}
                             <div style="font-weight:600; margin-bottom:15px;">Comments</div>
+                            {% for comment in comments %}
                             <div class="comment">
                                 <a href="{% url 'user_profile' username=comment.author.username %}" style="text-decoration: none;color: var(--text-color)">
                                 {% if comment.author.profile.role == "tutor" and comment.author.teacher.pfp %}
