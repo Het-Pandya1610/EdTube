@@ -46,7 +46,7 @@ def watchVideo(request):
     video_id = request.GET.get('v') 
     
     if not video_id:
-        return redirect('home')
+        return redirect('index')
         
     video = get_object_or_404(Video, video_id=video_id)
 

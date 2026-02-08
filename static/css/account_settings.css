@@ -1,0 +1,112 @@
+body{
+    background: var(--bg-color) !important;
+}
+.settings-container {
+    margin-top: 80px;
+    padding: 20px;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--text-color);
+}
+hr{
+    margin-top: 35px;
+}
+/* Container for the header section */
+.account-overview-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent;
+    padding: 0px;
+    border-radius: 12px;
+    margin-bottom: 0px !important;
+    gap: 20px;
+}
+
+h3 {
+    font-size: 1rem !important;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: var(--text-color);
+}
+
+.header-content .subtitle {
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--text-color);
+    margin-top: 15px;
+    margin-bottom: 0px;
+}
+
+.user-badge {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
+}
+
+.email-label {
+    color: #7e7e7e;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* Image styling */
+.header-image img {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .account-overview-card {
+        flex-direction: column-reverse; /* Put image on top on mobile */
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .header-image img {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+.channel-card {
+    background: transparent;
+}
+.channel-card .subtitle {
+    font-size: 0.8rem;
+    color: gray;
+    margin-top: 8px;
+    margin-bottom: 0px;
+}
+.channel-card .title{
+    margin-top: 20px;
+}
+.account-subcard .avatar-mid{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #9333ea);
+    color: white;
+    font-size: 1.6rem;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    border: 2px solid var(--text-color);
+    margin-top: 40px;
+    margin-left: 180px;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.account-card .subtitle {
+    font-size: 0.9rem;
+    color: gray;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}

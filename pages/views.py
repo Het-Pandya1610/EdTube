@@ -3,15 +3,24 @@ from django.db.models import Q
 from teacher.models import Teacher, Follower
 from video.models import Video
 from video.utils import save_to_history
-import json, os
+import json, os, time
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from video.utils import HISTORY_FILE, file_lock
 from django.utils.html import escape
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
+import imghdr
+from PIL import Image
 
 def index(request):
-    return render(request, "EdTube.html")
-
+    if request.user.is_authenticated:
+        videos = Video.objects.all().order_by('-created_at')
+        context = {
+            'videos': videos
+        }
+        return render(request, "EdTube.html", context)
 
 def faqs(request):
     return render(request, "faqs.html")
@@ -196,3 +205,111 @@ def user_profile(request, username):
     }
 
     return render(request, 'profile.html', context)
+
+@require_POST
+@csrf_exempt
+def upload_profile_image(request):
+    """
+    Handle profile picture and banner uploads
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Authentication required'
+        }, status=401)
+    
+    try:
+        # Get the uploaded image
+        image_file = request.FILES.get('image')
+        image_type = request.POST.get('type', 'pfp')  # 'pfp' or 'banner'
+        
+        if not image_file:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No image provided'
+            }, status=400)
+        
+        # Validate file type
+        valid_image_types = ['jpeg', 'jpg', 'png', 'gif', 'bmp']
+        file_type = imghdr.what(image_file)
+        
+        if file_type not in valid_image_types:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Invalid image format. Allowed: {", ".join(valid_image_types)}'
+            }, status=400)
+        
+        # Validate file size (max 10MB)
+        if image_file.size > 10 * 1024 * 1024:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Image size must be less than 10MB'
+            }, status=400)
+        
+        # Process the image based on type
+        user = request.user
+        
+        # Generate unique filename
+        timestamp = int(time.time())
+        ext = image_file.name.split('.')[-1].lower()
+        filename = f"{image_type}_{user.id}_{timestamp}.{ext}"
+        
+        # Save to appropriate model field based on user role
+        if hasattr(user, 'profile'):
+            if user.profile.role == 'tutor':
+                teacher = user.teacher
+                if image_type == 'pfp':
+                    # Delete old profile picture if exists
+                    if teacher.pfp:
+                        teacher.pfp.delete(save=False)
+                    teacher.pfp.save(filename, ContentFile(image_file.read()), save=True)
+                    image_url = teacher.pfp.url
+                elif image_type == 'banner':
+                    # Delete old banner if exists
+                    if teacher.banner_img:
+                        teacher.banner_img.delete(save=False)
+                    teacher.banner_img.save(filename, ContentFile(image_file.read()), save=True)
+                    image_url = teacher.banner_img.url
+                else:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'Invalid image type'
+                    }, status=400)
+            elif user.profile.role == 'student':
+                student = user.student
+                if image_type == 'pfp':
+                    # Delete old profile picture if exists
+                    if student.pfp:
+                        student.pfp.delete(save=False)
+                    student.pfp.save(filename, ContentFile(image_file.read()), save=True)
+                    image_url = student.pfp.url
+                else:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'Students can only upload profile pictures'
+                    }, status=400)
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Unknown user role'
+                }, status=400)
+        else:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'User profile not found'
+            }, status=400)
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'{image_type} updated successfully',
+            'image_url': image_url
+        })
+        
+    except Exception as e:
+        import traceback
+        print(f"Upload error: {e}")
+        print(traceback.format_exc())
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
