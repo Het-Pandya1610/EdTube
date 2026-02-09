@@ -69,7 +69,7 @@ def watchVideo(request):
                 content=content
             )
             video.comment_count+=1
-            video.save(update_field=["comment_count"])
+            video.save(update_fields=["comment_count"])
             return redirect(request.path + f'?v={video_id}')
         
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':

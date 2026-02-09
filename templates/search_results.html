@@ -46,7 +46,7 @@
                     <a href="{% url 'user_profile' username=video.teacher.username %}" style="text-decoration: none !important;">
                         <div class="teacher-section">
                             {% if video.teacher.pfp %}
-                                <img src="{{ video.teacher.pfp.url }}" alt="Profile" class="profilePic">
+                                <img src="{{ video.teacher.pfp.url }}" alt="Profile" style="width: 35px;height: 35px;border-radius: 50%;object-fit: cover;border: 3px solid var(--text-color);">
                             {% else %}
                                 <div class="avatar-small">
                                     {{ video.teacher.name|initials }}
@@ -67,7 +67,7 @@
             <div class="teacher-result-card">
                 <div class="avatar-container">
                     {% if teacher.pfp %}
-                        <img src="{{ teacher.pfp.url }}" alt="{{ teacher.name }}" class="profilePic">
+                        <img src="{{ teacher.pfp.url }}" alt="{{ teacher.name }}" style="width: 120px;height: 120px;border-radius: 50%;object-fit: cover;border: 3px solid var(--text-color);">
                     {% else %}
                         <div class="avatar-circle">
                             {{ teacher.name|initials }}

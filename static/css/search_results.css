@@ -119,14 +119,14 @@
     object-fit: cover;
     border: 3px solid var(--text-color);
 }
-
 .profilePic{
-    width: 35px;
-    height: 35px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--text-color);
 }
+
 
 .avatar-circle {
     background: linear-gradient(135deg, #4f46e5, #9333ea);

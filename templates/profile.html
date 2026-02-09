@@ -86,8 +86,8 @@
             </div>
             {%if not is_owner %}
               <button class="follow {% if is_following %}following-active{% endif %}" 
-                    id="follow-btn" 
-                    onclick="toggleFollow('{{ profile_user.username }}')">
+                    id="follow-btn"
+                    data-teacher-username="{{profile_user.username}}">
                 {% if is_following %}
                     <i class="bi bi-check2"></i> Following
                 {% else %}

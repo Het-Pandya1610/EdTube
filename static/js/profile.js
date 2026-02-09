@@ -338,35 +338,48 @@ function loadCropperScript() {
     document.head.appendChild(script);
 }
 
-function toggleFollow(username) {
-    const followBtn = document.getElementById('follow-btn');
-    const nosCount = document.getElementById('follower-count'); // Ensure your count span has this ID
+document.addEventListener('click', function (event) {
+    // Look for the button or any element inside the button (like the icon)
+    const followBtn = event.target.closest('#follow-btn');
 
-    fetch(`/teacher/toggle-follow/${username}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}', // Standard Django CSRF protection
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            if (data.action === 'followed') {
-                // UI update for "Following" state
-                followBtn.innerHTML = '<i class="bi bi-check2"></i> Following';
-                followBtn.classList.add('following-active');
-                window.location.reload();
-            } else {
-                // UI update for "Follow" state
-                followBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Follow';
-                followBtn.classList.remove('following-active');
-                window.location.reload();
-            }
-            // Update the subscriber count number
-            nosCount.innerText = data.new_count;
-        }
+    if (followBtn) {
+        event.preventDefault();
+
+        const username = followBtn.getAttribute('data-teacher-username');
+        const nosCount = document.getElementById('follower-count');
         
-    })
-    .catch(error => console.error('Error:', error));
-}
+        // Grab the CSRF token from the page
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+        if (!csrftoken) {
+            console.error("CSRF token not found! Add {% csrf_token %} to your HTML.");
+            return;
+        }
+
+        fetch(`/teacher/toggle-follow/${username}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                if (data.action === 'followed') {
+                    followBtn.innerHTML = '<i class="bi bi-check2"></i> Following';
+                    followBtn.classList.add('following-active');
+                } else {
+                    followBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Follow';
+                    followBtn.classList.remove('following-active');
+                }
+
+                // Update the count without reloading the page
+                if (nosCount && data.new_count !== undefined) {
+                    nosCount.innerText = data.new_count;
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+});
