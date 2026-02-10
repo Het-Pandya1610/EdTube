@@ -805,19 +805,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Helper function to get CSRF token from cookies
+document.getElementById("like-btn").addEventListener("click", function () {
+    const videoId = this.dataset.videoId;
+
+    fetch(`/video/like/${videoId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const icon = document.getElementById("like-icon");
+        const count = document.getElementById("like-count");
+
+        if (data.liked) {
+            icon.classList.remove("bi-hand-thumbs-up");
+            icon.classList.add("bi-hand-thumbs-up-fill");
+        } else {
+            icon.classList.remove("bi-hand-thumbs-up-fill");
+            icon.classList.add("bi-hand-thumbs-up");
+        }
+
+        count.innerText = data.like_count;
+    });
+});
+
+
+// Get CSRF token from cookies (Django standard way)
 function getCookie(name) {
     let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            if (cookie.startsWith(name + "=")) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
             }
         }
     }
     return cookieValue;
+}
+
+const csrftoken = getCookie("csrftoken");
+
+const likeBtn = document.getElementById("like-btn");
+
+if (likeBtn) {
+    likeBtn.addEventListener("click", function () {
+        const videoId = this.dataset.videoId;
+
+        fetch(`/video/like/${videoId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "Content-Type": "application/json",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const icon = document.getElementById("like-icon");
+            const count = document.getElementById("like-count");
+
+            if (data.liked) {
+                icon.classList.remove("bi-hand-thumbs-up");
+                icon.classList.add("bi-hand-thumbs-up-fill");
+            } else {
+                icon.classList.remove("bi-hand-thumbs-up-fill");
+                icon.classList.add("bi-hand-thumbs-up");
+            }
+
+            count.innerText = data.like_count;
+        })
+        .catch(err => console.error("Like error:", err));
+    });
 }
