@@ -142,6 +142,33 @@ def searchVideos(request):
     return render(request, 'search_results.html', {'videos': videos, 'query': query})
 
 
+@login_required
+def toggle_video_like(request, video_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    video = get_object_or_404(Video, video_id=video_id)
+    user = request.user
+
+    if user in video.likes.all():
+        # UNLIKE
+        video.likes.remove(user)
+        video.like_count = max(video.like_count - 1, 0)
+        liked = False
+    else:
+        # LIKE
+        video.likes.add(user)
+        video.like_count += 1
+        liked = True
+
+    video.save(update_fields=["like_count"])
+
+    return JsonResponse({
+        "liked": liked,
+        "like_count": video.like_count
+    })
+
+
 def videoHistory(request):
     watched_videos = []
     if request.user.is_authenticated:
