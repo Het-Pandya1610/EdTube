@@ -456,7 +456,7 @@ body{
     padding-left: 3px;
     padding-right: 3px;
     border-radius: 5px;
-    width: 40px !important;
+    width: auto !important;
     margin-right: 15px;
     gap: 8px;
     display: inline-block; /* This is the key */

@@ -1,0 +1,95 @@
+
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, rgb(68, 68, 180), grey);
+      color: #fff;
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    header {
+      background: #000;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #00aaff;
+    }
+
+    header a {
+      color: white;
+      margin-right: 5%;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(6px);
+      padding: 120px 20px 60px;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 2.4rem;
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #cfeaff;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 25px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    h3 {
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-top: 40px;
+      font-size: 1.5rem;
+    }
+
+    p {
+      color: #dceaff;
+      font-size: 1rem;
+      margin: 10px 0;
+    }
+
+    ul {
+      margin-left: 20px;
+      color: #cfeaff;
+    }
+
+    ul li {
+      margin: 8px 0;
+    }
+
+    @media (max-width: 768px) {
+      .hero h2 { font-size: 2rem; }
+    }

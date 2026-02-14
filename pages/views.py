@@ -15,12 +15,15 @@ import imghdr
 from PIL import Image
 
 def index(request):
+    videos = []
+
     if request.user.is_authenticated:
         videos = Video.objects.all().order_by('-created_at')
-        context = {
-            'videos': videos
-        }
-        return render(request, "EdTube.html", context)
+
+    context = {
+        'videos': videos
+    }
+    return render(request, "EdTube.html", context)
 
 def faqs(request):
     return render(request, "faqs.html")

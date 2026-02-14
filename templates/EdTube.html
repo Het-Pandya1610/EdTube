@@ -13,101 +13,102 @@
 <body>
   {%include 'navbar.html'%}
   <div id="pageContent">
-      {% if not request.user.is_authenticated %}
-        <section class="hero">
-          <h1>Haven't Started Yet ??</h1>
-          <p>Click below to begin your journey. We'll guide you from there based on your status.</p>
-          <a href="{%url 'register'%}" style="text-decoration: none"><button>Let's get Started</button></a>
-        </section>
-        <section class="info-section">
-          <h2>Why Choose Us?</h2>
-          <div class="features">
-            <div class="feature-box">
-              <i class="fas fa-calendar-alt"></i>
-              <h4>Smart Scheduling</h4>
-              <p>Create and manage your study timetable with intelligent reminders and flexibility.</p>
+    {% if not request.user.is_authenticated %}
+      <section class="hero">
+        <h1>Haven't Started Yet ??</h1>
+        <p>Click below to begin your journey. We'll guide you from there based on your status.</p>
+        <a href="{%url 'register'%}" style="text-decoration: none"><button>Let's get Started</button></a>
+      </section>
+      <section class="info-section">
+        <h2>Why Choose Us?</h2>
+        <div class="features">
+          <div class="feature-box">
+            <i class="fas fa-calendar-alt"></i>
+            <h4>Smart Scheduling</h4>
+            <p>Create and manage your study timetable with intelligent reminders and flexibility.</p>
+          </div>
+          <div class="feature-box">
+            <i class="fas fa-chart-line"></i>
+            <h4>Progress Tracking</h4>
+            <p>Track your learning journey with visual progress and reports on your performance.</p>
+          </div>
+          <div class="feature-box">
+            <i class="fas fa-question-circle"></i>
+            <h4>Interactive Quizzes</h4>
+            <p>Assess your knowledge with adaptive quizzes designed to test and teach simultaneously.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="reviews-reel">
+        <h2>What Our Learners Say</h2>
+        <div class="reviews-slider">
+          <div class="reviews-container">
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>EdTube helped me build a consistent study habit. My scores improved faster than I expected!</p>
+              <h4>— Aarav Patel</h4>
             </div>
-            <div class="feature-box">
-              <i class="fas fa-chart-line"></i>
-              <h4>Progress Tracking</h4>
-              <p>Track your learning journey with visual progress and reports on your performance.</p>
+            <div class="review">
+              <div class="stars">★★★★☆</div>
+              <p>The quizzes actually adapt to your progress — it feels like having a personal tutor!</p>
+              <h4>— Meera Sharma</h4>
             </div>
-            <div class="feature-box">
-              <i class="fas fa-question-circle"></i>
-              <h4>Interactive Quizzes</h4>
-              <p>Assess your knowledge with adaptive quizzes designed to test and teach simultaneously.</p>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>Clean UI, smooth performance, and tracking features that keep you motivated every day.</p>
+              <h4>— Rohan Mehta</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>One of the best educational platforms I’ve used — simple, modern, and effective.</p>
+              <h4>— Priya Nair</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★☆</div>
+              <p>The scheduling and reminders make studying easier and more organized than ever.</p>
+              <h4>— Aditya Singh</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>EdTube keeps learning exciting! I can track everything I do — progress feels visible.</p>
+              <h4>— Diya Kapoor</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>EdTube helped me build a consistent study habit. My scores improved faster than I expected!</p>
+              <h4>— Aarav Patel</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★☆</div>
+              <p>The quizzes actually adapt to your progress — it feels like having a personal tutor!</p>
+              <h4>— Meera Sharma</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>Clean UI, smooth performance, and tracking features that keep you motivated every day.</p>
+              <h4>— Rohan Mehta</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>One of the best educational platforms I’ve used — simple, modern, and effective.</p>
+              <h4>— Priya Nair</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★☆</div>
+              <p>The scheduling and reminders make studying easier and more organized than ever.</p>
+              <h4>— Aditya Singh</h4>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>EdTube keeps learning exciting! I can track everything I do — progress feels visible.</p>
+              <h4>— Diya Kapoor</h4>
             </div>
           </div>
-        </section>
-
-        <section class="reviews-reel">
-            <h2>What Our Learners Say</h2>
-            <div class="reviews-slider">
-                <div class="reviews-container">
-                    <div class="review">
-                    <div class="stars">★★★★★</div>
-                    <p>EdTube helped me build a consistent study habit. My scores improved faster than I expected!</p>
-                    <h4>— Aarav Patel</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★☆</div>
-                    <p>The quizzes actually adapt to your progress — it feels like having a personal tutor!</p>
-                    <h4>— Meera Sharma</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★★</div>
-                    <p>Clean UI, smooth performance, and tracking features that keep you motivated every day.</p>
-                    <h4>— Rohan Mehta</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★★</div>
-                    <p>One of the best educational platforms I’ve used — simple, modern, and effective.</p>
-                    <h4>— Priya Nair</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★☆</div>
-                    <p>The scheduling and reminders make studying easier and more organized than ever.</p>
-                    <h4>— Aditya Singh</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★★</div>
-                    <p>EdTube keeps learning exciting! I can track everything I do — progress feels visible.</p>
-                    <h4>— Diya Kapoor</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★★</div>
-                    <p>EdTube helped me build a consistent study habit. My scores improved faster than I expected!</p>
-                    <h4>— Aarav Patel</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★☆</div>
-                    <p>The quizzes actually adapt to your progress — it feels like having a personal tutor!</p>
-                    <h4>— Meera Sharma</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★★</div>
-                    <p>Clean UI, smooth performance, and tracking features that keep you motivated every day.</p>
-                    <h4>— Rohan Mehta</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★★</div>
-                    <p>One of the best educational platforms I’ve used — simple, modern, and effective.</p>
-                    <h4>— Priya Nair</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★☆</div>
-                    <p>The scheduling and reminders make studying easier and more organized than ever.</p>
-                    <h4>— Aditya Singh</h4>
-                    </div>
-                    <div class="review">
-                    <div class="stars">★★★★★</div>
-                    <p>EdTube keeps learning exciting! I can track everything I do — progress feels visible.</p>
-                    <h4>— Diya Kapoor</h4>
-                    </div>
-                </div>
-            </div>
-        </section>
-      {% else %}
+        </div>
+      </section>
+    {% else %}
+      <div class="body-clone">
       <div class="home-container" style="padding-left: 30px;padding-right: 30px;min-height: 100vh;margin-bottom: 0;width: 100%;min-width: 100%;max-width: 100%;">
         <div class="video-grid">
           {% for video in videos %}
@@ -115,7 +116,7 @@
               <button class="video-options-btn" data-video-id="{{ video.video_id }}">
                 <i class="bi bi-three-dots-vertical"></i>
               </button>
-
+          
               <div class="options-dropdown" id="menu-{{ video.video_id }}">
                 <div class="dropdown-item"><i class="bi bi-clock"></i> Watch Later</div>
                 <div class="dropdown-item"><i class="bi bi-bookmarks"></i> Save</div>
@@ -174,9 +175,9 @@
           {% empty %}
             <p style="color:var(--text-color);">No videos available.</p>
           {% endfor %}
-          </div>
         </div>
-      {% endif %}
+      </div>
+    {% endif %}
   </div>
 </body>
 </html>

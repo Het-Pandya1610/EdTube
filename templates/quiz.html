@@ -1,0 +1,35 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}">
+  <title>Quiz | EdTube</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static "css/quiz.css" %}">
+</head>
+<body>
+    {%include 'navbar.html'%}
+    <div id="pageContent">
+        <div class="quiz-container">
+            <h1>Quiz Title</h1>
+            <p class="quiz-description">This is a sample quiz description. It provides an overview of the quiz content and instructions.</p>
+            <form class="quiz-form">
+                {% csrf_token %}
+                {%for quiz in video.quiz.all %}
+                    <div class="quiz-question">
+                        <h3>{{ quiz.question_text }}</h3>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q1" id="q1a"><label for="q1a">A) {{quiz.option_a}}</label></li>
+                            <li><input type="radio" name="q1" id="q1b"><label for="q1b">B) {{quiz.option_b}}</label></li>
+                            <li><input type="radio" name="q1" id="q1c"><label for="q1c">C) {{quiz.option_c}}</label></li>
+                            <li><input type="radio" name="q1" id="q1d"><label for="q1d">D) {{quiz.option_d}}</label></li>
+                        </ul>
+                    </div>
+                {%endfor%}
+                <button class="submit-btn">Submit Quiz</button>
+            </form>
+        </div>
+    </div>
+</body>

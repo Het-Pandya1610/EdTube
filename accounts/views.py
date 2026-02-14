@@ -47,41 +47,75 @@ def register_view(request):
 @transaction.atomic
 def reg(request):
     if request.method == "POST":
-
+        
         # ---------- OTP VERIFY ----------
         if "verify_otp" in request.POST:
             email = request.session.get("pending_email")
+            purpose = request.session.get("pending_purpose", "registration")
             otp_entered = request.POST.get("otp")
-
+            
             if not email:
-                return redirect("reg")
-
+                messages.error(request, "Session expired. Please try again.")
+                return redirect("register")
+            
             user = User.objects.filter(email=email).first()
             if not user:
-                return redirect("reg")
-
+                messages.error(request, "User not found")
+                return redirect("register")
+            
+            # Get the latest unused OTP
             verification = EmailVerification.objects.filter(
                 user=user, is_used=False
             ).order_by("-created_at").first()
-
-            if not verification or verification.is_expired() or verification.otp != otp_entered:
+            
+            # Validate OTP
+            if not verification:
                 return render(request, "verify_email.html", {
                     "email": email,
-                    "error": "Invalid or expired OTP"
+                    "purpose": purpose,
+                    "error": "No valid OTP found. Please request a new one."
                 })
-
+            
+            if verification.is_expired():
+                return render(request, "verify_email.html", {
+                    "email": email,
+                    "purpose": purpose,
+                    "error": "OTP has expired. Please request a new one."
+                })
+            
+            if verification.otp != otp_entered:
+                return render(request, "verify_email.html", {
+                    "email": email,
+                    "purpose": purpose,
+                    "error": "Invalid OTP. Please try again."
+                })
+            
+            # Mark OTP as used
             verification.is_used = True
             verification.save()
-
+            
+            # Mark email as verified
             profile = user.profile
             profile.is_email_verified = True
             profile.save()
-
-            del request.session["pending_email"]
-            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-
-            messages.success(request, "Email verified successfully!")
-            return redirect("index")
+            
+            # Clear session data
+            if "pending_email" in request.session:
+                del request.session["pending_email"]
+            if "pending_purpose" in request.session:
+                del request.session["pending_purpose"]
+            
+            # Handle based on purpose
+            if purpose == "login":
+                # For login, log the user in
+                auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                messages.success(request, "Email verified successfully! You're now logged in.")
+                return redirect("index")
+            else:
+                # For registration, log the user in and welcome them
+                auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                messages.success(request, f"Welcome to EdTube, {user.first_name}! Your account has been verified.")
+                return redirect("index")
 
         # ---------- REGISTER ----------
         fullname = request.POST.get("fullname")
@@ -143,66 +177,95 @@ def reg(request):
     return render(request, "register.html")
 
 
-# ================= RESEND OTP =================
 def resend_otp(request):
-    email = request.POST.get("email")
-    user = User.objects.filter(email=email).first()
+    if request.method == "POST":
+        email = request.POST.get("email")
+        purpose = request.POST.get("purpose", "registration")
+        
+        user = User.objects.filter(email=email).first()
+        
+        if not user:
+            messages.error(request, "User not found")
+            return redirect("reg")
+        
+        # Mark old OTPs as used
+        EmailVerification.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        # Generate new OTP
+        otp = EmailVerification.generate_otp()
+        EmailVerification.objects.create(user=user, otp=otp)
+        
+        # Send OTP with correct purpose
+        send_otp_email(email, otp, purpose)
+        
+        # Update session
+        request.session["pending_email"] = email
+        request.session["pending_purpose"] = purpose
+        
+        # Prepare response context
+        context = {
+            "email": email,
+            "purpose": purpose,
+            "success": "New OTP has been sent to your email"
+        }
+        
+        # Add appropriate message based on purpose
+        if purpose == "login":
+            context["message"] = "Please verify your email to login"
+        else:
+            context["message"] = "Please verify your email to complete registration"
+        
+        return render(request, "verify_email.html", context)
+    
+    return redirect("reg")
 
-    if not user:
-        return redirect("reg")
 
-    EmailVerification.objects.filter(user=user, is_used=False).update(is_used=True)
-
-    otp = EmailVerification.generate_otp()
-    EmailVerification.objects.create(user=user, otp=otp)
-
-    send_otp_email(email, otp, "registration")
-    request.session["pending_email"] = email
-
-    return render(request, "verify_email.html", {
-        "email": email,
-        "success": "New OTP sent"
-    })
-
-
-# ================= LOGIN =================
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
         
-
         if not email or not password:
             return render(request, "login.html", {"error": "Email and password are required"})
         
-
         user = User.objects.filter(email=email).first()
         if not user:
             return render(request, "login.html", {"error": "Email not found"})
 
         username = email.split("@")[0]
         
-
+        # Authenticate to check password first
+        user = authenticate(request, username=username, password=password)
+        if not user:
+            return render(request, "login.html", {"error": "Invalid password"})
+        
+        # Check if email is verified
         profile = user.profile
         if not profile.is_email_verified:
+            # Mark old OTPs as used
             EmailVerification.objects.filter(user=user, is_used=False).update(is_used=True)
-
+            
+            # Generate new OTP for LOGIN purpose
             otp = EmailVerification.generate_otp()
             EmailVerification.objects.create(user=user, otp=otp)
-            send_otp_email(email, otp, "registration")
-
+            
+            # Send LOGIN OTP
+            send_otp_email(email, otp, "login")
+            
+            # Store both email and purpose in session
             request.session["pending_email"] = email
+            request.session["pending_purpose"] = "login"
+            request.session["pending_user_id"] = user.id  # Store user ID for later login
+            
             return render(request, "verify_email.html", {
                 "email": email,
-                "error": "Please verify your email"
+                "purpose": "login",
+                "message": "Please verify your email to complete login"
             })
 
-        user = authenticate(request, username=username, password=password)
-        if user:
-            auth_login(request, user, backend=user.backend)
-            return redirect("index")
-
-        return render(request, "login.html", {"error": "Invalid password"})
+        # If email is already verified, log them in directly
+        auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        return redirect("index")
 
     return render(request, "login.html")
 

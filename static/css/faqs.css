@@ -1,0 +1,119 @@
+
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, rgb(68, 68, 180), grey);
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #000;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #00aaff;
+    }
+
+    header a {
+      color: white;
+      margin-right: 5%;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(6px);
+      padding: 120px 20px 60px;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 2.4rem;
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #cfeaff;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .category {
+      margin-bottom: 50px;
+    }
+
+    .category h3 {
+      background-image: linear-gradient(to top, white, gray);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-size: 1.7rem;
+      margin-bottom: 15px;
+      border-left: 4px solid #00ccff;
+      padding-left: 10px;
+    }
+
+    details {
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    details:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    details summary {
+      font-weight: 600;
+      color: #fff;
+      outline: none;
+    }
+
+    details[open] summary {
+      color: #00ccff;
+    }
+
+    details p {
+      margin-top: 10px;
+      color: #d8ebff;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-5px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    @media (max-width: 768px) {
+      .hero h2 { font-size: 2rem; }
+      .category h3 { font-size: 1.4rem; }
+    }

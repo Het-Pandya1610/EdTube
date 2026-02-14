@@ -7,6 +7,10 @@ from .utils import save_to_history
 from django.utils.html import linebreaks, urlize
 from .utils import HISTORY_FILE
 import json, os
+from django.db import transaction
+import csv
+from .models import Quiz
+
 
 @login_required
 def videoUpload(request):
@@ -39,8 +43,45 @@ def videoUpload(request):
 
         return redirect("index")
 
-    return render(request, "video_upload.html")
+    return render(request, "video_upload.html")        
+    
+def upload_quiz_file_in_database(video, csv_file):
 
+    try:
+        decoded_file = csv_file.read().decode("utf-8").splitlines()
+        reader = csv.DictReader(decoded_file)
+
+        with transaction.atomic():
+
+            quiz_objects = []
+
+            for row in reader:
+
+                # Validate correct option
+                correct_option = row["correct_option"].upper()
+                if correct_option not in ["A", "B", "C", "D"]:
+                    raise ValueError("Invalid correct_option value")
+
+                quiz_objects.append(
+                    Quiz(
+                        video=video,
+                        question_id=row["question_id"],
+                        question_text=row["question_text"],
+                        option_a=row["option_a"],
+                        option_b=row["option_b"],
+                        option_c=row["option_c"],
+                        option_d=row["option_d"],
+                        correct_option=correct_option
+                    )
+                )
+
+            Quiz.objects.bulk_create(quiz_objects)
+
+        return True
+
+    except Exception as e:
+        print("CSV Quiz Upload Error:", e)
+        return False
 
 def watchVideo(request):
     video_id = request.GET.get('v') 
@@ -198,3 +239,12 @@ def videoHistory(request):
                 pass
 
     return render(request, 'video_history.html', {'videos': watched_videos})
+
+def quiz(request):
+    video_id = request.GET.get('v')
+    video = get_object_or_404(Video, video_id=video_id)
+
+    if not video.quiz:
+        return HttpResponseForbidden("No quiz available for this video.")
+
+    return render(request, 'quiz.html', {'video': video})

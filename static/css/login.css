@@ -1,0 +1,131 @@
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+      background-image: linear-gradient(to right, navy, rgb(44, 167, 50));
+      overflow-x: hidden;
+    }
+    .login-container {
+      margin-top: 120px;
+      background: rgba(255, 255, 255, 0.08);
+      margin-left: auto;
+      margin-right: auto;
+      padding: 40px;
+      border-radius: 15px;
+      width: 45%;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      backdrop-filter: blur(6px);
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    .login-container h2 {
+      margin-bottom: 10px;
+      font-size: 2.3rem;
+      color: var(--text-color);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    p {
+      color: #cfeaff;
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
+
+    input[name="email"],input[name="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    button {
+      width: 40%;
+      background-image: linear-gradient(to top, rgb(0, 0, 0), rgb(74, 74, 74));
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      padding: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+    }
+
+    .social-login {
+      margin: 13px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .social-login button {
+      width: 39%;
+      background-image: linear-gradient(to top, rgb(0, 0, 0), rgb(74, 74, 74));
+      color: #fff;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      border-radius: 20px !important;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .social-login button i {
+      font-size: 1rem;
+    }
+
+    p a {
+      color: #00cfff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    p a:hover {
+      border-bottom: 2px solid #00cfff;
+    }
+    @media (max-width: 900px) {
+      .login-container{
+        width: 80%;
+      }
+    }
+    @media(max-width: 450px){
+      .login-container h2{
+        font-size: 1.3rem;
+      }
+      button{
+        font-size: 0.6rem;
+      }
+      .social-login button{
+        font-size: 0.6rem;
+      }
+    }
+    .password-box {
+        position: relative;
+    }
+    .password-box input {
+        width: 100%;
+        padding-right: 45px;
+    }
+
+    .password-box .toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: #555;
+    }

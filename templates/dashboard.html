@@ -7,7 +7,64 @@
   <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}">
   <title>EdTube | Next-Gen Learning for All</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
 </head>
 <body>
-    {%include 'navbar.html'%}    
+  {%include 'navbar.html'%}
+  <div id="pageContent">
+    <div class="dashboard-container">
+      <h1>Welcome to Your Dashboard, {{ request.user.first_name }}!</h1>
+      {% if user.profile.role == 'student' %}
+        <p>Here’s a quick overview of your learning journey so far:</p>
+
+        <div class="dashboard-cards">
+            <div class="cards">
+                <h3>Total Study Time</h3>
+                <p>{{ total_study_time }}</p>
+            </div>
+            <div class="cards">
+                <h3>Completed Tasks</h3>
+                <p>{{ completed_tasks }}</p>
+            </div>
+            <div class="cards">
+                <h3>Current Streak</h3>
+                <p>{{ current_streak }} days</p>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h2>Your Progress</h2>
+            <!-- Placeholder for progress charts or graphs -->
+            <p>(Progress charts will be displayed here in the future.)</p>
+        </div>
+
+        <div class="recommendations-section">
+            <h2>Recommended Next Steps</h2>
+            <!-- Placeholder for personalized recommendations -->
+            <p>(Personalized recommendations will be displayed here in the future.)</p>
+        </div>
+      {% elif user.profile.role == 'tutor' %}
+        <p>Here’s a quick overview of your teaching dashboard:</p>
+        <div class="dashboard-cards">
+            <div class="cards">
+                <h3>Total Followers</h3>
+                <p>{{ user.teacher.nos }}</p>
+            </div>
+            <div class="cards">
+                <h3>Average Student Progress</h3>
+                <p>{{ average_progress | default:"0" }}%</p>
+            </div>
+            <div class="cards">
+                <h3>Watch Hours</h3>
+                <p>{{ watch_hours | default:"0" }}</p>
+            </div>
+        </div>
+        <div class="insights-section">
+            <h2>Teaching Insights</h2>
+            <!-- Placeholder for teaching insights and analytics -->
+            <p>(Teaching insights and analytics will be displayed here in the future.)</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </body>

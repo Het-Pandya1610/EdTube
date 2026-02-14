@@ -216,3 +216,22 @@ class CommentReply(models.Model):
 
     def __str__(self):
         return f"Reply by {self.author}"
+    
+class Quiz(models.Model):
+    video = models.ForeignKey(
+        'video.video',
+        on_delete=models.CASCADE,
+        related_name='quiz_questions'
+    )
+    question_id = models.CharField(max_length=50)
+    question_text = models.TextField()
+    option_a = models.CharField(max_length=200)
+    option_b = models.CharField(max_length=200)
+    option_c = models.CharField(max_length=200)
+    option_d = models.CharField(max_length=200)
+    correct_option = models.CharField(max_length=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f"Quiz for {self.video.title}"

@@ -118,34 +118,31 @@
                         </div>
 
                         
-                        <div class="comment-section" style="margin-top:30px;">
+                        <div class="comment-section" style="margin-top:30px;margin-bottom: 50px;">
                             <div style="font-weight:600; margin-bottom:15px;">Comments</div>
-                            {% for comment in comments %}
                             <div class="comment">
+                                {% for comment in comments %}
                                 <a href="{% url 'user_profile' username=comment.author.username %}" style="text-decoration: none;color: var(--text-color)">
                                 {% if comment.author.profile.role == "tutor" and comment.author.teacher.pfp %}
                                         <img src="{{ comment.author.teacher.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
 
-                                    {% elif comment.author.profile.role == "student" and comment.author.student.pfp %}
-                                        <img src="{{ comment.author.student.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                                {% elif comment.author.profile.role == "student" and comment.author.student.pfp %}
+                                    <img src="{{ comment.author.student.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
 
-                                    {% else %}
-                                        <div class="avatar-small" style="width:40px; height:40px;display: inline-flex;">
-                                        {{ comment.author.first_name|first }}{{ comment.author.last_name|first }}
-                                        </div>
-                                    {% endif %}
+                                {% else %}
+                                    <div class="avatar-small" style="width:40px; height:40px;display: inline-flex;">
+                                    {{ comment.author.first_name|first }}{{ comment.author.last_name|first }}
+                                    </div>
+                                {% endif %}
                                 <strong>@{{ comment.author.username }}</strong> </a><small>{{ comment.created_at|naturaltime }}</small>
                                 <p style="margin-left: 40px;">{{ comment.content }}</p>
                                 
-
-
-                                <!-- Replies -->
-                                {% for reply in comment.replies.all %}
-                                <div class="reply">
-                                    <strong>{{ reply.author.username }}</strong>
-                                    <p>{{ reply.content }}</p>
-                                </div>
-                                {% endfor %}
+                                    {% for reply in comment.replies.all %}
+                                    <div class="reply">
+                                        <strong>{{ reply.author.username }}</strong>
+                                        <p>{{ reply.content }}</p>
+                                    </div>
+                                    {% endfor %}
 
                                 <!-- Reply form -->
                                 {% comment %} <form method="post" action="{% url 'add_reply' comment.id %}">
@@ -153,8 +150,9 @@
                                 <input type="text" name="reply" placeholder="Reply..." required>
                                 <button type="submit">Reply</button>
                                 </form> {% endcomment %}
+                                
+                                {% endfor %}
                             </div>
-                            {% endfor %}
                             <div style="font-weight:600; margin-bottom:15px;">Write a comment</div>
                             <div style="display:flex; gap:15px; align-items:center;margin-top: 30px;">
                                 <div class="comment_user">

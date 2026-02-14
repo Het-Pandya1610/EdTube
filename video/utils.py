@@ -3,12 +3,24 @@ import os
 import threading
 from datetime import datetime
 from django.conf import settings
+import csv
+from django.core.exceptions import ValidationError
 
 # Global lock to prevent file corruption during simultaneous writes
 file_lock = threading.Lock()
 
 # This stores the file in your main project folder
 HISTORY_FILE = os.path.join(settings.BASE_DIR, 'user_history.json')
+
+REQUIRED_COLUMNS = [
+    "question_id",
+    "question_number",
+    "option_a",
+    "option_b",
+    "option_c",
+    "option_d",
+    "correct_option"
+]
 
 def save_to_history(history_type, email, data_value):
     """
@@ -74,3 +86,62 @@ def get_user_video_history(email, limit=10):
         except:
             return []
         
+def validate_quiz_csv(file):
+    """
+    Validates quiz CSV file format and content.
+    Raises ValidationError if invalid.
+    """
+
+    # Check file extension
+    if not file.name.endswith(".csv"):
+        raise ValidationError("Only CSV files are allowed.")
+
+    # Check file size (max 5MB for example)
+    if file.size > 5 * 1024 * 1024:
+        raise ValidationError("CSV file must be under 5MB.")
+
+    try:
+        decoded_file = file.read().decode("utf-8").splitlines()
+        reader = csv.DictReader(decoded_file)
+
+        # Validate headers
+        if reader.fieldnames != REQUIRED_COLUMNS:
+            raise ValidationError(
+                f"CSV headers must be exactly: {', '.join(REQUIRED_COLUMNS)}"
+            )
+
+        question_ids = set()
+
+        for row_number, row in enumerate(reader, start=2):
+
+            # Empty value check
+            for column in REQUIRED_COLUMNS:
+                if not row.get(column):
+                    raise ValidationError(
+                        f"Missing value in column '{column}' at row {row_number}"
+                    )
+
+            # Correct option validation
+            if row["correct_option"].upper() not in ["A", "B", "C", "D"]:
+                raise ValidationError(
+                    f"Invalid correct_option at row {row_number}. Must be A, B, C or D."
+                )
+
+            # Duplicate question_id
+            if row["question_id"] in question_ids:
+                raise ValidationError(
+                    f"Duplicate question_id '{row['question_id']}' at row {row_number}"
+                )
+
+            question_ids.add(row["question_id"])
+
+    except UnicodeDecodeError:
+        raise ValidationError("Invalid file encoding. Use UTF-8.")
+
+    except csv.Error:
+        raise ValidationError("Invalid CSV format.")
+
+    finally:
+        file.seek(0)  # reset pointer for future use
+
+    return True

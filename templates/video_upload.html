@@ -11,117 +11,134 @@
 
 <body>
 {%include 'navbar.html'%}
-<div class="container">
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="tab">
-      <a id="tabUrl" class="active">Video By URL</a>
-      <a id="tabMedia">Video By Media</a>
-    </div>
-    <div id="videoByUrl" class="content active">
-      <label>Video Link <span class="required">*</span></label>
-      <div class="video-url-wrapper">
-        <input
-          type="url"
-          name="video_url"
-          id="videoUrlInput"
-          placeholder="Enter YouTube URL"
-        >
-        <span class="clear-btn">&times;</span>
-        <button type="button" class="paste-btn" id="pasteBtn">
-          Paste
+<div id="pageContent">
+  <div class="container">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="tab">
+        <a id="tabUrl" class="active">Video By URL</a>
+        <a id="tabMedia">Video By Media</a>
+      </div>
+      <div id="videoByUrl" class="content active">
+        <label>Video Link <span class="required">*</span></label>
+        <div class="video-url-wrapper">
+          <input
+            type="url"
+            name="video_url"
+            id="videoUrlInput"
+            placeholder="Enter YouTube URL"
+          >
+          <span class="clear-btn">&times;</span>
+          <button type="button" class="paste-btn" id="pasteBtn">
+            Paste
+          </button>
+        </div>
+
+        <label>Title <span class="required">*</span></label>
+        <input type="text" name="title" placeholder="Enter Video Title" id="titleUrl" required>
+
+        <label>Description</label>
+        <textarea name="description" id="desUrl" rows="3"></textarea>
+
+        <div class="uploads">
+          <div class="input-group">
+            <label>Notes</label>
+            <input type="file" name="notes" accept=".pdf,.doc,.docx,.txt">
+          </div>
+
+          <div class="input-group">
+            <div class="quiz-label" style="display: inline">
+              <label>Quiz</label>
+              <a href="{% static 'sample/quiz_sample.csv' %}" 
+                download 
+                class="demo-download">
+                <i class="bi bi-filetype-csv"></i> 
+                Download Demo CSV
+              </a>
+            </div>
+            <input type="file" name="quiz" accept=".csv">
+          </div>
+        </div>
+
+        <div class="sublan">
+          <div class="input-group">
+            <label>Language <span class="required">*</span></label>
+            <select name="language" id="langUrl" required>
+              <option value="" hidden>Select Language</option>
+              <option>English</option>
+              <option>Hindi</option>
+              <option>Gujarati</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Subject <span class="required">*</span></label>
+            <input type="text" name="subject" id="subUrl" required>
+          </div>
+        </div>
+
+        <button type="submit" id="upload-button">
+          <i class="bi bi-upload"></i> Upload
         </button>
       </div>
+      <div id="videoByMedia" class="content">
 
-      <label>Title <span class="required">*</span></label>
-      <input type="text" name="title" placeholder="Enter Video Title" id="titleUrl" required>
+        <label>Video File (MP4) <span class="required">*</span></label>
+        <input type="file" name="video_file" accept="video/mp4" required>
 
-      <label>Description</label>
-      <textarea name="description" id="desUrl" rows="3"></textarea>
+        <label>Thumbnail <span class="required">*</span></label>
+        <input type="file" name="thumbnail" accept="image/*" required>
 
-      <div class="uploads">
-        <div class="input-group">
-          <label>Notes</label>
-          <input type="file" name="notes">
+        <label>Title <span class="required">*</span></label>
+        <input type="text" name="title" placeholder="Enter Video Title" id="titleMedia" required>
+
+        <label>Description</label>
+        <textarea name="description" id="desMedia" rows="3"></textarea>
+
+        <div class="uploads">
+          <div class="input-group">
+            <label>Notes</label>
+            <input type="file" name="notes" accept=".pdf,.doc,.docx,.txt">
+          </div>
+
+          <div class="input-group">
+            <div class="quiz-label" style="display: inline">
+              <label>Quiz</label>
+              <a href="{% static 'sample/quiz_sample.csv' %}" 
+                download 
+                class="demo-download">
+                <i class="bi bi-filetype-csv"></i> 
+                Download Demo CSV
+              </a>
+            </div>
+            <input type="file" name="quiz" accept=".csv">
+          </div>
         </div>
 
-        <div class="input-group">
-          <label>Quiz</label>
-          <input type="file" name="quiz">
+        <div class="sublan">
+          <div class="input-group">
+            <label>Language <span class="required">*</span></label>
+            <select name="language" id="langMedia" required >
+              <option value="" hidden>Select Language</option>
+              <option>English</option>
+              <option>Hindi</option>
+              <option>Gujarati</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Subject <span class="required">*</span></label>
+            <input type="text" name="subject" id="subMedia" required>
+          </div>
         </div>
+
+        <button type="submit" id="upload-button">
+          <i class="bi bi-upload"></i> Upload
+        </button>
       </div>
+    </form>
 
-      <div class="sublan">
-        <div class="input-group">
-          <label>Language <span class="required">*</span></label>
-          <select name="language" id="langUrl" required>
-            <option value="" hidden>Select Language</option>
-            <option>English</option>
-            <option>Hindi</option>
-            <option>Gujarati</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Subject <span class="required">*</span></label>
-          <input type="text" name="subject" id="subUrl" required>
-        </div>
-      </div>
-
-      <button type="submit" id="upload-button">
-        <i class="bi bi-upload"></i> Upload
-      </button>
-    </div>
-    <div id="videoByMedia" class="content">
-
-      <label>Video File (MP4) <span class="required">*</span></label>
-      <input type="file" name="video_file" accept="video/mp4" required>
-
-      <label>Thumbnail <span class="required">*</span></label>
-      <input type="file" name="thumbnail" accept="image/*" required>
-
-      <label>Title <span class="required">*</span></label>
-      <input type="text" name="title" placeholder="Enter Video Title" id="titleMedia" required>
-
-      <label>Description</label>
-      <textarea name="description" id="desMedia" rows="3"></textarea>
-
-      <div class="uploads">
-        <div class="input-group">
-          <label>Notes</label>
-          <input type="file" name="notes">
-        </div>
-
-        <div class="input-group">
-          <label>Quiz</label>
-          <input type="file" name="quiz">
-        </div>
-      </div>
-
-      <div class="sublan">
-        <div class="input-group">
-          <label>Language <span class="required">*</span></label>
-          <select name="language" id="langMedia" required >
-            <option value="" hidden>Select Language</option>
-            <option>English</option>
-            <option>Hindi</option>
-            <option>Gujarati</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Subject <span class="required">*</span></label>
-          <input type="text" name="subject" id="subMedia" required>
-        </div>
-      </div>
-
-      <button type="submit" id="upload-button">
-        <i class="bi bi-upload"></i> Upload
-      </button>
-    </div>
-  </form>
-
+  </div>
 </div>
-
 </body>
 </html>

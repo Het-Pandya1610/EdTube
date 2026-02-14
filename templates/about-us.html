@@ -6,85 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <title>About Us | EdTube</title>
-  <style>
-    .about-container {
-      max-width: 1000px;
-      margin: 80px auto;
-      padding: 60px 50px;
-      background: rgba(255, 255, 255, 0.203);
-      border-radius: 15px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    h1 {
-      text-align: center;
-      background-image: linear-gradient(to top, white, gray);
-      color: transparent;
-      background-clip: text;
-      -webkit-background-clip: text;
-      font-size: 2.5rem;
-      margin-bottom: 30px;
-    }
-
-    h2 {
-      background-image: linear-gradient(to top, white, gray);
-      color: transparent;
-      background-clip: text;
-      -webkit-background-clip: text;
-      font-size: 1.5rem;
-      margin-top: 40px;
-    }
-
-    p {
-      font-size: 1rem;
-      line-height: 1.8;
-      color: #f0f0f0;
-      margin-bottom: 20px;
-    }
-
-    ul {
-      margin: 15px 0 30px 20px;
-      line-height: 1.8;
-      color: #e0e0e0;
-    }
-
-    ul li {
-      margin-bottom: 8px;
-    }
-    @media (max-width: 700px) {
-      header a{
-          margin-right: 50px;
-      }
-      header {
-        z-index: 1000;
-        position: fixed;
-      }
-
-      header h1 {
-        font-size: 1.2rem;
-      }
-      .about-container {
-        width: 90%;
-        padding: 30px 20px;
-        margin: 60px auto;
-      }
-
-      h1 {
-        font-size: 1.6rem;
-      }
-
-      h2 {
-        font-size: 1.1rem;
-      }
-
-      p, ul {
-        font-size: 0.9rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{% static "css/about-us.css" %}">
 </head>
 <body>
+  
   {%include 'navbar.html'%}
   <div class="about-container">
     <h1>About EdTube</h1>
