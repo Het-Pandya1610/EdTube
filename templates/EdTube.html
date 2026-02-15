@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}">
+  <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}?v=1">
   <title>EdTube | Next-Gen Learning for All</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="{% static "css/EdTube.css" %}">
@@ -108,8 +108,12 @@
         </div>
       </section>
     {% else %}
-      <div class="body-clone">
-      <div class="home-container" style="padding-left: 30px;padding-right: 30px;min-height: 100vh;margin-bottom: 0;width: 100%;min-width: 100%;max-width: 100%;">
+      <style>
+        body {
+          background: var(--bg-color) !important;
+        }
+      </style>
+      <div class="home-container">
         <div class="video-grid">
           {% for video in videos %}
             <div class="video-card-container">

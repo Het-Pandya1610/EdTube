@@ -174,18 +174,18 @@ body {
 }
 }
 
-.body-clone {
-    width: 100%;
-    height: auto;
-    min-height: 100vh;
-    background-color: var(--bg-color) !important;
-    padding: 0;
-}
 
 .home-container {
   margin: 60px auto;           /* CENTER IT */
   padding: 24px 16px;
   background-color: var(--bg-color);
+  padding-left: 30px;
+  padding-right: 30px;
+  min-height: 100vh;
+  margin-bottom: 0;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
 }
 
 .video-grid {

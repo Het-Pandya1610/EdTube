@@ -91,7 +91,7 @@
           </a>
         {% endif %}
         <div class="notification-bedge">
-          <a><i class="bi bi-bell"></i></a>
+          <a href="{% url "notifications" %}"><i class="bi bi-bell"></i></a>
         </div>
         <a href="{% url 'user_profile' username=request.user.username %}" class="profile" style="text-decoration: none;">
           {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}

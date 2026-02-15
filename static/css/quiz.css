@@ -58,5 +58,22 @@ body{
     padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover{
+    scale: 1.05;
+}
+
+@media (max-width: 768px) {
+    .quiz-container {
+        padding: 20px;
+    }
+    .quiz-question {
+        font-size: 1.1rem;
+    }
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+    }
 }

@@ -241,10 +241,4 @@ def videoHistory(request):
     return render(request, 'video_history.html', {'videos': watched_videos})
 
 def quiz(request):
-    video_id = request.GET.get('v')
-    video = get_object_or_404(Video, video_id=video_id)
-
-    if not video.quiz:
-        return HttpResponseForbidden("No quiz available for this video.")
-
-    return render(request, 'quiz.html', {'video': video})
+    return render(request, 'quiz.html')

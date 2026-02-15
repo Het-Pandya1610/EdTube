@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Account Settings | EdTube</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}?v=1">
     <link rel="stylesheet" href="{% static "css/account_settings.css" %}">
 </head>
 <body>
@@ -35,30 +36,39 @@
 
                         <div class="content-wrapper" style="display: flex; flex-direction: column; gap: 15px;">
                             
-                            <div class="profile-detail" onclick="window.location.href='{% url 'user_profile' username=request.user.username %}'" style="display: flex; align-items: center; cursor: pointer;">
-                                {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
-                                    <img src="{{ request.user.teacher.pfp.url }}" alt="Profile" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--text-color); object-fit: cover;">
-                                {% elif request.user.profile.role == "student" and request.user.student.pfp %}
-                                    <img src="{{ request.user.student.pfp.url }}" alt="Profile" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--text-color); object-fit: cover;">
-                                {% else %}
-                                    <div class="avatar-mid" style="margin: 0;">
-                                        {{ request.user.first_name|first }}{{ request.user.last_name|first }}
-                                    </div>
-                                {% endif %}
-                                <strong style="margin-left: 15px; font-size: 1.1rem;">{{request.user.first_name}} {{request.user.last_name}}</strong>
+                            <div class="profile-detail" style="display: flex; align-items: center; cursor: pointer;">
+                                <a href="{% url 'user_profile' username=request.user.username %}" style="text-decoration: none;color: var(--text-color);">
+                                    {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
+                                        <img src="{{ request.user.teacher.pfp.url }}" alt="Profile" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--text-color); object-fit: cover;">
+                                    {% elif request.user.profile.role == "student" and request.user.student.pfp %}
+                                        <img src="{{ request.user.student.pfp.url }}" alt="Profile" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--text-color); object-fit: cover;">
+                                    {% else %}
+                                        <div class="avatar-mid" style="margin: 0;">
+                                            {{ request.user.first_name|first }}{{ request.user.last_name|first }}
+                                        </div>
+                                    {% endif %}
+                                    <strong style="margin-left: 15px; font-size: 1.1rem;">{{request.user.first_name}} {{request.user.last_name}}</strong>
+                                </a>
                             </div>
 
                             <div class="choices" style="display: flex; flex-direction: column; gap: 10px; margin-left: 0px;">
                                 <a href="" style="text-decoration: none; color: #3ea6ff; font-size: 0.9rem;">Create a new channel</a>
-                                <a href="" style="text-decoration: none; color: #3ea6ff; font-size: 0.9rem;">View advanced settings</a>
+                                <a href="{% url "advanced_settings" %}" style="text-decoration: none; color: #3ea6ff; font-size: 0.9rem;">View advanced settings</a>
+                                <a href="{% url "logout" %}" style="text-decoration: none; color: #ff0000; font-size: 0.9rem;">Sign out</a>
+                                <a href="{% url "delete_account" %}" style="text-decoration: none; background: #ff0000; padding: 10px; border-radius: 10px; color: #fff; font-size: 0.9rem;width: fit-content">Delete account</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr></hr>
-                <div class="account-card">
-                    <h3 style="font-size: 1.6rem !important; font-weight: 700">Your Account</h3>
-                    <p class="subtitle">You sign in to EdTube with your Google Account</p>
+                <div class="help-card">
+                    <h3 style="font-size: 1.6rem !important; font-weight: 700;">Need help?</h3>
+                    <p class="subtitle">
+                        Visit our <a href="{% url "help" %}" style="text-decoration: none; color: #3ea6ff;">Help Center</a> to find answers to common questions, learn how to use EdTube, and get support for any issues you may encounter.
+                    </p>
+                    <p class="subtitle" style="margin-top: 30px;">
+                        If you can't find what you're looking for, contact our support team at <a href="mailto:edtube.edu@gmail.com" style="text-decoration: none; color: var(--text-color); font-weight: 500;"> edtube.edu@gmail.com</a>. We're here to help!
+                    </p>
                 </div>
             </div>
         </div>

@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Register | EdTube</title>
+  <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}?v=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <script src="{%static 'js/password-toggle.js'%}"></script>
@@ -44,26 +45,11 @@
 
     <div class="social-login">
       <button><a href="https://accounts.google.com/v3/signin/accountchooser?access_type=online&client_id=775850403491-cp1lors9l3pmpr2bok00hrbqng7rgqmb.apps.googleusercontent.com&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Faccounts%2Fgoogle%2Flogin%2Fcallback%2F&response_type=code&scope=email+profile&state=nKV09kcaSZwRXBu2&dsh=S-231968954%3A1769079246592497&o2v=2&service=lso&flowName=GeneralOAuthFlow&opparams=%253F&continue=https%3A%2F%2Faccounts.google.com%2Fsignin%2Foauth%2Fconsent%3Fauthuser%3Dunknown%26part%3DAJi8hAODkQtSTdmKy6cz5Uvv_v3NBNrBvR0sWL26U3QM4wb5g5dTwHk-dXlfTMkS17qu0zEZ6eID3SmegfAJCe8kAn_vv5fmWrlCzdBnH0dO-TUBZt5TU_B2uN4EoTXjwpw3J9aKzSfdl60EEISkULidPB9csONJDOQ5ZRuQ8Z1gDSbSJ7BiK4suY5g-nTlSNB1uTUcAyKaVw1vXpVOkbT-xTieqDKbHz76nh-Cp1u9jQjPmsx2oqS8MED43h8hXXKu9YauqWgJAIAt09GJueW4xMcs7iOof8LBbSrUdK8nK0P3q3ACVyJp1xsZilL26yptEkE5KpIqx2DvA3ivsHGYg6k96hfiGPPi2QD8WdoO8R-XDJvWH6Hedn4yUR4I1hXCqVrRCQoK29N6q4TANAhnlr5_BgQnlnJnrLpn4F5v5Ws57vA-j-iHYaTWlUcwPlZgqUvMOfCLvEBnb8hAPCZ6wl_IKE4Fk0A%26flowName%3DGeneralOAuthFlow%26as%3DS-231968954%253A1769079246592497%26client_id%3D775850403491-cp1lors9l3pmpr2bok00hrbqng7rgqmb.apps.googleusercontent.com%26requestPath%3D%252Fsignin%252Foauth%252Fconsent%23&app_domain=http%3A%2F%2F127.0.0.1%3A8000" style="text-decoration: none;color: white;"><i class="fab fa-google"></i> Google</a></button>
-      <button><i class="fab fa-facebook-f"></i> Facebook</button>
     </div>
 
     <p>Already have an account? <a href="{%url 'login'%}">Login</a></p>
   </div>
-  <script>
-  function togglePassword(inputId, icon) {
-      const input = document.getElementById(inputId);
-
-      if (input.type === "password") {
-          input.type = "text";
-          icon.classList.remove("bi-eye");
-          icon.classList.add("bi-eye-slash");
-      } else {
-          input.type = "password";
-          icon.classList.remove("bi-eye-slash");
-          icon.classList.add("bi-eye");
-      }
-  }
-  </script>
+  <script src="{% static "js/register.js" %}" defer></script>
 
 </body>
 </html>

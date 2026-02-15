@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}?v=1">
+    <title>Delete Account | EdTube</title>
+    <link rel="stylesheet" href="{% static "css/delete_account.css" %}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="delete-container">
+        <h2>Delete Your Account</h2>
+        
+        {% if success %}
+            <div class="message success">
+                <i class="fas fa-check-circle"></i> {{ success }}
+            </div>
+        {% endif %}
+        
+        {% if error %}
+            <div class="message error">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+        {% endif %}
+        
+        <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="delete_account" value="true">
+            
+            <button type="submit" class="delete-btn">Yes, Delete My Account</button>
+            <a href="{% url 'account_settings' %}" class="cancel-link">No, Keep My Account</a>
+        </form>
+    </div>
+</body>
+</html>

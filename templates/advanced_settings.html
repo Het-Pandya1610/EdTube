@@ -1,0 +1,272 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}?v=1">
+    <title>Advanced Settings | EdTube</title>
+    <link rel="stylesheet" href="{% static "css/advanced_settings.css" %}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% if request.user.is_authenticated %}
+        <div id="pageContent">
+            <div class="settings-container">
+                <div class="settings-header">
+                    <a href="{% url 'account_settings' %}" class="back-button">
+                        <span class="back-arrow">←</span> Back to Account Settings
+                    </a>
+                    <h1>Advanced Settings</h1>
+                    <p class="subtitle">Customize your EdTube experience</p>
+                </div>
+                <hr style="border:2px solid var(--text-color) !important;"></hr>
+                <div class="settings-section">
+                    <h2 style="color: var(--text-color)">Update Bio</h2>
+                    <p style="color: var(--text-color)">Let others know more about you. Share your teaching philosophy, subjects of expertise, or learning goals.</p>
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <div class="bio-wrapper">
+                            <textarea
+                                name="bio"
+                                id="bioTextarea"
+                                rows="4"
+                                maxlength="1000"
+                                class="bio-textarea"
+                                placeholder="Write something about yourself..."
+                            >{{ request.user.profile.bio }}</textarea>
+
+                            <div class="bio-counter">
+                                <span id="bioCount">0</span>/1000
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Bio</button>
+                    </form>
+                </div>
+                <hr style="border:2px solid var(--text-color) !important;"></hr>
+
+                <!-- Username Settings Section -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3>Username Settings</h3>
+                        <p class="section-subtitle">Choose your unique username on EdTube</p>
+                    </div>
+
+                    <form id="usernameForm" method="POST" action="{% url 'update_username' %}">
+                        {% csrf_token %}
+                        <div class="setting-item">
+                            <label class="setting-label">Current Username</label>
+                            <div class="setting-control">
+                                <div class="current-username">
+                                    @{{ request.user.username }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label" for="new_username">New Username</label>
+                            <div class="setting-control">
+                                <div class="username-input-wrapper">
+                                    <span class="username-prefix">@</span>
+                                    <input type="text" 
+                                           id="new_username" 
+                                           name="username" 
+                                           placeholder="enter new username"
+                                           value="{{ request.user.username }}"
+                                           class="username-input" 
+                                           autocomplete="off">
+                                </div>
+                                <div class="username-feedback" id="usernameFeedback"></div>
+                                
+                                <!-- Suggestions Container - Same place for both initial and generated suggestions -->
+                                <div class="suggestions-container" id="suggestionsContainer">
+                                    {% if suggestions %}
+                                        <p class="suggestions-title">Suggested usernames:</p>
+                                        <div class="suggestions-list" id="initialSuggestionsList">
+                                            {% for suggestion in suggestions %}
+                                                <button type="button" class="suggestion-btn" data-username="{{ suggestion }}">
+                                                    @{{ suggestion }}
+                                                </button>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="action-buttons">
+                                    <button type="button" id="checkUsernameBtn">Check Availability</button>
+                                    <button type="button" id="suggestUsernameBtn">Suggest Username</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" id="updateUsernameBtn" class="btn btn-primary" disabled>Update Username</button>
+                        </div>
+                    </form>
+                </div>
+
+                <hr style="border:2px solid var(--text-color) !important;"></hr>
+
+                <!-- Name Appearance Section -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3>Name Appearance</h3>
+                        <p class="section-subtitle">Control how your name is displayed on EdTube</p>
+                    </div>
+
+                    <form id="nameForm" method="POST" action="{% url 'update_name_appearance' %}">
+                        {% csrf_token %}
+                        <div class="setting-item">
+                            <label class="setting-label">Display Name</label>
+                            <div class="setting-control">
+                                <div class="name-preview" id="namePreview">
+                                    <div class="preview-avatar">
+                                        {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
+                                            <img src="{{ request.user.teacher.pfp.url }}" alt="Profile">
+                                        {% elif request.user.profile.role == "student" and request.user.student.pfp %}
+                                            <img src="{{ request.user.student.pfp.url }}" alt="Profile">
+                                        {% else %}
+                                            <div class="avatar-small">
+                                                {{ request.user.first_name|first }}{{ request.user.last_name|first }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="preview-details">
+                                        <span class="preview-name" id="previewName">
+                                            {{ request.user.first_name }} {{ request.user.last_name }}
+                                        </span>
+                                        <span class="preview-username">@{{ request.user.username }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label" for="display_name_format">Name Format</label>
+                            <div class="setting-control">
+                                <select id="display_name_format" name="name_format" class="setting-select">
+                                    <option value="full" {% if user.profile.name_format == 'full' %}selected{% endif %}>
+                                        Full Name (John Doe)
+                                    </option>
+                                    <option value="first_last" {% if user.profile.name_format == 'first_last' %}selected{% endif %}>
+                                        First + Last Initial (John D.)
+                                    </option>
+                                    <option value="first_only" {% if user.profile.name_format == 'first_only' %}selected{% endif %}>
+                                        First Name Only (John)
+                                    </option>
+                                    <option value="last_only" {% if user.profile.name_format == 'last_only' %}selected{% endif %}>
+                                        Last Name Only (Doe)
+                                    </option>
+                                    <option value="username" {% if user.profile.name_format == 'username' %}selected{% endif %}>
+                                        Username Only (@{{ user.username }})
+                                    </option>
+                                </select>
+                                <p class="setting-hint">Choose how your name appears to other users</p>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Update Name Display</button>
+                        </div>
+                    </form>
+                </div>
+
+                <hr style="border:2px solid var(--text-color) !important;"></hr>
+
+                <!-- Teacher Professional Info Section -->
+                <div class="settings-section" id="teacherSection" 
+                     {% if request.user.profile.role != "tutor" %}style="display: none;"{% endif %}>
+                    <div class="section-header">
+                        <h3>Professional Information</h3>
+                        <p class="section-subtitle">Enhance your teaching profile with credentials</p>
+                    </div>
+
+                    <form id="teacherInfoForm" method="POST" action="{% url 'update_teacher_info' %}">
+                        {% csrf_token %}
+                        
+                        <!-- Degree/Degree Pursued -->
+                        <div class="setting-item">
+                            <label class="setting-label" for="degree">Degree/Certification</label>
+                            <div class="setting-control">
+                                <input type="text" 
+                                       id="degree" 
+                                       name="degree_pursued" 
+                                       placeholder="e.g., B.Sc. Computer Science, M.Ed., Ph.D."
+                                       value="{{ request.user.teacher.degree_pursued|default:'' }}"
+                                       class="setting-input">
+                                <p class="setting-hint">Your academic qualifications or current degree program</p>
+                            </div>
+                        </div>
+
+                        <!-- Experience Years -->
+                        <div class="setting-item">
+                            <label class="setting-label" for="experience">Years of Experience</label>
+                            <div class="setting-control">
+                                <input type="number" 
+                                       id="experience" 
+                                       name="experience_years" 
+                                       placeholder="Years"
+                                       min="0"
+                                       max="70"
+                                       value="{{ request.user.teacher.experience_years|default:'0' }}"
+                                       class="setting-input setting-input-small">
+                                <p class="setting-hint">Total years of teaching experience</p>
+                            </div>
+                        </div>
+
+                        <!-- Offline Classes Address -->
+                        <div class="setting-item">
+                            <label class="setting-label" for="center_address">Offline Classes Address</label>
+                            <div class="setting-control">
+                                <textarea id="center_address" 
+                                          name="center_address" 
+                                          rows="3"
+                                          class="setting-textarea"
+                                          placeholder="Street address, city, state, pincode">{{ request.user.teacher.center_address|default:'' }}</textarea>
+                                <p class="setting-hint">Physical location where you conduct offline classes (optional)</p>
+                            </div>
+                        </div>
+
+                        <!-- Additional verification badges info -->
+                        <div class="verification-info">
+                            <h4>Verification Benefits</h4>
+                            <p>Adding your degree and teaching experience helps us verify your expertise. Verified teachers get:</p>
+                            <ul>
+                                <li> Verified badge on your profile</li>
+                                <li> Higher visibility in search results</li>
+                                <li> Increased student trust</li>
+                            </ul>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary"  style="margin-left: -200px;">Save Professional Info</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Student Notice (if role is student) -->
+                <div class="settings-section" id="studentSection" 
+                     {% if request.user.profile.role != "student" %}style="display: none;"{% endif %}>
+                    <div class="info-card">
+                        <h4>Teacher Features</h4>
+                        <p>Professional information such as degrees and offline class locations are available for teacher accounts.</p>
+                        <a href="{% url 'upgrade_to_teacher' %}" class="btn btn-secondary">Upgrade to Teacher Account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- User data container (hidden) -->
+    <div id="user-data" 
+        data-first-name="{{ request.user.first_name|escapejs }}"
+        data-last-name="{{ request.user.last_name|escapejs }}"
+        data-username="{{ request.user.username|escapejs }}"
+        data-check-url="{% url 'check_username' %}"
+        data-suggest-url="{% url 'suggest_usernames' %}"
+        style="display: none;">
+    </div>
+    
+    <script src="{% static 'js/advanced_settings.js' %}"></script>
+</body>  
+</html>

@@ -25,6 +25,9 @@ def index(request):
     }
     return render(request, "EdTube.html", context)
 
+def notifications(request):
+    return render(request, "notifications.html")
+
 def faqs(request):
     return render(request, "faqs.html")
 

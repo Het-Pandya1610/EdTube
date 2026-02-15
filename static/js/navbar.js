@@ -23,12 +23,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function toggleMenu() {
   const nav = document.getElementById('mobileNav');
-  const isOpen = nav.style.display === 'flex';
+  const hamburger = document.getElementById('hamburgerBtn');
+  
+  // Toggle the 'active' class to trigger the CSS transition
+  nav.classList.toggle('active');
+  hamburger.classList.toggle('active');
 
-  nav.style.display = isOpen ? 'none' : 'flex';
-
+  // Logic for shifting page content if on desktop
   if (window.innerWidth >= 992) {
-    document.body.classList.toggle('nav-open', !isOpen);
+    const isNowOpen = nav.classList.contains('active');
+    document.body.classList.toggle('nav-open', isNowOpen);
   }
 }
 

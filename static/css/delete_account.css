@@ -1,0 +1,44 @@
+body{
+    background: var(--bg-color) !important;
+}
+.delete-container {
+    margin-top: 80px;
+    padding: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--text-color);
+    background-color: var(--srch-bg-color);
+    border-radius: 8px;
+}
+.delete-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.delete-container p {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.delete-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.delete-container input[type="password"] {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+.delete-container button {
+    background: rgb(255, 0, 0);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.delete-container button:hover {
+    background: rgb(200, 0, 0);
+}

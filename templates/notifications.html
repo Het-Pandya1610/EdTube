@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}?v=1">
+    <title>Notifications | EdTube</title>
+    <link rel="stylesheet" href="{% static "css/notifications.css" %}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div id="pageContent">
+        <div class="notifications-container">
+            <h1>Notifications</h1>
+            {% if notifications %}
+                <ul class="notification-list">
+                    {% for notification in notifications %}
+                        <li class="notification-item {% if not notification.is_read %}unread{% endif %}">
+                            <a href="{{ notification.link }}" class="notification-link">
+                                {{ notification.message }}
+                                <span class="timestamp">{{ notification.created_at }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You have no notifications.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
