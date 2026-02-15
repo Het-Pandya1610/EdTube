@@ -27,6 +27,9 @@ class Teacher(models.Model):
     bio = models.TextField(blank=True)
     nos = models.IntegerField(default=0)
     nov = models.IntegerField(default=0)
+    degree_pursued = models.CharField(max_length=100, blank=True)
+    experience_years = models.IntegerField(default=0)
+    center_address = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

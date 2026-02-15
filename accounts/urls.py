@@ -13,6 +13,7 @@ urlpatterns = [
     path("set-new-password/", views.set_new_password, name="set_new_password"),
     path("settings/",views.account_settings, name="account_settings"),
     path("advanced-settings/", views.advanced_settings, name="advanced_settings"),
+    path("update-bio/", views.update_bio, name="update_bio"),
     path("update-username/", views.update_username, name="update_username"),
     path("update-name-appearance/", views.update_name_appearance, name="update_name_appearance"),
     path("update-teacher-info/", views.update_teacher_info, name="update_teacher_info"),

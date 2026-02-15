@@ -78,7 +78,7 @@
           </span><br>
           
           <strong>@{{profile_user.username}}</strong>
-          
+          <p>{{ profile_user.profile.bio | urlize | linebreaks }}</p>
           {% if profile_user.profile.role == 'tutor' %}
             <div class="inline-stats">
               <span class="stat-item"><span class="stat-count">{{ profile_user.teacher.nos }}</span> Followers</span>

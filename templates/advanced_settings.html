@@ -24,7 +24,7 @@
                 <div class="settings-section">
                     <h2 style="color: var(--text-color)">Update Bio</h2>
                     <p style="color: var(--text-color)">Let others know more about you. Share your teaching philosophy, subjects of expertise, or learning goals.</p>
-                    <form method="POST" action="">
+                    <form method="POST" action="{% url "update_bio" %}">
                         {% csrf_token %}
                         <div class="bio-wrapper">
                             <textarea
