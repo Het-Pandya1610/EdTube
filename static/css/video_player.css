@@ -315,7 +315,7 @@ body{
     font-size: clamp(0.8rem, 2vw, 0.9rem);
     white-space: nowrap;
 }
-.action-btn:hover { background: rgba(255,255,255,0.2); }
+.action-btn:hover { background: rgba(137, 137, 137, 1); }
 
 /* SIDEBAR STYLE */
 .sidebar { color: var(--text-color); }
@@ -419,7 +419,6 @@ body{
     color: white;
     font-weight: bold;
 }
-
 
 .yt-desc-box {
     background: var(--srch-bg-color);

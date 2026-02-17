@@ -90,10 +90,8 @@
                                     <span id="like-count">{{ video.like_count }}</span>
                                 </button>
 
-                                <button class="action-btn"><i class="bi bi-share"></i> Share</button>
+                                <button class="action-btn openShare" data-video-id="{{video.video_id}}"><i class="bi bi-share"></i> Share</button>
                                 <button class="action-btn"><i class="bi bi-plus-square"></i> Save</button>
-                                <button class="action-btn"><i class="bi bi-clock-history"></i> Later</button>
-                                <button class="action-btn"><i class="bi bi-heart"></i> Favorite</button>
                             </div>
                         </div>
 
@@ -122,35 +120,36 @@
                             <div style="font-weight:600; margin-bottom:15px;">Comments</div>
                             <div class="comment">
                                 {% for comment in comments %}
-                                <a href="{% url 'user_profile' username=comment.author.username %}" style="text-decoration: none;color: var(--text-color)">
-                                {% if comment.author.profile.role == "tutor" and comment.author.teacher.pfp %}
-                                        <img src="{{ comment.author.teacher.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                                    <a href="{% url 'user_profile' username=comment.author.username %}" style="text-decoration: none;color: var(--text-color)">
+                                    {% if comment.author.profile.role == "tutor" and comment.author.teacher.pfp %}
+                                            <img src="{{ comment.author.teacher.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
 
-                                {% elif comment.author.profile.role == "student" and comment.author.student.pfp %}
-                                    <img src="{{ comment.author.student.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                                    {% elif comment.author.profile.role == "student" and comment.author.student.pfp %}
+                                        <img src="{{ comment.author.student.pfp.url }}" alt="Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
 
-                                {% else %}
-                                    <div class="avatar-small" style="width:40px; height:40px;display: inline-flex;">
-                                    {{ comment.author.first_name|first }}{{ comment.author.last_name|first }}
-                                    </div>
-                                {% endif %}
-                                <strong>@{{ comment.author.username }}</strong> </a><small>{{ comment.created_at|naturaltime }}</small>
-                                <p style="margin-left: 40px;">{{ comment.content }}</p>
+                                    {% else %}
+                                        <div class="avatar-small" style="width:40px; height:40px;display: inline-flex;">
+                                        {{ comment.author.first_name|first }}{{ comment.author.last_name|first }}
+                                        </div>
+                                    {% endif %}
+                                    <strong>@{{ comment.author.username }}</strong> </a><small>{{ comment.created_at|naturaltime }}</small>
+                                    <p style="margin-left: 40px;">{{ comment.content }}</p>
                                 
                                     {% for reply in comment.replies.all %}
-                                    <div class="reply">
-                                        <strong>{{ reply.author.username }}</strong>
-                                        <p>{{ reply.content }}</p>
-                                    </div>
+                                        <div class="reply">
+                                            <strong>{{ reply.author.username }}</strong>
+                                            <p>{{ reply.content }}</p>
+                                        </div>
                                     {% endfor %}
 
-                                <!-- Reply form -->
-                                {% comment %} <form method="post" action="{% url 'add_reply' comment.id %}">
-                                {% csrf_token %}
-                                <input type="text" name="reply" placeholder="Reply..." required>
-                                <button type="submit">Reply</button>
-                                </form> {% endcomment %}
-                                
+                                    <!-- Reply form -->
+                                    {% comment %} <form method="post" action="{% url 'add_reply' comment.id %}">
+                                    {% csrf_token %}
+                                    <input type="text" name="reply" placeholder="Reply..." required>
+                                    <button type="submit">Reply</button>
+                                    </form> {% endcomment %}
+                                {% empty %}
+                                    <p style="color: var(--text-muted);">No comments yet. Be the first to comment!</p>
                                 {% endfor %}
                             </div>
                             <div style="font-weight:600; margin-bottom:15px;">Write a comment</div>
@@ -202,5 +201,6 @@
     </div>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="{%static 'js/video_player.js'%}" defer></script>
+    {% include "components/share_modal.html" %}
 </body>
 </html>

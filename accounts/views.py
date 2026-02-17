@@ -60,64 +60,141 @@ def reg(request):
             user_id = request.session.get("pending_user_id")
             otp_entered = request.POST.get("otp")
 
-            if not email or not purpose:
-                messages.error(request, "Session expired. Please try again.")
+            # Debug prints (remove in production)
+            print(f"🔍 VERIFY DEBUG - Email: {email}, Purpose: {purpose}, User ID: {user_id}, OTP: {otp_entered}")
+            print(f"🔍 VERIFY DEBUG - Session data: {dict(request.session.items())}")
+
+            if not email:
+                messages.error(request, "Session expired. Email not found. Please try again.")
+                return redirect("login")
+            
+            if not purpose:
+                messages.error(request, "Session expired. Purpose not found. Please try again.")
                 return redirect("login")
 
+            # Try to get user by email first
             user = User.objects.filter(email=email).first()
+            
+            # If not found by email and we have user_id, try by ID
+            if not user and user_id:
+                user = User.objects.filter(id=user_id).first()
+                print(f"🔍 VERIFY DEBUG - Found user by ID: {user.username if user else 'None'}")
 
+            if not user:
+                messages.error(request, "User not found. Please register again.")
+                return redirect("register")
+
+            print(f"🔍 VERIFY DEBUG - User found: {user.username} (ID: {user.id})")
+
+            # Get the most recent unused OTP for this user and purpose
             verification = EmailVerification.objects.filter(
                 user=user,
                 is_used=False,
-                purpose=purpose
+                otp_purpose=purpose
             ).order_by("-created_at").first()
 
-            if not verification or verification.is_expired() or verification.otp != otp_entered:
+            if not verification:
+                print(f"🔍 VERIFY DEBUG - No OTP found for user {user.id} with purpose '{purpose}'")
                 return render(request, "verify_email.html", {
                     "email": email,
-                    "error": "Invalid or expired OTP"
+                    "error": "No OTP found. Please request a new one.",
+                    "purpose": purpose
                 })
 
-            # mark used
+            print(f"🔍 VERIFY DEBUG - OTP found: {verification.otp}, Created: {verification.created_at}")
+            print(f"🔍 VERIFY DEBUG - OTP expired: {verification.is_expired()}")
+
+            # Check if OTP is expired
+            if verification.is_expired():
+                return render(request, "verify_email.html", {
+                    "email": email,
+                    "error": "OTP has expired. Please request a new one.",
+                    "purpose": purpose
+                })
+
+            # Check if OTP matches
+            if verification.otp != otp_entered:
+                return render(request, "verify_email.html", {
+                    "email": email,
+                    "error": "Invalid OTP. Please try again.",
+                    "purpose": purpose
+                })
+
+            # Mark OTP as used
             verification.is_used = True
             verification.save()
+            print(f"🔍 VERIFY DEBUG - OTP marked as used")
 
-            # mark email verified
-            profile = user.profile
-            profile.is_email_verified = True
-            profile.save()
+            # Mark email as verified (if not already)
+            if not user.profile.is_email_verified:
+                profile = user.profile
+                profile.is_email_verified = True
+                profile.save()
+                print(f"🔍 VERIFY DEBUG - Email verified for user {user.id}")
 
-            # ================= LOGIN PURPOSE =================
+            # ================= HANDLE BASED ON PURPOSE =================
+            
+            # LOGIN PURPOSE
             if purpose == "login":
+                print(f"🔍 VERIFY DEBUG - Processing LOGIN purpose")
 
-                if not user_id:
-                    messages.error(request, "Session expired. Please login again.")
-                    return redirect("login")
-
+                # Log the user in
                 auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
-                # cleanup session
-                request.session.pop("pending_user_id", None)
-                request.session.pop("pending_email", None)
-                request.session.pop("otp_purpose", None)
+                # Clean up session
+                for key in ['pending_user_id', 'pending_email', 'otp_purpose']:
+                    if key in request.session:
+                        del request.session[key]
 
+                messages.success(request, f"Welcome back, {user.first_name or user.username}!")
                 return redirect("index")
 
-            # ================= REGISTER PURPOSE =================
-            auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+            # REGISTRATION PURPOSE
+            elif purpose == "registration" or purpose == "registeration":  # Handle typo
+                print(f"🔍 VERIFY DEBUG - Processing REGISTRATION purpose")
 
-            request.session.pop("pending_email", None)
-            request.session.pop("otp_purpose", None)
+                # Log the user in
+                auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
-            messages.success(request, "Email verified successfully!")
-            return redirect("index")
+                # Clean up session
+                for key in ['pending_email', 'otp_purpose']:
+                    if key in request.session:
+                        del request.session[key]
 
-        # ================= REGISTER =================
+                messages.success(request, "Email verified successfully! Welcome to EdTube!")
+                return redirect("index")
+
+            # PASSWORD RESET PURPOSE
+            elif purpose == "password_reset":
+                print(f"🔍 VERIFY DEBUG - Processing PASSWORD RESET purpose")
+
+                # Store in session for password reset
+                request.session["reset_user_id"] = user.id
+                request.session["reset_email"] = email
+                request.session.set_expiry(900)  # 15 minutes
+
+                # Clean up pending session data
+                for key in ['pending_user_id', 'pending_email', 'otp_purpose']:
+                    if key in request.session:
+                        del request.session[key]
+
+                messages.success(request, "OTP verified. Please set your new password.")
+                return redirect("set_new_password")
+
+            # UNKNOWN PURPOSE
+            else:
+                print(f"🔍 VERIFY DEBUG - Unknown purpose: {purpose}")
+                messages.error(request, "Invalid verification purpose.")
+                return redirect("login")
+
+        # ================= REGISTER (New Registration) =================
         fullname = request.POST.get("fullname")
         email = request.POST.get("email")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
         role = request.POST.get("role")
+
+        print(f"🔍 REGISTER DEBUG - New registration attempt: {email}, role: {role}")
 
         if not all([fullname, email, password, confirm_password, role]):
             return render(request, "register.html", {"error": "All fields required"})
@@ -128,9 +205,20 @@ def reg(request):
         if User.objects.filter(email=email).exists():
             return render(request, "register.html", {"error": "Email already exists"})
 
+        # Split name into first and last
         first_name, last_name = split_name(fullname)
         username = email.split("@")[0]
 
+        # Create base username and ensure uniqueness
+        base_username = username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        print(f"🔍 REGISTER DEBUG - Creating user: {username}")
+
+        # Create user
         user = User.objects.create_user(
             username=username,
             email=email,
@@ -139,10 +227,13 @@ def reg(request):
             last_name=last_name
         )
 
+        # Create profile
         profile = user.profile
         profile.role = role
+        profile.is_email_verified = False  # Explicitly set to False
         profile.save()
 
+        # Create teacher or student profile
         if role == "tutor":
             Teacher.objects.create(
                 teacher_id=generate_teacher_id(fullname),
@@ -150,6 +241,7 @@ def reg(request):
                 name=fullname,
                 username=username
             )
+            print(f"🔍 REGISTER DEBUG - Teacher profile created")
         else:
             Student.objects.create(
                 student_id=generate_student_id(fullname),
@@ -157,69 +249,83 @@ def reg(request):
                 name=fullname,
                 username=username
             )
+            print(f"🔍 REGISTER DEBUG - Student profile created")
 
-        # send OTP
+        # Generate and send OTP
         otp = EmailVerification.generate_otp()
+        print(f"🔍 REGISTER DEBUG - OTP generated: {otp}")
 
+        # Save OTP to database
         EmailVerification.objects.create(
             user=user,
             otp=otp,
-            purpose="register"
+            otp_purpose="registration"  # Fixed typo: was "registeration"
         )
 
+        # Send OTP email
         send_otp_email(email, otp, "registration")
 
+        # Clear any existing session data
+        for key in ['pending_email', 'pending_user_id', 'otp_purpose']:
+            if key in request.session:
+                del request.session[key]
+
+        # Set new session data
         request.session["pending_email"] = email
-        request.session["otp_purpose"] = "register"
+        request.session["otp_purpose"] = "registration"  # Fixed typo
+        request.session.set_expiry(900)  # 15 minutes expiry
+        request.session.modified = True
+
+        print(f"🔍 REGISTER DEBUG - Session set: {dict(request.session.items())}")
 
         return render(request, "verify_email.html", {
             "email": email,
-            "success": "OTP sent to your email"
+            "success": "OTP sent to your email. Please verify to complete registration.",
+            "purpose": "registration"
         })
 
+    # GET request - show registration form
     return render(request, "register.html")
 
 
 def resend_otp(request):
     if request.method == "POST":
+
         email = request.POST.get("email")
-        purpose = request.POST.get("purpose", "registration")
-        
+        purpose = request.POST.get("purpose")   # no default
+
         user = User.objects.filter(email=email).first()
-        
+
         if not user:
             messages.error(request, "User not found")
             return redirect("reg")
-        
-        # Mark old OTPs as used
-        EmailVerification.objects.filter(user=user, is_used=False).update(is_used=True)
-        
-        # Generate new OTP
+
+        # deactivate old OTPs for THIS purpose only
+        EmailVerification.objects.filter(
+            user=user,
+            otp_purpose=purpose,
+            is_used=False
+        ).update(is_used=True)
+
         otp = EmailVerification.generate_otp()
-        EmailVerification.objects.create(user=user, otp=otp)
-        
-        # Send OTP with correct purpose
+
+        EmailVerification.objects.create(
+            user=user,
+            otp=otp,
+            otp_purpose=purpose   # ✅ required
+        )
+
         send_otp_email(email, otp, purpose)
-        
-        # Update session
+
         request.session["pending_email"] = email
-        request.session["pending_purpose"] = purpose
-        
-        # Prepare response context
-        context = {
+        request.session["otp_purpose"] = purpose   # ✅ correct key
+
+        return render(request, "verify_email.html", {
             "email": email,
             "purpose": purpose,
-            "success": "New OTP has been sent to your email"
-        }
-        
-        # Add appropriate message based on purpose
-        if purpose == "login":
-            context["message"] = "Please verify your email to login"
-        else:
-            context["message"] = "Please verify your email to complete registration"
-        
-        return render(request, "verify_email.html", context)
-    
+            "success": "New OTP sent"
+        })
+
     return redirect("reg")
 
 
@@ -249,30 +355,47 @@ def login_view(request):
 
         # ================= EMAIL NOT VERIFIED =================
         if not user.profile.is_email_verified:
-
+            
+            # Clear any existing OTP-related session data first
+            for key in ['pending_email', 'pending_user_id', 'otp_purpose']:
+                if key in request.session:
+                    del request.session[key]
+            
+            # Mark old unused OTPs as used
             EmailVerification.objects.filter(
                 user=user,
                 is_used=False,
-                purpose="login"
+                otp_purpose="login"
             ).update(is_used=True)
 
+            # Generate and save new OTP
             otp = EmailVerification.generate_otp()
-
+            
             EmailVerification.objects.create(
                 user=user,
                 otp=otp,
-                purpose="login"
+                otp_purpose="login"
             )
 
+            # Send OTP email
             send_otp_email(email, otp, "login")
 
+            # Set session variables with explicit expiry
             request.session["pending_email"] = email
             request.session["pending_user_id"] = user.id
             request.session["otp_purpose"] = "login"
+            request.session.set_expiry(900)  # 15 minutes expiry
+            
+            # Force session save
+            request.session.modified = True
+
+            # Debug print (remove in production)
+            print(f"DEBUG - Login OTP sent - Session: {request.session.items()}")
 
             return render(request, "verify_email.html", {
                 "email": email,
-                "error": "Please verify your email"
+                "error": "Please verify your email",
+                "purpose": "login"
             })
 
         # ================= NORMAL LOGIN =================
@@ -349,7 +472,8 @@ def verify_reset_otp(request):
         if not verification or verification.is_expired() or verification.otp != otp_entered:
             return render(request, "verify_reset_otp.html", {
                 "email": email,
-                "error": "Invalid or expired OTP"
+                "error": "Invalid or expired OTP",
+                "purpose": "password_reset"
             })
 
         verification.is_used = True
@@ -396,11 +520,22 @@ def set_new_password(request):
 def account_settings(request):
     user = request.user
     profile = user.profile
-    teacher = user.teacher
-    if hasattr(user, 'student'):
-        student = user.student
-    else:
-        student=None
+    
+    teacher = None
+    student = None
+    
+    try:
+        if hasattr(user, 'teacher'):
+            teacher = user.teacher
+    except Teacher.DoesNotExist:
+        teacher = None
+        
+    try:
+        if hasattr(user, 'student'):
+            student = user.student
+    except Student.DoesNotExist:
+        student = None
+    
     suggestions = None
 
     if request.method == 'POST':

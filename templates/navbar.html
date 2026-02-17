@@ -38,8 +38,33 @@
             <hr style="color: var(--srch-color)"></hr>
             <a href="{%url 'vidhistory'%}"><i class="bi bi-clock-history"></i>Watch history</a>
             <a href=""><i class="bi bi-bookmarks"></i>Saved Videos</a>
-            <a href=""><i class="bi bi-play-btn-fill"></i>Your Videos</a>
-          {%endif%}          
+            <a href="{% url 'user_profile' username=request.user.username %}"><i class="bi bi-play-btn-fill"></i>Your Videos</a>
+          {%endif%}
+            <a href="javascript:void(0);" class="following-toggle">
+              Following
+              <i class="bi bi-chevron-down" style="float:right;"></i>
+            </a>
+            <div class="following-list d-none">
+              {% for follow in request.user.following_set.all %}
+                <a href="{% url 'user_profile' username=follow.teacher.user.username %}">
+                  
+                  {% if follow.teacher.pfp %}
+                    <img src="{{ follow.teacher.pfp.url }}"
+                        style="width:25px;height:25px;border-radius:50%;object-fit:cover;margin-right:8px;">
+                  {% else %}
+                    <div class="avatar-small" style="width:25px;height:25px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;">
+                      {{ follow.teacher.user.first_name|first }}{{ follow.teacher.user.last_name|first }}
+                    </div>
+                  {% endif %}
+                  {{ follow.teacher.user.first_name }} {{ follow.teacher.user.last_name }}
+
+                </a>
+              {% empty %}
+                <span style="padding:10px 20px;display:block;color:gray;">
+                  Not following anyone
+                </span>
+              {% endfor %}
+            </div>      
         {%endif%}
           <a href="javascript:void(0);" class="theme-toggle-btn">
             <i class="bi bi-brightness-high-fill theme-icon sun d-none" style="display: flex !important;"></i>

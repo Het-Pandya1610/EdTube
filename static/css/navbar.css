@@ -109,7 +109,7 @@ header img {
 /* Divider */
 .dropdown-divider {
     height: 1px;
-    background: var(--text-color);
+    background: var(--text-color) !important;
     margin: 8px 0;
     display: block;
 }
@@ -117,6 +117,17 @@ header img {
 .mobile-nav a:hover {
     background: rgba(255,255,255,0.1);
     color: #00c6ff;
+}
+
+.following-list a {
+    display: flex;
+    align-items: center;
+    padding: 8px 20px;
+    font-size: 14px;
+}
+
+.following-list a:hover {
+    background: rgba(0,0,0,0.05);
 }
 
 #pageContent{

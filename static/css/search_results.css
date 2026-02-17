@@ -1,8 +1,12 @@
+body{
+    background: var(--bg-color) !important;
+}
+
 .search-container {
     width: 100%; 
     max-width: 100%; 
     margin: 20px auto; 
-    padding: 0 15px;
+    padding: 0 30px;
     background: var(--bg-color);
 }
 .results-heading { 
@@ -78,6 +82,93 @@
     color: var(--text-color);
     margin: 0;
     line-height: 26px;
+    position: relative;
+}
+.video-options-btn{
+    background: none;
+    color: var(--text-color);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    z-index: 5;
+}
+
+.video-options-btn:hover {
+    background: rgba(128, 128, 128, 0.2);
+}
+
+.options-dropdown {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: var(--bg-color);
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    color: var(--text-color);
+    border-radius: 12px;
+    min-width: 220px;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.options-dropdown.show {
+    display: block;
+    margin-top: 5px;
+}
+
+.dropdown-item {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: rgba(79, 70, 229, 0.15);
+}
+
+.dropdown-item i { 
+    font-size: 1.2rem; 
+    width: 24px;
+    text-align: center;
+}
+
+.dropdown-item.delete-opt {
+    color: #ff4d4d;
+}
+
+.options-dropdown hr{
+    border: 0;
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+    margin: 8px 0;
+}
+
+.video-title-section {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
 }
 
 .meta-line { color: var(--text-color); font-size: 12px; }
@@ -90,7 +181,7 @@
 }
 
 .teacher-img { width: 24px; height: 24px; border-radius: 50%; }
-.teacher-name { color: var(--text-color); font-size: 28px; }
+.teacher-name { color: var(--text-color); font-size: 13px; }
 
 .badge-container { display: flex; gap: 8px; }
 .meta-badge {

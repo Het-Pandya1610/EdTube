@@ -36,6 +36,17 @@ function toggleMenu() {
   }
 }
 
+document.addEventListener("DOMContentLoaded", function() {
+    const toggle = document.querySelector(".following-toggle");
+    const list = document.querySelector(".following-list");
+
+    if (toggle && list) {
+        toggle.addEventListener("click", function() {
+            list.classList.toggle("d-none");
+        });
+    }
+});
+
 function toggleSearch() {
   document.body.classList.toggle('mobile-search-active');
 }

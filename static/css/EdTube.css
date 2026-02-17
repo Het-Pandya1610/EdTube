@@ -292,9 +292,9 @@ body {
     position: absolute;
     top: 45px;
     right: 10px;
-    background: var(--text-color);
+    background: var(--bg-color);
     border: 1px solid #444;
-    color: var(--bg-color);
+    color: var(--text-color);
     border-radius: 8px;
     min-width: 160px;
     padding-left: 5px;

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static "css/verify_email.css" %}">
 </head>
 <body>
-    {%include 'navbar.html'%}
+    {% include 'navbar.html' %}
     <div class="verify-container">
         <h2>Verify Your Email</h2>
         
@@ -35,7 +35,7 @@
         
         <p>Please enter the 6-digit verification code sent to your email address.</p>
         
-        <form method="POST">
+        <form method="POST" action="{% url 'verify_email' %}">
             {% csrf_token %}
             <input type="hidden" name="verify_otp" value="true">
             
@@ -54,13 +54,13 @@
                    autocomplete="off"
                    autofocus>
             
-            <button type="submit">Verify Email</button>
+            <button type="submit" class="verify-btn-primary">Verify Email</button>
         </form>
         
         <form method="POST" action="{% url 'resend_otp' %}">
             {% csrf_token %}
             <input type="hidden" name="email" value="{{ email }}">
-            <button type="submit" class="secondary-btn">
+            <button type="submit" class="verify-btn-secondary">
                 <i class="fas fa-redo"></i> Resend Verification Code
             </button>
         </form>

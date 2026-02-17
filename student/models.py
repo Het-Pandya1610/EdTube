@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from cloudinary_storage.storage import RawMediaCloudinaryStorage
 from cloudinary_storage.validators import validate_image
+from video.models import Quiz
+from django.db.models import Max
+from datetime import date, timedelta
 
 class Student(models.Model):
     user = models.OneToOneField(
@@ -54,3 +57,49 @@ class Student(models.Model):
         if self.pfp:
             return self.pfp.url
         return None
+    
+class QuizAttempt(models.Model):
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="quiz_attempts"
+    )
+
+    quiz = models.ForeignKey(
+        Quiz,
+        on_delete=models.CASCADE
+    )
+
+    score = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.student_id} - {self.quiz.id}"
+
+@property
+def total_quizzes(self):
+    return self.quiz_attempts.count()
+
+
+@property
+def best_score(self):
+    return self.quiz_attempts.aggregate(Max("score"))["score__max"] or 0
+
+
+@property
+def current_streak(self):
+    days = (
+        self.quiz_attempts
+        .dates("created_at", "day", order="DESC")
+    )
+
+    streak = 0
+    today = date.today()
+
+    for i, day in enumerate(days):
+        if day == today - timedelta(days=i):
+            streak += 1
+        else:
+            break
+
+    return streak

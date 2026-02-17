@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # EdTube - Educational Video Platform
 
 A Django-based platform for sharing and watching educational videos with YouTube-like interface.
@@ -439,6 +438,3 @@ git add README.md
 git commit -m "Add comprehensive README.md"
 git push origin main
 ```
-=======
-# Innovation-Village-SEM-III
->>>>>>> c8e6ab3b8e28c8f8ab5f2d2c2026caa0de194bf8

@@ -81,7 +81,7 @@
           <p>{{ profile_user.profile.bio | urlize | linebreaks }}</p>
           {% if profile_user.profile.role == 'tutor' %}
             <div class="inline-stats">
-              <span class="stat-item"><span class="stat-count">{{ profile_user.teacher.nos }}</span> Followers</span>
+              <span class="stat-item"><span id="follower-count" class="stat-count">{{ profile_user.teacher.nos }}</span> Followers</span>
               <span>•</span>
               <span class="stat-item"><span class="stat-count">{{ profile_user.teacher.nov }}</span> Videos</span>
             </div>
@@ -118,7 +118,7 @@
                 <div class="options-dropdown" id="menu-{{ video.video_id }}">
                   <div class="dropdown-item"><i class="bi bi-clock"></i> Watch Later</div>
                   <div class="dropdown-item"><i class="bi bi-bookmarks"></i> Save</div>
-                  <div class="dropdown-item"><i class="bi bi-share"></i> Share</div>
+                  <div class="dropdown-item openShare"  data-video-id="{{ video.video_id }}"><i class="bi bi-share"></i> Share</div>
                   
                   {% if is_owner %}
                     <hr style="border:0; border-top:2px solid var(--bg-color); margin:5px 0;">
@@ -178,6 +178,53 @@
                 </p>
               </div>
             {% endfor %}
+        </div>
+      {% else %}
+        <div class="student-dashboard">
+          <h3 class="section-title">
+            <i class="bi bi-clipboard-data"></i> Quiz Activity
+          </h3>
+          <div class="quiz-stats">
+            <div class="quiz-stat-box">
+              <h4>{{ profile_user.student.total_quizzes }}</h4>
+              <span>Quizzes Attempted</span>
+            </div>
+            <div class="quiz-stat-box">
+              <h4>{{ profile_user.student.current_streak }}</h4>
+              <span>Day Streak</span>
+            </div>
+            <div class="quiz-stat-box">
+              <h4>{{ profile_user.student.best_score }}%</h4>
+              <span>Best Score</span>
+            </div>
+          </div>
+          <div class="quiz-heatmap-wrapper">
+            <div class="heatmap-grid">
+              {% for day in quiz_activity %}
+                <div
+                  class="heatmap-box level-{{ day.level }}"
+                  title="{{ day.date }} • {{ day.count }} quizzes">
+                </div>
+              {% empty %}
+                <p>No quiz activity yet.</p>
+              {% endfor %}
+            </div>
+          </div>
+          <h4 class="mt-4">Recent Attempts</h4>
+          <div class="recent-quiz-list">
+            {% for attempt in profile_user.student.quiz_attempts.all|slice:":5" %}
+              <div class="recent-quiz-item">
+                <span class="quiz-title">
+                  {{ attempt.quiz.video.title }}
+                </span>
+                <span class="quiz-score">
+                  {{ attempt.score }}%
+                </span>
+              </div>
+            {% empty %}
+              <p>No quizzes attempted yet.</p>
+            {% endfor %}
+          </div>
         </div>
       {% endif %}
     </div>

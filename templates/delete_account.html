@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}?v=1">
     <title>Delete Account | EdTube</title>
     <link rel="stylesheet" href="{% static "css/delete_account.css" %}">
+    <script src="{% static "js/password-toggle.js" %}" defer></script>
 </head>
 <body>
     {% include 'navbar.html' %}
@@ -30,7 +31,28 @@
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="delete_account" value="true">
-            
+            <div class="warning-note">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>This will permanently delete your account and all associated data.</span>
+            </div>
+            <div class="consequences">
+                <ul>
+                    <li>All your videos, playlists, and comments will be removed.</li>
+                    <li>You will lose access to your channel and profile.</li>
+                    <li>Any subscriptions or followers will be lost.</li>
+                </ul>
+            </div>
+            <div class="input-group">
+                <label for="password">Confirm your password:</label>
+                <div class="password-box">
+                    <input type="password" name="password" id="password" placeholder="Password" required>
+                    <i class="bi bi-eye toggle" style="margin-top: -6px !important;" data-target="password" aria-label="Toggle password visibility"></i>
+                </div>
+            </div>
+            <div class="confirmation-checkbox">
+                <input type="checkbox" id="confirmDelete" name="confirm_delete" required>
+                <label for="confirmDelete">I understand the consequences of deleting my account.</label>
+            </div>
             <button type="submit" class="delete-btn">Yes, Delete My Account</button>
             <a href="{% url 'account_settings' %}" class="cancel-link">No, Keep My Account</a>
         </form>

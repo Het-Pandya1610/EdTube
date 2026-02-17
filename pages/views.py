@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 import imghdr
 from PIL import Image
+from student.utils import get_quiz_heatmap
 
 def index(request):
     videos = []
@@ -209,7 +210,11 @@ def user_profile(request, username):
         'is_owner': is_owner, 
         'is_following': is_following,         
     }
-
+    
+    if profile_user.profile.role == 'student':
+        student = profile_user.student
+        context['quiz_heatmap'] = get_quiz_heatmap(student)
+    
     return render(request, 'profile.html', context)
 
 @require_POST

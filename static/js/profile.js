@@ -1,4 +1,13 @@
-// static/js/profile.js - UPDATED VERSION
+// static/js/profile.js - UPDATED VERSION WITH OPTIMIZED FOLLOW TOGGLE
+
+// Cache for CSRF token
+let cachedCsrfToken = null;
+
+// Map to track ongoing follow requests for debouncing
+const followRequests = new Map();
+
+// Loading states for buttons
+const loadingStates = new Map();
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all functionality
@@ -9,7 +18,38 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof ImageCropper === 'undefined') {
         loadCropperScript();
     }
+    
+    // Add spinner styles if not present
+    addSpinnerStyles();
 });
+
+function addSpinnerStyles() {
+    if (!document.querySelector('#spinner-style')) {
+        const style = document.createElement('style');
+        style.id = 'spinner-style';
+        style.textContent = `
+            .spinning {
+                animation: spin 1s linear infinite;
+                display: inline-block;
+            }
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            .btn-loading {
+                opacity: 0.8;
+                cursor: wait;
+                pointer-events: none;
+            }
+            
+            .btn-loading i {
+                animation: spin 1s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
 
 function initImageUpload() {
     // Profile picture upload
@@ -122,6 +162,8 @@ function positionDropdown(dropdown) {
     }
 }
 
+
+
 function handleImageUpload(event, type, aspectRatio) {
     const file = event.target.files[0];
     if (!file) return;
@@ -224,13 +266,17 @@ function uploadCroppedImage(blob, type) {
     });
 }
 
+// Optimized CSRF token getter with caching
 function getCsrfToken() {
+    if (cachedCsrfToken) return cachedCsrfToken;
+    
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('csrftoken='))
         ?.split('=')[1];
     
-    return cookieValue || '';
+    cachedCsrfToken = cookieValue || '';
+    return cachedCsrfToken;
 }
 
 function showNotification(message, type = 'info') {
@@ -338,24 +384,70 @@ function loadCropperScript() {
     document.head.appendChild(script);
 }
 
+// OPTIMIZED FOLLOW TOGGLE HANDLER
+// OPTIMIZED FOLLOW TOGGLE HANDLER - FIXED VERSION
 document.addEventListener('click', function (event) {
-    // Look for the button or any element inside the button (like the icon)
     const followBtn = event.target.closest('#follow-btn');
-
+    
     if (followBtn) {
         event.preventDefault();
-
-        const username = followBtn.getAttribute('data-teacher-username');
-        const nosCount = document.getElementById('follower-count');
         
-        // Grab the CSRF token from the page
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-        if (!csrftoken) {
-            console.error("CSRF token not found! Add {% csrf_token %} to your HTML.");
+        // Prevent multiple rapid clicks
+        if (followBtn.classList.contains('btn-loading')) {
             return;
         }
 
+        const username = followBtn.getAttribute('data-teacher-username');
+        
+        // Debounce check - prevent duplicate requests for same user
+        if (followRequests.has(username)) {
+            const lastRequest = followRequests.get(username);
+            if (Date.now() - lastRequest < 1500) { // 1.5 second debounce
+                showNotification('Please wait...', 'info');
+                return;
+            }
+        }
+        followRequests.set(username, Date.now());
+
+        const nosCount = document.getElementById('follower-count');
+        const currentCount = parseInt(nosCount?.innerText || '0');
+        const isCurrentlyFollowing = followBtn.classList.contains('following-active');
+        
+        // Store original state for rollback
+        const originalState = {
+            html: followBtn.innerHTML,
+            class: isCurrentlyFollowing ? 'following-active' : '',
+            count: currentCount,
+            isFollowing: isCurrentlyFollowing
+        };
+        
+        // Show loading state
+        followBtn.classList.add('btn-loading');
+        followBtn.innerHTML = '<i class="bi bi-arrow-repeat spinning"></i>';
+        
+        // Calculate optimistic update based on current state
+        const optimisticCount = isCurrentlyFollowing ? currentCount - 1 : currentCount + 1;
+        
+        // Apply optimistic update
+        if (isCurrentlyFollowing) {
+            followBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Follow';
+            followBtn.classList.remove('following-active');
+        } else {
+            followBtn.innerHTML = '<i class="bi bi-check2"></i> Following';
+            followBtn.classList.add('following-active');
+        }
+        
+        // Update count optimistically
+        if (nosCount) {
+            nosCount.innerText = optimisticCount;
+        }
+        
+        // Remove loading state
+        followBtn.classList.remove('btn-loading');
+
+        const csrftoken = getCsrfToken();
+
+        // Actual server request (happens in background)
         fetch(`/teacher/toggle-follow/${username}/`, {
             method: 'POST',
             headers: {
@@ -363,9 +455,20 @@ document.addEventListener('click', function (event) {
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.status === 'success') {
+                // Server confirmed - update with server's count
+                if (nosCount && data.new_count !== undefined) {
+                    nosCount.innerText = data.new_count;
+                }
+                
+                // Ensure button state matches server action
                 if (data.action === 'followed') {
                     followBtn.innerHTML = '<i class="bi bi-check2"></i> Following';
                     followBtn.classList.add('following-active');
@@ -373,13 +476,51 @@ document.addEventListener('click', function (event) {
                     followBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Follow';
                     followBtn.classList.remove('following-active');
                 }
-
-                // Update the count without reloading the page
-                if (nosCount && data.new_count !== undefined) {
-                    nosCount.innerText = data.new_count;
-                }
+            } else {
+                throw new Error(data.message || 'Failed to update follow status');
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Follow error:', error);
+            
+            // Rollback to original state on error
+            followBtn.innerHTML = originalState.html;
+            if (originalState.isFollowing) {
+                followBtn.classList.add('following-active');
+            } else {
+                followBtn.classList.remove('following-active');
+            }
+            if (nosCount) {
+                nosCount.innerText = originalState.count;
+            }
+            
+            showNotification('Error updating follow status: ' + error.message, 'error');
+        })
+        .finally(() => {
+            // Clean up debounce after a delay
+            setTimeout(() => {
+                followRequests.delete(username);
+            }, 1500);
+        });
+    }
+});
+
+
+document.addEventListener('touchstart', function (event) {
+    const followBtn = event.target.closest('#follow-btn');
+    if (followBtn) {
+        // Prevent double-tap zoom on follow button
+        event.preventDefault();
+    }
+}, { passive: false });
+
+// Optional: Add keyboard shortcut for accessibility (Enter key)
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        const followBtn = document.activeElement.closest('#follow-btn');
+        if (followBtn) {
+            event.preventDefault();
+            followBtn.click();
+        }
     }
 });
