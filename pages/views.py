@@ -10,8 +10,10 @@ from video.utils import HISTORY_FILE, file_lock
 from django.utils.html import escape
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 import imghdr
+from accounts.models import SearchHistory
 from PIL import Image
 from student.utils import get_quiz_heatmap
 
@@ -73,8 +75,27 @@ def search(request):
     teachers = []
     
     if query:
+        # ===== UPDATED: Save search to DATABASE instead of JSON =====
         if request.user.is_authenticated:
-            save_to_history("search", request.user.email, query)
+            # Save to database
+            SearchHistory.objects.create(
+                user=request.user,
+                query=raw_query[:255]  # Limit length
+            )
+            
+            # Optional: Clean up old searches (keep last 100)
+            # This prevents the table from growing indefinitely
+            from django.db.models import Count
+            search_count = SearchHistory.objects.filter(user=request.user).count()
+            if search_count > 100:
+                # Keep only the 100 most recent
+                oldest_to_keep = SearchHistory.objects.filter(
+                    user=request.user
+                ).order_by('-searched_at')[100:].values_list('id', flat=True)
+                SearchHistory.objects.filter(
+                    user=request.user,
+                    id__in=oldest_to_keep
+                ).delete()
         
         # Check for "subject by teacher" pattern (e.g., "Math by John")
         if ' by ' in raw_query.lower():
@@ -107,15 +128,14 @@ def search(request):
         elif raw_query.startswith('#'):
             tag_query = query[1:]
 
+            # ===== UPDATED: Better hashtag search =====
             videos = Video.objects.filter(
-                Q(description__icontains=f" #{tag_query} ") |  # Hashtag with spaces around
-                Q(description__icontains=f" #{tag_query}\n") |  # Hashtag followed by newline
-                Q(description__icontains=f"\n#{tag_query} ") |  # Hashtag preceded by newline
-                Q(description__icontains=f"#{tag_query},") |    # Hashtag followed by comma
-                Q(description__icontains=f",#{tag_query}") |    # Hashtag preceded by comma
-                Q(description__startswith=f"#{tag_query} ") |   # Hashtag at start of description
-                Q(title__icontains=tag_query) |                # Also search in title
-                Q(subject__icontains=tag_query)                # Also search in subject
+                Q(description__icontains=f"#{tag_query}") |
+                Q(description__icontains=f"#{tag_query} ") |
+                Q(description__icontains=f"#{tag_query},") |
+                Q(description__icontains=f"#{tag_query}.") |
+                Q(title__icontains=tag_query) |
+                Q(subject__icontains=tag_query)
             ).select_related("teacher")
             
             teachers = Teacher.objects.filter(
@@ -123,7 +143,7 @@ def search(request):
                 Q(username__icontains=tag_query)
             )
         else:
-            # Normal search (existing logic)
+            # Normal search
             videos = Video.objects.filter(
                 Q(title__icontains=raw_query) |
                 Q(subject__icontains=raw_query) |
@@ -135,62 +155,144 @@ def search(request):
                 Q(username__icontains=raw_query)
             )
     
+    # ===== NEW: Get popular searches for the template =====
+    popular_searches = []
+    if request.user.is_authenticated:
+        from django.db.models import Count
+        popular_searches = SearchHistory.objects.filter(
+            user=request.user
+        ).values('query').annotate(
+            count=Count('id')
+        ).order_by('-count')[:5]
+    
     return render(request, "search_results.html", {
         "query": query,
         "videos": videos,
         "teachers": teachers,
+        "popular_searches": popular_searches,
+        "result_count": len(videos) + len(teachers)
     })
     
+@login_required
+def search_suggestions(request):
+    """API endpoint for search suggestions"""
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse([], safe=False)
+    
+    # 1. Get user's search history that matches
+    history_suggestions = SearchHistory.objects.filter(
+        user=request.user,
+        query__icontains=query
+    ).values_list('query', flat=True).order_by('-searched_at')[:3]
+    
+    # 2. Get video title suggestions
+    video_suggestions = Video.objects.filter(
+        Q(title__icontains=query) |
+        Q(subject__icontains=query)
+    ).values_list('title', flat=True).distinct()[:5]
+    
+    # 3. Get teacher name suggestions
+    teacher_suggestions = Teacher.objects.filter(
+        Q(name__icontains=query) |
+        Q(username__icontains=query)
+    ).values_list('name', flat=True)[:3]
+    
+    # Combine and remove duplicates
+    suggestions = []
+    suggestions.extend(list(history_suggestions))
+    suggestions.extend(list(video_suggestions))
+    suggestions.extend(list(teacher_suggestions))
+    
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_suggestions = []
+    for s in suggestions:
+        if s not in seen and s.lower() != query.lower():
+            seen.add(s)
+            unique_suggestions.append(s)
+            if len(unique_suggestions) >= 8:
+                break
+    
+    return JsonResponse(unique_suggestions, safe=False)
+
+@login_required
+def popular_searches_api(request):
+    """Get user's most frequent searches"""
+    from django.db.models import Count
+    
+    popular = SearchHistory.objects.filter(
+        user=request.user
+    ).values('query').annotate(
+        count=Count('id')
+    ).order_by('-count')[:10]
+    
+    return JsonResponse(list(popular), safe=False)
        
+@login_required
 def get_search_suggestions(request):
-    if not request.user.is_authenticated or not os.path.exists(HISTORY_FILE):
-        return JsonResponse([], safe=False)
-
+    """Get user's search history from DATABASE for suggestions"""
     try:
-        with open(HISTORY_FILE, 'r') as f:
-            content = json.load(f)
-            
-            # Filter searches for the logged-in user (Het or anyone else)
-            user_history = [
-                item['query'] for item in content.get("search_history", []) 
-                if item['email'] == request.user.email
-            ]
-            
-            # dict.fromkeys removes duplicates while keeping order
-            # reversed() makes sure the most recent searches show up first
-            unique_history = list(dict.fromkeys(reversed(user_history)))[:8]
-            return JsonResponse(unique_history, safe=False)
-    except (json.JSONDecodeError, IOError):
+        # Get last 20 searches from database
+        searches = SearchHistory.objects.filter(
+            user=request.user
+        ).order_by('-searched_at').values_list('query', flat=True)[:20]
+        
+        # Remove duplicates while preserving order
+        unique_searches = []
+        seen = set()
+        for query in searches:
+            if query not in seen:
+                seen.add(query)
+                unique_searches.append(query)
+                if len(unique_searches) >= 8:
+                    break
+        
+        return JsonResponse(unique_searches, safe=False)
+        
+    except Exception as e:
         return JsonResponse([], safe=False)
 
-
+@login_required
 def delete_search_suggestion(request):
-    if request.method == "POST" and request.user.is_authenticated:
+    """Delete a specific search query from DATABASE"""
+    
+    if request.method == "POST":
         try:
             data = json.loads(request.body)
             query_to_delete = data.get("query")
-            email = request.user.email #
-
-            with file_lock: # Prevent corruption during write
-                if os.path.exists(HISTORY_FILE):
-                    with open(HISTORY_FILE, 'r') as f:
-                        content = json.load(f)
-                    
-                    # Filter out the specific query for this user
-                    content["search_history"] = [
-                        item for item in content.get("search_history", [])
-                        if not (item['email'] == email and item['query'] == query_to_delete)
-                    ]
-
-                    with open(HISTORY_FILE, 'w') as f:
-                        json.dump(content, f, indent=4)
-                    
-                    return JsonResponse({"status": "success"})
+            
+            # Delete from database
+            deleted = SearchHistory.objects.filter(
+                user=request.user,
+                query=query_to_delete
+            ).delete()
+            
+            return JsonResponse({"status": "success", "deleted": deleted[0]})
+            
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
-            
+    
     return JsonResponse({"status": "unauthorized"}, status=401)
     
+@login_required
+def clear_search_history(request):
+    """Clear all search history from DATABASE"""
+    
+    if request.method == "POST":
+        try:
+            deleted = SearchHistory.objects.filter(
+                user=request.user
+            ).delete()
+            
+            
+            return JsonResponse({"status": "success", "deleted": deleted[0]})
+            
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+    
+    return JsonResponse({"status": "unauthorized"}, status=401)
 
 def user_profile(request, username):
     profile_user = get_object_or_404(User, username=username)

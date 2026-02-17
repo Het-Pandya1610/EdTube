@@ -1,60 +1,184 @@
+// navbar.js
 document.addEventListener("DOMContentLoaded", () => {
-
   const hamburger = document.getElementById("hamburgerBtn");
   const searchToggle = document.getElementById("searchToggleBtn");
   const voiceBtn = document.getElementById("voiceSearchBtn");
+  const searchInput = document.getElementById("searchInput");
+  const suggestionsBox = document.getElementById("suggestionsBox");
 
   hamburger?.addEventListener("click", toggleMenu);
   searchToggle?.addEventListener("click", toggleSearch);
   voiceBtn?.addEventListener("click", openVoiceSearch);
+  
+  // UPDATED: Load search history from database
+  if (searchInput) {
+    searchInput.addEventListener("focus", loadSearchHistory);
+    searchInput.addEventListener("input", handleSearchInput);
+    searchInput.addEventListener("blur", () => {
+      setTimeout(() => {
+        suggestionsBox.style.display = "none";
+      }, 200);
+    });
+  }
 
-});
-
-document.addEventListener("DOMContentLoaded", () => {
+  // Logo click handler
   const logo = document.getElementById("theme-logo");
-
   if (logo) {
     logo.addEventListener("click", () => {
       window.location.href = "/";
     });
   }
+
+  // Following dropdown
+  const toggle = document.querySelector(".following-toggle");
+  const list = document.querySelector(".following-list");
+  if (toggle && list) {
+    toggle.addEventListener("click", function() {
+      list.classList.toggle("d-none");
+    });
+  }
 });
 
+// UPDATED: Load search history from database
+function loadSearchHistory() {
+  const suggestionsBox = document.getElementById("suggestionsBox");
+  const searchInput = document.getElementById("searchInput");
+  
+  if (!searchInput.value) {
+    fetch('/get-search-suggestions/')
+      .then(response => response.json())
+      .then(searches => {
+        if (searches.length > 0) {
+          suggestionsBox.style.display = "block";
+          suggestionsBox.innerHTML = `
+            <div class="suggestions-header">
+              <span>Recent searches</span>
+              <button class="clear-history-btn" onclick="clearSearchHistory()">
+                <i class="bi bi-trash"></i> Clear
+              </button>
+            </div>
+            ${searches.map(query => `
+              <div class="suggestion-item" onclick="selectSuggestion('${query}')">
+                <i class="bi bi-clock-history"></i>
+                <span>${query}</span>
+                <button class="delete-suggestion" onclick="deleteSearch('${query}', event)">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            `).join('')}
+          `;
+        }
+      })
+      .catch(error => console.error('Error loading search history:', error));
+  }
+}
+
+// UPDATED: Delete single search
+function deleteSearch(query, event) {
+  event.stopPropagation();
+  
+  fetch('/delete-search-suggestion/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({ query: query })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      loadSearchHistory(); // Reload suggestions
+    }
+  })
+  .catch(error => console.error('Error deleting search:', error));
+}
+
+// UPDATED: Clear all search history
+function clearSearchHistory() {
+  fetch('/clear-search-history/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken')
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      document.getElementById("suggestionsBox").style.display = "none";
+    }
+  })
+  .catch(error => console.error('Error clearing history:', error));
+}
+
+// Helper to get CSRF token
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function selectSuggestion(query) {
+  document.getElementById("searchInput").value = query;
+  document.getElementById("suggestionsBox").style.display = "none";
+  // Submit search
+  document.querySelector(".search-bar form").submit();
+}
+
+function handleSearchInput(e) {
+  const query = e.target.value;
+  const suggestionsBox = document.getElementById("suggestionsBox");
+  
+  if (query.length > 1) {
+    fetch(`/search/suggestions/?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          suggestionsBox.style.display = "block";
+          suggestionsBox.innerHTML = data.map(item => `
+            <div class="suggestion-item" onclick="selectSuggestion('${item}')">
+              <i class="bi bi-search"></i>
+              <span>${item}</span>
+            </div>
+          `).join('');
+        } else {
+          suggestionsBox.style.display = "none";
+        }
+      });
+  } else {
+    loadSearchHistory();
+  }
+}
 
 function toggleMenu() {
   const nav = document.getElementById('mobileNav');
   const hamburger = document.getElementById('hamburgerBtn');
   
-  // Toggle the 'active' class to trigger the CSS transition
   nav.classList.toggle('active');
   hamburger.classList.toggle('active');
 
-  // Logic for shifting page content if on desktop
   if (window.innerWidth >= 992) {
     const isNowOpen = nav.classList.contains('active');
     document.body.classList.toggle('nav-open', isNowOpen);
   }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    const toggle = document.querySelector(".following-toggle");
-    const list = document.querySelector(".following-list");
-
-    if (toggle && list) {
-        toggle.addEventListener("click", function() {
-            list.classList.toggle("d-none");
-        });
-    }
-});
-
 function toggleSearch() {
   document.body.classList.toggle('mobile-search-active');
 }
 
-/* ================= VOICE SEARCH ================= */
-
+/* ================= VOICE SEARCH (unchanged) ================= */
 let recognition;
-const micOnSound  = document.getElementById("micOnSound");
+const micOnSound = document.getElementById("micOnSound");
 const micOffSound = document.getElementById("micOffSound");
 const micErrorSound = document.getElementById("micErrorSound");
 
@@ -89,6 +213,8 @@ function openVoiceSearch() {
     const transcript = event.results[0][0].transcript;
     input.value = transcript;
     closeVoiceSearch();
+    // Submit search automatically
+    document.querySelector(".search-bar form").submit();
   };
 
   recognition.onerror = () => {
@@ -112,8 +238,7 @@ document.getElementById("voiceOverlay")?.addEventListener("click", (e) => {
   }
 });
 
-/* ================= MIC VISUALIZER ================= */
-
+// Mic visualizer (unchanged)
 const voiceMic = document.getElementById("voiceMic");
 const canvas = document.getElementById("voiceCanvas");
 const ctx = canvas?.getContext("2d");
@@ -129,23 +254,27 @@ voiceMic && (voiceMic.onclick = async () => {
     return;
   }
 
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-  audioContext = new AudioContext();
-  analyser = audioContext.createAnalyser();
-  source = audioContext.createMediaStreamSource(stream);
+    audioContext = new AudioContext();
+    analyser = audioContext.createAnalyser();
+    source = audioContext.createMediaStreamSource(stream);
 
-  source.connect(analyser);
-  analyser.fftSize = 256;
+    source.connect(analyser);
+    analyser.fftSize = 256;
 
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-  canvas.width = 300;
-  canvas.height = 80;
-  canvas.style.display = "block";
-  isListening = true;
+    canvas.width = 300;
+    canvas.height = 80;
+    canvas.style.display = "block";
+    isListening = true;
 
-  draw();
+    draw();
+  } catch (err) {
+    console.error('Microphone error:', err);
+  }
 });
 
 function draw() {
@@ -161,7 +290,7 @@ function draw() {
 
   for (let i = 0; i < dataArray.length; i++) {
     const barHeight = dataArray[i] / 2;
-    ctx.fillStyle = "rgb(0,0,255)";
+    ctx.fillStyle = "rgb(0, 207, 255)"; // Your theme color
     ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
     x += barWidth + 1;
   }

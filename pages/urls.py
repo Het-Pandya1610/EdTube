@@ -15,8 +15,10 @@ urlpatterns = [
     path('about-us/', views.aboutUs, name='AboutUs'),
     path('search/', views.search, name='search_alt'),
     path('search-results/',views.search,name='search'),
-    path('api/search-suggestions/', views.get_search_suggestions, name='search_suggestions_api'),
-    path('api/delete-search-history/', views.delete_search_suggestion, name='delete_search_history'),
+    path('get-search-suggestions/', views.get_search_suggestions, name='get_search_suggestions'),
+    path('delete-search-suggestion/', views.delete_search_suggestion, name='delete_search_suggestion'),
+    path('clear-search-history/', views.clear_search_history, name='clear_search_history'),
+    path('search/suggestions/', views.search_suggestions, name='search_suggestions'),
     path('api/upload-profile-image/', views.upload_profile_image, name='upload_profile_image'),
     path('@<str:username>/', views.user_profile, name='user_profile'),
 ]

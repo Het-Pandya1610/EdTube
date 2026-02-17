@@ -52,13 +52,13 @@
                    autocomplete="off"
                    autofocus>
             
-            <button type="submit">Verify Email</button>
+            <button type="submit" class="verify-btn-primary">Verify Email</button>
         </form>
         
         <form method="POST" action="{% url 'resend_otp' %}">
             {% csrf_token %}
             <input type="hidden" name="email" value="{{ email }}">
-            <button type="submit" class="secondary-btn">
+            <button type="submit" class="verify-btn-secondary">
                 <i class="fas fa-redo"></i> Resend Verification Code
             </button>
         </form>

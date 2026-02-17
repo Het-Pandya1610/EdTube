@@ -1,16 +1,14 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
-from .models import Video,Comment, CommentReply
+from .models import Video,Comment, CommentReply, Quiz, VideoHistory
 from teacher.models import Teacher
-from .utils import save_to_history 
+from .utils import save_to_history
 from django.utils.html import linebreaks, urlize
 from .utils import HISTORY_FILE
 import json, os
 from django.db import transaction
 import csv
-from .models import Quiz
-
 
 @login_required
 def videoUpload(request):
@@ -209,36 +207,29 @@ def toggle_video_like(request, video_id):
         "like_count": video.like_count
     })
 
-
+@login_required
 def videoHistory(request):
+    """View for video history page"""
+    
+    # Get user's video history with prefetched video data
+    history_entries = VideoHistory.objects.filter(
+        user=request.user
+    ).select_related('video').order_by('-watched_at')[:20]
+    
+    # Extract unique videos (keeping order)
+    seen_ids = set()
     watched_videos = []
-    if request.user.is_authenticated:
-        if os.path.exists(HISTORY_FILE):
-            try:
-                with open(HISTORY_FILE, 'r') as f:
-                    content = json.load(f)
-                    # Filter history for current user and get video IDs
-                    history_entries = [
-                        item for item in content.get("video_history", []) 
-                        if item['email'] == request.user.email
-                    ]
-                    
-                    # Sort by most recent (timestamp) and get unique IDs
-                    history_entries.sort(key=lambda x: x['timestamp'], reverse=True)
-                    video_ids = []
-                    for entry in history_entries:
-                        if entry['video_id'] not in video_ids:
-                            video_ids.append(entry['video_id'])
-                    
-                    # Fetch Video objects from DB in the correct order
-                    # Using a list to maintain the 'most recent' order
-                    unordered_videos = Video.objects.filter(video_id__in=video_ids[:20])
-                    video_map = {v.video_id: v for v in unordered_videos}
-                    watched_videos = [video_map[vid] for vid in video_ids if vid in video_map]
-            except (json.JSONDecodeError, IOError):
-                pass
-
-    return render(request, 'video_history.html', {'videos': watched_videos})
+    for entry in history_entries:
+        if entry.video.video_id not in seen_ids:
+            seen_ids.add(entry.video.video_id)
+            watched_videos.append(entry.video)
+    
+    context = {
+        'videos': watched_videos,
+        'total_count': VideoHistory.objects.filter(user=request.user).count()
+    }
+    
+    return render(request, 'video_history.html', context)
 
 def quiz(request):
     return render(request, 'quiz.html')

@@ -335,7 +335,7 @@ def login_view(request):
 
         email = request.POST.get("email")
         password = request.POST.get("password")
-
+        
         if not email or not password:
             return render(request, "login.html", {
                 "error": "Email and password are required"
@@ -346,9 +346,7 @@ def login_view(request):
         if not user:
             return render(request, "login.html", {"error": "Email not found"})
 
-        username = email.split("@")[0]
-
-        auth_user = authenticate(request, username=username, password=password)
+        auth_user = authenticate(request, username=user.username, password=password)
 
         if not auth_user:
             return render(request, "login.html", {"error": "Invalid password"})

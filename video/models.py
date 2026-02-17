@@ -170,6 +170,24 @@ class Video(models.Model):
 
     def __str__(self):
         return f"{self.video_id} - {self.title}"
+
+class VideoHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='video_history')
+    video = models.ForeignKey('Video', on_delete=models.CASCADE)
+    watched_at = models.DateTimeField(auto_now_add=True)
+    watch_duration = models.IntegerField(default=0)  # seconds watched
+    completed = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-watched_at']
+        indexes = [
+            models.Index(fields=['user', '-watched_at']),
+            models.Index(fields=['user', 'video']),
+        ]
+        unique_together = ['user', 'video', 'watched_at']  # Prevent exact duplicates
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.video.title} - {self.watched_at}"
     
 class Comment(models.Model):
     video = models.ForeignKey(

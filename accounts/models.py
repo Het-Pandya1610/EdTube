@@ -40,3 +40,18 @@ class EmailVerification(models.Model):
     @classmethod
     def generate_otp(cls):
         return ''.join(random.choices(string.digits, k=6))
+    
+class SearchHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='search_history')
+    query = models.CharField(max_length=255)
+    searched_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-searched_at']
+        indexes = [
+            models.Index(fields=['user', '-searched_at']),
+            models.Index(fields=['query']),  # For popular searches
+        ]
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.query} - {self.searched_at}"

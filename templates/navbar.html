@@ -1,3 +1,4 @@
+<!-- navbar.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -5,12 +6,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{% static 'js/themes.js' %}" defer></script>
   <link rel="stylesheet" href="{% static "css/navbar.css" %}">
-  <title>Document</title>
+  <title>EduNex</title>
 </head>
 <body>
   <header>
@@ -29,59 +30,68 @@
           <a href="{%url 'login'%}"><i class="bi bi-box-arrow-in-right"></i>Sign In</a>
         {% endif %}
         <a href="{%url 'reviews'%}"><i class="bi bi-star-fill"></i>Reviews</a>
+        
         {% if request.user.is_authenticated %}
-          {%if request.user.profile.role == "student"%}
-            <hr style="color: var(--srch-color)"></hr>
-            <a href="{%url 'vidhistory'%}"><i class="bi bi-clock-history"></i>Watch history</a>
-            <a href=""><i class="bi bi-bookmarks"></i>Saved Videos</a>
-          {%else%}
-            <hr style="color: var(--srch-color)"></hr>
-            <a href="{%url 'vidhistory'%}"><i class="bi bi-clock-history"></i>Watch history</a>
-            <a href=""><i class="bi bi-bookmarks"></i>Saved Videos</a>
-            <a href="{% url 'user_profile' username=request.user.username %}"><i class="bi bi-play-btn-fill"></i>Your Videos</a>
-          {%endif%}
-            <a href="javascript:void(0);" class="following-toggle">
-              Following
-              <i class="bi bi-chevron-down" style="float:right;"></i>
+          <hr style="color: var(--srch-color)">
+          
+          <!-- UPDATED: Video History Link -->
+          <a href="{% url 'video_history' %}">
+            <i class="bi bi-clock-history"></i>Watch history
+          </a>          
+          <a href=""><i class="bi bi-bookmarks"></i>Saved Videos</a>
+          
+          {% if request.user.profile.role == "tutor" %}
+            <a href="{% url 'user_profile' username=request.user.username %}">
+              <i class="bi bi-play-btn-fill"></i>Your Videos
             </a>
-            <div class="following-list d-none">
-              {% for follow in request.user.following_set.all %}
-                <a href="{% url 'user_profile' username=follow.teacher.user.username %}">
-                  
-                  {% if follow.teacher.pfp %}
-                    <img src="{{ follow.teacher.pfp.url }}"
-                        style="width:25px;height:25px;border-radius:50%;object-fit:cover;margin-right:8px;">
-                  {% else %}
-                    <div class="avatar-small" style="width:25px;height:25px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;">
-                      {{ follow.teacher.user.first_name|first }}{{ follow.teacher.user.last_name|first }}
-                    </div>
-                  {% endif %}
-                  {{ follow.teacher.user.first_name }} {{ follow.teacher.user.last_name }}
-
-                </a>
-              {% empty %}
-                <span style="padding:10px 20px;display:block;color:gray;">
-                  Not following anyone
-                </span>
-              {% endfor %}
-            </div>      
-        {%endif%}
-          <a href="javascript:void(0);" class="theme-toggle-btn">
-            <i class="bi bi-brightness-high-fill theme-icon sun d-none" style="display: flex !important;"></i>
-            <i class="bi bi-toggle-off theme-toggle" style="display: flex !important;"></i>
-            <i class="bi bi-moon-fill theme-icon moon" style="display: flex !important;"></i>
+          {% endif %}
+          
+          <!-- Following dropdown (unchanged) -->
+          <a href="javascript:void(0);" class="following-toggle">
+            Following
+            <i class="bi bi-chevron-down" style="float:right;"></i>
           </a>
-        {%include 'footer.html'%}
+          <div class="following-list d-none">
+            {% for follow in request.user.following_set.all %}
+              <a href="{% url 'user_profile' username=follow.teacher.user.username %}">
+                {% if follow.teacher.pfp %}
+                  <img src="{{ follow.teacher.pfp.url }}"
+                       style="width:25px;height:25px;border-radius:50%;object-fit:cover;margin-right:8px;">
+                {% else %}
+                  <div class="avatar-small" style="width:25px;height:25px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;">
+                    {{ follow.teacher.user.first_name|first }}{{ follow.teacher.user.last_name|first }}
+                  </div>
+                {% endif %}
+                {{ follow.teacher.user.first_name }} {{ follow.teacher.user.last_name }}
+              </a>
+            {% empty %}
+              <span style="padding:10px 20px;display:block;color:gray;">
+                Not following anyone
+              </span>
+            {% endfor %}
+          </div>      
+        {% endif %}
+        
+        <a href="javascript:void(0);" class="theme-toggle-btn">
+          <i class="bi bi-brightness-high-fill theme-icon sun d-none"></i>
+          <i class="bi bi-toggle-off theme-toggle"></i>
+          <i class="bi bi-moon-fill theme-icon moon"></i>
+        </a>
+        {% include 'footer.html' %}
       </div>
+      
       <div style="display:flex; align-items:center;">
         <img id="theme-logo" src="{% static 'assets/EdTube logo dark copy.png' %}" alt="LOGO"/>
       </div>
+      
       <div class="mobile-search-icon" id="searchToggleBtn">
         <i class="bi bi-search"></i>
       </div>
     </div>
+    
+    <!-- UPDATED: Search Bar with Database History -->
     <div class="search-bar">
-      <form action="{%url 'search'%}" method="get" autocomplete="off">
+      <form action="{% url 'search' %}" method="get" autocomplete="off">
         <input
           type="text"
           name="q"
@@ -89,8 +99,23 @@
           value="{{ query|escape }}"
           placeholder="Search"
           aria-label="Search"
+          autocomplete="off"
         />
-        <div class="search-suggestions" id="suggestionsBox"></div>
+        
+        <!-- UPDATED: Search suggestions from database -->
+        <div class="search-suggestions" id="suggestionsBox">
+          {% if request.user.is_authenticated %}
+            <div class="suggestions-header">
+              <span>Recent searches</span>
+              <button class="clear-history-btn" onclick="clearSearchHistory()">
+                <i class="bi bi-trash"></i> Clear
+              </button>
+            </div>
+            <div id="recentSearchesList">
+              <!-- Populated by JavaScript -->
+            </div>
+          {% endif %}
+        </div>
 
         <button type="submit" class="search-btn">
           <i class="bi bi-search"></i>
@@ -100,31 +125,29 @@
         </button>
       </form>
     </div>
-    
-
 
     {% if not request.user.is_authenticated %}
       <div class="auth-buttons">
-        <a href="{%url 'register'%}" class="btn signup">Sign Up</a>
-        <a href="{%url 'login'%}" class="btn login">Log In</a>
+        <a href="{% url 'register' %}" class="btn signup">Sign Up</a>
+        <a href="{% url 'login' %}" class="btn login">Log In</a>
       </div>
     {% else %}
       <div class="auth-buttons">
-        {%if request.user.profile.role == 'tutor'%}
-          <a class="create-btn" href="{%url 'videoUpload'%}">
+        {% if request.user.profile.role == 'tutor' %}
+          <a class="create-btn" href="{% url 'videoUpload' %}">
             <i class="bi bi-plus-lg" style="margin-right: 7px;"></i> Create
           </a>
         {% endif %}
+        
         <div class="notification-bedge">
-          <a href="{% url "notifications" %}"><i class="bi bi-bell"></i></a>
+          <a href="{% url 'notifications' %}"><i class="bi bi-bell"></i></a>
         </div>
+        
         <a href="{% url 'user_profile' username=request.user.username %}" class="profile" style="text-decoration: none;">
           {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
             <img src="{{ request.user.teacher.pfp.url }}" alt="Profile" style="width:40px !important; height:40px !important; border-radius:50% !important; object-fit:cover !important;">
-
           {% elif request.user.profile.role == "student" and request.user.student.pfp %}
             <img src="{{ request.user.student.pfp.url }}" alt="Profile" style="width:40px !important; height:40px !important; border-radius:50% !important; object-fit:cover !important;">
-
           {% else %}
             <div class="avatar-small">
               {{ request.user.first_name|first }}{{ request.user.last_name|first }}
@@ -133,22 +156,22 @@
         </a>
       </div>
     {% endif %}
-    
   </header>
-<div id="voiceOverlay" class="voice-overlay d-none">
-  <div class="voice-box">
-    <div class="voice-mic" id="voiceMic">
-      <i class="bi bi-mic-fill"></i>
+
+  <div id="voiceOverlay" class="voice-overlay d-none">
+    <div class="voice-box">
+      <div class="voice-mic" id="voiceMic">
+        <i class="bi bi-mic-fill"></i>
+      </div>
+      <canvas id="voiceCanvas"></canvas>
     </div>
-    <canvas id="voiceCanvas"></canvas>
   </div>
-</div>
-<audio id="micOnSound" src="{% static 'sounds/mic-on.mp3' %}" preload="auto"></audio>
-<audio id="micOffSound" src="{% static 'sounds/mic-off.mp3' %}" preload="auto"></audio>
-<audio id="micErrorSound" src="{% static 'sounds/mic-error.mp3' %}" preload="auto"></audio>
+  
+  <audio id="micOnSound" src="{% static 'sounds/mic-on.mp3' %}" preload="auto"></audio>
+  <audio id="micOffSound" src="{% static 'sounds/mic-off.mp3' %}" preload="auto"></audio>
+  <audio id="micErrorSound" src="{% static 'sounds/mic-error.mp3' %}" preload="auto"></audio>
 
   <script src="{% static 'js/navbar.js' %}" defer></script>
-
-<script src="{% static 'js/themes.js' %}" defer></script>
+  <script src="{% static 'js/themes.js' %}" defer></script>
 </body>
 </html>

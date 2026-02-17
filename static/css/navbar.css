@@ -530,6 +530,103 @@ z-index: 2000;
   opacity: 0.9;
 }
 
+.search-suggestions {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 87%;
+    flex: 1;
+    max-width: 497px;
+    margin: 0;
+    width: 100%;
+    background: var(--bg-color);
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    margin-top: 6px;
+    display: none;
+    z-index: 3000;
+    overflow: hidden;
+}
+
+.search-suggestions div {
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-color);
+}
+
+.search-suggestions div:hover {
+    background: rgba(0,0,0,0.08);
+}
+
+.search-suggestions i {
+    color: gray;
+}
+
+.suggestions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.clear-history-btn {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.clear-history-btn:hover {
+    color: #ff0000;
+}
+.suggestion-item{
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-color);
+}
+.suggestion-item:hover {
+    background: var(--srch-bg-color);
+}
+
+.suggestion-item i {
+    color: var(--icon-color);
+    font-size: 14px;
+}
+
+.suggestion-item span {
+    flex: 1;
+}
+
+.delete-suggestion {
+    margin-left: auto !important;
+    cursor: pointer;
+    font-size: 0.9rem;
+    background: none;
+    border: none;
+    color: var(--text-color);
+}
+
+.suggestion-item:hover .delete-suggestion {
+    opacity: 1;
+}
+
+.delete-suggestion:hover {
+    color: #ff4444;
+}
+
 /* Pulse animation */
 @keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(34, 0, 255, 0.6); }
@@ -548,12 +645,7 @@ z-index: 2000;
   display: none;
 }
 
-.remove-history{
-  margin-left: auto !important;
-  cursor: pointer;
-  color: var(--text-color);
-  font-size: 0.9rem;
-}
+
 
 @keyframes pendulum {
     0% { transform: rotate(0deg); }
