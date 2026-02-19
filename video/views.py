@@ -1,7 +1,8 @@
 from pathlib import Path
 import subprocess
 import uuid
-
+from notifications.models import Notification
+from teacher.models import Follower
 from EdTube import settings
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
@@ -36,8 +37,8 @@ def videoUpload(request):
 
         try:
             with transaction.atomic():
-                # ⚡ Create video object first
-                video = Video.objects.create(
+                # ✅ Create video object WITHOUT saving to DB yet
+                video = Video(
                     teacher=teacher,
                     title=request.POST.get("title"),
                     description=request.POST.get("description"),
@@ -45,7 +46,7 @@ def videoUpload(request):
                     subject=request.POST.get("subject"),
                 )
 
-                # ✅ Assign optional files / links
+                # ✅ Assign ALL fields BEFORE first save
                 if video_url:
                     video.video_link = video_url
                 if video_file:
@@ -56,7 +57,9 @@ def videoUpload(request):
                     video.notes = notes_file
                 if quiz_file:
                     video.quiz = quiz_file
-                video.save()
+                
+                # ✅ NOW save once with everything populated
+                video.save()  # This will trigger duration fetch
 
                 if quiz_file:
                     success, message = upload_quiz_file_in_database(video, quiz_file)
@@ -64,6 +67,22 @@ def videoUpload(request):
                         messages.warning(request, f"Quiz upload issue: {message}")
                     else:
                         messages.success(request, message)
+
+                followers = Follower.objects.filter(teacher=teacher).select_related("follower")
+
+                notification_list = []
+
+                for f in followers:
+                    if f.follower.profile.role == "student":
+                        notification_list.append(
+                            Notification(
+                                user=f.follower,
+                                message=f"{teacher.user.username} uploaded a new video: {video.title}",
+                                link=f"/watch/?v={video.video_id}"
+                            )
+                        )
+
+                Notification.objects.bulk_create(notification_list)
 
                 teacher.nov += 1
                 teacher.save()
@@ -74,7 +93,7 @@ def videoUpload(request):
         except Exception as e:
             print("Video Upload Error:", e)
             messages.error(request, f"Video upload failed: {e}")
-            return redirect("video_upload")
+            return redirect("videoUpload")
 
     return render(request, "video_upload.html")
 

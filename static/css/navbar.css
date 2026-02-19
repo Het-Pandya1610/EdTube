@@ -492,6 +492,36 @@ transform-origin: top center;
 .notification-bedge i:hover{
     animation: pendulum 0.5s ease-in-out infinite;    
 }
+.notification-bedge{
+  position: relative;
+}
+
+.notification-count{
+  position: absolute;
+  top: -5px;
+  right: 2px;
+
+  background: red;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+
+  padding: 2px 6px;
+  border-radius: 50px;
+}
+
+@keyframes swingOnce {
+  0% { transform: rotate(0); }
+  25% { transform: rotate(18deg); }
+  50% { transform: rotate(-14deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0); }
+}
+
+.bell-once{
+  animation: swingOnce 0.7s ease;
+}
+
 .auth-buttons .create-btn{
 width: 105px;
 height: 40px;

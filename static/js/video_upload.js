@@ -97,6 +97,15 @@ document.addEventListener("DOMContentLoaded", () => {
         subjectMedia.disabled = false;
         desMed.disabled = false;
     });
+    const uploadForm = document.querySelector("form");
+
+    uploadForm.addEventListener("submit", function () {
+      pageLoader.show({
+          message: "Uploading video...",
+          submessage: "Please wait while we process your content",
+          type: "upload"
+      });
+    });
 });
 
 document.addEventListener("DOMContentLoaded", () => {

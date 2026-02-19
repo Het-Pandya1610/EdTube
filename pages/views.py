@@ -32,8 +32,18 @@ def index(request):
     }
     return render(request, "EdTube.html", context)
 
+@login_required
 def notifications(request):
-    return render(request, "notifications.html")
+
+    notifications = request.user.notifications.order_by("-created_at")
+
+    # mark as read when opened
+    notifications.filter(is_read=False).update(is_read=True)
+
+    return render(request, "notifications.html", {
+        "notifications": notifications
+    })
+
 
 def faqs(request):
     return render(request, "faqs.html")

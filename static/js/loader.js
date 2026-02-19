@@ -8,9 +8,10 @@ class PageLoader {
     init() {
         // Create overlay if it doesn't exist
         if (!document.getElementById('global-loader-overlay')) {
-            this.overlay = document.createElement('div');
-            this.overlay.id = 'global-loader-overlay';
-            this.overlay.innerHTML = `
+            if (!this.overlay) {
+                this.overlay = document.createElement('div');
+                this.overlay.id = 'global-loader-overlay';
+                this.overlay.innerHTML = `
                 <div class="loader-container">
                     <div class="spinner-wrapper">
                         <div class="spinner"></div>
@@ -19,11 +20,11 @@ class PageLoader {
                     <div class="loader-message">Processing...</div>
                     <div class="loader-submessage">Please don't close or refresh the page</div>
                 </div>
-            `;
-            document.body.appendChild(this.overlay);
-            
-            // Add styles
-            this.addStyles();
+                `;
+                document.body.appendChild(this.overlay);
+
+                this.addStyles();
+            }
         }
     }
 
@@ -50,6 +51,7 @@ class PageLoader {
                 #global-loader-overlay.active {
                     display: flex;
                 }
+
 
                 .loader-container {
                     text-align: center;
@@ -108,7 +110,7 @@ class PageLoader {
                 }
 
                 /* Disable all clicks globally when overlay is active */
-                #global-loader-overlay.active ~ * {
+                body.loader-active *:not(#global-loader-overlay):not(#global-loader-overlay *) {
                     pointer-events: none !important;
                 }
 

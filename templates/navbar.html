@@ -147,7 +147,18 @@
           </div>
         {% endif %}
         <div class="notification-bedge">
-          <a href="{% url 'notifications' %}"><i class="bi bi-bell"></i></a>
+          <a href="{% url 'notifications' %}" class="bell-link">
+            <i class="bi bi-bell {% if notification_count > 0 %}bell-once{% else %}bell-hover{% endif %}" id="bell"></i>
+            {% if notification_count > 0 %}
+              <span class="notification-count">
+                {% if notification_count > 4 %}
+                  4+
+                {% else %}
+                  {{ notification_count }}
+                {% endif %}
+              </span>
+            {% endif %}
+          </a>
         </div>
         
         <div class="profile" id="pfpToggle" style="cursor:pointer;">

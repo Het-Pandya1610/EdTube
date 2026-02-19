@@ -81,7 +81,7 @@ class Video(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        # 1. Generate Custom Video ID
+
         if not self.video_id:
             teacher_name = self.teacher.name.strip().split()
             initials = "".join([n[0].upper() for n in teacher_name[:2]])
@@ -92,14 +92,13 @@ class Video(models.Model):
                 try:
                     last_num = int(last_video.video_id.split("-")[-1])
                     new_num = last_num + 1
-                except (ValueError, IndexError):
+                except:
                     new_num = 1
             else:
                 new_num = 1
 
             self.video_id = f"VID-{initials}-{subject_code}-{new_num:04d}"
 
-        # 2. File size validation
         if self.video_file and hasattr(self.video_file, "size"):
             if self.video_file.size > 100 * 1024 * 1024:
                 raise ValidationError("Video file must be under 100MB")
@@ -113,23 +112,24 @@ class Video(models.Model):
                 if field.size > 10 * 1024 * 1024:
                     raise ValidationError(f"{name} must be under 10MB")
 
-        # 3. FIRST save → upload files to Cloudinary
-        super().save(*args, **kwargs)
-
-        # 4. Duration extraction (ONLY if not set)
-        if not self.duration or self.duration == "0:00":
+        # Fetch duration BEFORE saving (for new objects)
+        if self._state.adding and (not self.duration or self.duration == "0:00"):
             try:
-                # Option A: YouTube link
                 if self.video_link:
-                    ydl_opts = {"quiet": True, "noplaylist": True}
+                    ydl_opts = {
+                        "quiet": True,
+                        "noplaylist": True,
+                        "skip_duration": False
+                    }
+
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                         info = ydl.extract_info(self.video_link, download=False)
-                        seconds = info.get("duration")
-                        if seconds:
-                            self.duration = self.format_seconds(seconds)
-                            super().save(update_fields=["duration"])
 
-                # Option B: Cloudinary video file
+                    seconds = info.get("duration")
+
+                    if seconds:
+                        self.duration = self.format_seconds(seconds)
+
                 elif self.video_file:
                     resource = api.resource(
                         self.video_file.name,
@@ -139,19 +139,21 @@ class Video(models.Model):
                     )
 
                     seconds = resource.get("duration")
+
                     if seconds:
                         self.duration = self.format_seconds(seconds)
-                        super().save(update_fields=["duration"])
 
             except Exception as e:
                 print("Duration extraction error:", e)
                 self.duration = "N/A"
-                super().save(update_fields=["duration"])
-                
+
+        # Set quiz_id if needed
         if self.quiz and not self.quiz_id:
-            # Generate quiz_id based on video ID
             self.quiz_id = f"{self.video_id}-QUIZ"
+
+        # Single save with all fields
         super().save(*args, **kwargs)
+
 
     def format_seconds(self, seconds):
         """Helper to turn 125 seconds into '2:05'"""

@@ -235,6 +235,7 @@ function confirmDeleteVideo(videoId, videoTitle) {
             updateVideoCount();
             
             showNotification('Video deleted successfully', 'success');
+            window.location.reload();
         } catch (error) {
             console.error('Delete error:', error);
             showNotification('Failed to delete video: ' + error.message, 'error');
