@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="{%static 'assets/favicon.png'%}?v=1">
+  <title>Coins Inventory | EdTube</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'css/coins.css' %}">
+</head>
+<body>
+  {% include "navbar.html" %}
+  <div id="pageContent">
+    <div class="coins-page">
+        <div class="coins-hero">
+            <div class="coins-left">
+                <h2>Your Balance</h2>
+                <div class="coin-balance">
+                    <img src="{% static 'assets/coins.png' %}">
+                    <span>{{ request.user.student.coins|default:"0" }}</span>
+                </div>
+                <p>Earn coins by completing quizzes & learning daily.</p>
+
+                <div class="coins-actions">
+                  <a href="#EarnCoins" class="primary-btn">Earn Coins</a>
+                    {% if can_redeem %}
+                        <form method="POST" action="{% url 'daily_quiz_coins_redeem' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="ghost-btn" style="border: 1px solid var(--text-color) !important;
+                            padding: 10px 18px !important;
+                            border-radius: 10px !important;
+                            color: var(--text-color) !important;
+                            background: none;">
+                                <i class="fas fa-gift"></i> Daily Quiz Coins
+                            </button>
+                        </form>
+                    {% else %}
+                        <button class="ghost-btn disabled" disabled>
+                            <i class="fas fa-clock"></i> 
+                            {% if not has_quiz_today %}
+                                Take a quiz first
+                            {% else %}
+                                Available in <span id="timer">{{ timer_display }}</span>
+                            {% endif %}
+                        </button>
+                    {% endif %}
+                </div>
+                {% if not has_quiz_today %}
+                <div class="quiz-requirement-alert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Complete at least one quiz today to claim 10 coins!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <h3 class="section-title">Ways to Earn</h3>
+
+        <div class="earn-grid" id="#EarnCoins">
+
+            <div class="earn-card">
+                <i class="bi bi-patch-question"></i>
+                <h4>Daily Quiz</h4>
+                <p>+10 Coins</p>
+            </div>
+
+            <div class="earn-card">
+                <i class="bi bi-fire"></i>
+                <h4>7 Day Streak</h4>
+                <p>+50 Coins</p>
+            </div>
+
+            <div class="earn-card">
+                <i class="bi bi-trophy"></i>
+                <h4>Leaderboard</h4>
+                <p>Top 3 Bonus</p>
+            </div>
+
+            <div class="earn-card">
+                <i class="bi bi-people"></i>
+                <h4>Refer Friend</h4>
+                <p>+100 Coins</p>
+            </div>
+
+        </div>
+
+        <!-- TRANSACTION HISTORY -->
+        <h3 class="section-title">Recent Activity</h3>
+
+        <div class="history-box">
+            {% if recent_transactions %}
+                {% for transaction in recent_transactions %}
+                <div class="history-row">
+                    <span>{{ transaction.title }}</span>
+                    <span class="{% if transaction.transaction_type == 'credit' %}credit{% else %}debit{% endif %}">
+                        {% if transaction.transaction_type == 'credit' %}+{% else %}-{% endif %}{{ transaction.amount }}
+                    </span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="history-row">
+                    <span>No transactions yet. Start taking quizzes to earn coins!</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="view-all">
+            <a href="">View All Transactions <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+    </div>
+  </div>
+</body>
+</html>  

@@ -114,8 +114,21 @@
                                 </button>
                             {% endif %}
                         </div>
+                        {%if request.user.profile.role == "student" or is_owner%}
+                            <div class="video-actions">
+                                {% if video.notes %}
+                                    <a href="{{ video.notes.url }}" class="btn-notes" download>
+                                        Notes
+                                    </a>
+                                {% endif %}
 
-                        
+                                {% if video.quiz %}
+                                    <a href="{% url 'quiz' video.quiz_id %}" class="btn-quiz">
+                                        Quiz
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                         <div class="comment-section" style="margin-top:30px;margin-bottom: 50px;">
                             <div style="font-weight:600; margin-bottom:15px;">Comments</div>
                             <div class="comment">

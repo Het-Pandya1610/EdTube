@@ -1,7 +1,7 @@
 * { box-sizing: border-box; }
 
 .verify-container {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--bg-color) !important;
     padding: 40px;
     border-radius: 15px;
     width: 100%;
@@ -29,52 +29,57 @@ p {
     margin-bottom: 25px;
 }
 
-.otp-input {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 25px;
+.otp-container{
+    margin: 25px 0;
+    text-align:center;
+    background: var(--bg-color) !important;
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 12px;
 }
 
-.otp-input input {
-    width: 50px;
-    height: 50px;
-    text-align: center;
-    font-size: 1.5rem;
-    border: none;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    outline: none;
-    transition: 0.3s;
+.otp-input{
+    display:flex;
+    justify-content:center;
+    gap:15px;
 }
 
-.otp-input input:focus {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 10px rgba(0, 207, 255, 0.5);
+#otpInputs{
+    width:55px !important;
+    height:60px !important;
+    font-size:22px;
+    text-align:center;
+    border-radius:12px;
+    border:2px solid var(--text-color);
+    background:var(--bg-color);
+    color: var(--text-color);
+    outline:none;
+    transition:0.25s;
 }
 
-.single-otp-input {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    outline: none;
-    transition: 0.3s;
-    text-align: center;
+.otp-box{
+    width:55px;
+    height:60px;
+    font-size:22px;
+    text-align:center;
+    border-radius:12px;
+    border:2px solid var(--text-color);
+    background:var(--bg-color);
+    color: var(--text-color);
+    outline:none;
+    transition:0.25s;
 }
 
-.single-otp-input:focus {
-    background: rgba(255, 255, 255, 0.2);
+.otp-box:focus{
+    border-color:#4c00ff;
+    box-shadow:0 0 12px var(--text-color);
+    transform:translateY(-2px);
 }
+
 
 .verify-btn-primary {
     width: 100%;
-    background-image: linear-gradient(to top, rgb(0, 0, 0), rgb(74, 74, 74));
+    background: #4c00ff;
     color: #fff;
     font-weight: bold;
     border: none;
@@ -91,8 +96,16 @@ p {
 }
 
 .verify-btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    width: 100%;
+    border: 2px solid var(--text-color);
+    padding: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 1rem;
+    border-radius: 20px !important;
+    margin-bottom: 15px !important;
+    background: none;
+    color: var(--text-color);
 }
 
 .verify-btn-secondary:hover {

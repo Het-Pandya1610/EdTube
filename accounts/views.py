@@ -32,16 +32,44 @@ with open(SURNAME_FILE, newline="", encoding="utf-8") as f:
         if row:
             SURNAME_SET.add(row[0].strip().lower())
 
-
 def split_name(fullname):
     parts = fullname.strip().split()
     if len(parts) == 1:
         return parts[0], ""
+    
+    if parts[0].lower() not in SURNAME_SET:
+        for i, part in enumerate(parts):
+            if part.lower() in SURNAME_SET:
+                return " ".join(parts[:i]), " ".join(parts[i:])
 
-    for i, part in enumerate([p.lower() for p in parts]):
-        if part in SURNAME_SET:
+    if parts[-1].lower() not in SURNAME_SET:
+        for i, part in enumerate(parts):
+            if part.lower() in SURNAME_SET:
+                if i == 0 and len(parts) > 1:
+                    remaining_parts = parts[1:]
+                    remaining_are_names = all(p.lower() not in SURNAME_SET for p in remaining_parts)
+                    if remaining_are_names:
+                        return " ".join(parts[1:]), parts[0]
+                    
+    for i in range(len(parts) - 1, 0, -1):
+        if parts[i].lower() in SURNAME_SET:
+            preceding_parts = parts[:i]
+            preceding_are_names = all(p.lower() not in SURNAME_SET for p in preceding_parts)
+            if preceding_are_names:
+                return " ".join(parts[:i]), " ".join(parts[i:])
+            
+    for i in range(len(parts)):
+        if parts[i].lower() in SURNAME_SET:
+            following_parts = parts[i+1:]
+            following_are_names = all(p.lower() not in SURNAME_SET for p in following_parts)
+            if following_are_names:
+                return " ".join(parts[i+1:]), parts[i]
+    
+    for i in range(1, len(parts) - 1):
+        if parts[i].lower() in SURNAME_SET:
             return " ".join(parts[:i]), " ".join(parts[i:])
-    return parts[0], parts[-1]
+
+    return " ".join(parts[:-1]), parts[-1]
 
 
 def register_view(request):
@@ -516,65 +544,63 @@ def set_new_password(request):
 
 @login_required
 def account_settings(request):
-    user = request.user
-    profile = user.profile
-    
-    teacher = None
-    student = None
-    
-    try:
-        if hasattr(user, 'teacher'):
-            teacher = user.teacher
-    except Teacher.DoesNotExist:
-        teacher = None
-        
-    try:
-        if hasattr(user, 'student'):
-            student = user.student
-    except Student.DoesNotExist:
-        student = None
-    
-    suggestions = None
 
-    if request.method == 'POST':
-        new_username = request.POST.get('username').strip().lower()
-        if new_username != user.username:
-            if User.objects.filter(username=new_username).exists():
-                full_name = f"{user.first_name} {user.last_name}"
-                suggestions = generate_suggestions_by_name(full_name)
-                messages.error(request, f"The username @{new_username} is already taken.")
-                return render(request, 'account_settings.html', {'suggestions': suggestions})
-            else:
-                user.username = new_username
+    # user = request.user
+    # profile = user.profile
+    
+    # teacher = None
+    # student = None
+    
+    # try:
+    #     if hasattr(user, 'teacher'):
+    #         teacher = user.teacher
+    # except Teacher.DoesNotExist:
+    #     teacher = None
+        
+    # try:
+    #     if hasattr(user, 'student'):
+    #         student = user.student
+    # except Student.DoesNotExist:
+    #     student = None
+    
+    # suggestions = None
+
+    # if request.method == 'POST':
+    #     new_username = request.POST.get('username').strip().lower()
+    #     if new_username != user.username:
+    #         if User.objects.filter(username=new_username).exists():
+    #             full_name = f"{user.first_name} {user.last_name}"
+    #             suggestions = generate_suggestions_by_name(full_name)
+    #             messages.error(request, f"The username @{new_username} is already taken.")
+    #             return render(request, 'account_settings.html', {'suggestions': suggestions})
+    #         else:
+    #             user.username = new_username
                 
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.email = request.POST.get('email')
+    #     user.first_name = request.POST.get('first_name')
+    #     user.last_name = request.POST.get('last_name')
+    #     user.email = request.POST.get('email')
 
-        new_pass = request.POST.get('new_password')
-        confirm_pass = request.POST.get('confirm_password')
-        if new_pass:
-            if new_pass == confirm_pass:
-                user.set_password(new_pass)
-                update_session_auth_hash(request, user) # Don't log out
-            else:
-                messages.error(request, "Passwords do not match!")
-                return redirect('account_settings')
+    #     new_pass = request.POST.get('new_password')
+    #     confirm_pass = request.POST.get('confirm_password')
+    #     if new_pass:
+    #         if new_pass == confirm_pass:
+    #             user.set_password(new_pass)
+    #             update_session_auth_hash(request, user) # Don't log out
+    #         else:
+    #             messages.error(request, "Passwords do not match!")
+    #             return redirect('account_settings')
 
-        user.save()
+    #     user.save()
 
-        if profile.role=="tutor":
-            teacher.bio = request.POST.get('bio')
-        else:
-            student.bio = request.POST.get('bio')
-        teacher.center_address = request.POST.get('center_address')
-        teacher.degree_pursued = request.POST.get('degree_pursued')
-        teacher.experience_years = request.POST.get('experience_years') or 0
-        teacher.save()
+    #     profile.bio = request.POST.get('bio')
+    #     teacher.center_address = request.POST.get('center_address')
+    #     teacher.degree_pursued = request.POST.get('degree_pursued')
+    #     teacher.experience_years = request.POST.get('experience_years') or 0
+    #     teacher.save()
 
         
-        messages.success(request, "Your settings have been updated successfully!")
-        return redirect('account_settings')
+    #     messages.success(request, "Your settings have been updated successfully!")
+    #     return redirect('account_settings')
 
     return render(request, 'account_settings.html')
 
@@ -623,7 +649,7 @@ def advanced_settings(request):
     session_suggestions = request.session.pop('username_suggestions', None)
     if session_suggestions:
         suggestions = session_suggestions
-    
+
     context = {
         'suggestions': suggestions[:5] if suggestions else [],
         'teacher': teacher,
@@ -641,17 +667,19 @@ def update_bio(request):
     if len(bio) > 1000:
         messages.error(request, "Bio cannot exceed 1000 characters.")
         return redirect("advanced_settings")
-    
-    profile = request.user.profile
+
+    user = request.user
+    profile = Profile.objects.get(user=user)
+
     if profile.bio == bio:
         messages.info(request, "No changes detected in bio.")
         return redirect("advanced_settings")
-    
+
     profile.bio = bio
     profile.save()
     
     messages.success(request, "Bio updated successfully!")
-    return redirect("advanced_settings")
+    return redirect("user_profile")
 
 @login_required
 @require_POST

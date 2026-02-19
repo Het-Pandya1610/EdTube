@@ -1,5 +1,6 @@
 import cloudinary.api as api
 import yt_dlp
+import uuid
 import urllib.parse as urlparse
 from django.db import models
 from django.contrib.auth.models import User
@@ -72,7 +73,7 @@ class Video(models.Model):
         null=True,
         storage=RawMediaCloudinaryStorage()
     )
-    
+    quiz_id = models.CharField(max_length=50, unique=True, blank=True, null=True, editable=False)
     views_count = models.PositiveIntegerField(default=0)
     
     # Timestamps
@@ -146,6 +147,11 @@ class Video(models.Model):
                 print("Duration extraction error:", e)
                 self.duration = "N/A"
                 super().save(update_fields=["duration"])
+                
+        if self.quiz and not self.quiz_id:
+            # Generate quiz_id based on video ID
+            self.quiz_id = f"{self.video_id}-QUIZ"
+        super().save(*args, **kwargs)
 
     def format_seconds(self, seconds):
         """Helper to turn 125 seconds into '2:05'"""

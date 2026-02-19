@@ -47,6 +47,126 @@ input[name="fullname"],input[name="email"],input[name="password"],input[name="co
   transition: 0.3s;
 }
 
+/* Password Strength Styles */
+.password-strength-container {
+  margin: 10px 0 15px 0;
+  padding: 0 5px;
+}
+
+.strength-meter {
+  height: 6px;
+  background-color: rgba(128, 128, 128, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.strength-meter-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 10px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+.strength-score {
+  font-weight: bold;
+}
+
+/* Password Requirements */
+.password-requirements {
+  background-color: rgba(128, 128, 128, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.requirement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  color: #ff4444;
+  transition: color 0.3s ease;
+}
+
+.requirement i {
+  font-size: 1rem;
+}
+
+.requirement.met {
+  color: #28a745;
+}
+
+.requirement.met i {
+  color: #28a745;
+}
+
+/* Password Match Indicator */
+.password-match-container {
+  margin: 5px 0 15px 0;
+  padding: 0 5px;
+}
+
+.password-match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+.password-match.match {
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.password-match.match i {
+  color: #28a745;
+}
+
+.password-match.no-match {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.password-match.no-match i {
+  color: #dc3545;
+}
+
+/* Strength colors */
+.strength-0 .strength-meter-bar { 
+  background-color: #ff4444; 
+  width: 20%; 
+}
+.strength-1 .strength-meter-bar { 
+  background-color: #ff7744; 
+  width: 40%; 
+}
+.strength-2 .strength-meter-bar { 
+  background-color: #ffaa44; 
+  width: 60%; 
+}
+.strength-3 .strength-meter-bar { 
+  background-color: #ffdd44; 
+  width: 80%; 
+}
+.strength-4 .strength-meter-bar { 
+  background-color: #44ff44; 
+  width: 100%; 
+}
+
 select {
   width: 100%;
   padding: 12px 15px;

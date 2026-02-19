@@ -24,7 +24,6 @@ class Teacher(models.Model):
         validators=[validate_image],
         help_text="Profile picture (max 10MB - Cloudinary Free limit)"
     )
-    bio = models.TextField(blank=True)
     nos = models.IntegerField(default=0)
     nov = models.IntegerField(default=0)
     degree_pursued = models.CharField(max_length=100, blank=True)

@@ -73,7 +73,7 @@
         {% endif %}
         
         <a href="javascript:void(0);" class="theme-toggle-btn">
-          <i class="bi bi-brightness-high-fill theme-icon sun d-none"></i>
+          <i class="bi bi-brightness-high-fill theme-icon sun"></i>
           <i class="bi bi-toggle-off theme-toggle"></i>
           <i class="bi bi-moon-fill theme-icon moon"></i>
         </a>
@@ -137,13 +137,20 @@
           <a class="create-btn" href="{% url 'videoUpload' %}">
             <i class="bi bi-plus-lg" style="margin-right: 7px;"></i> Create
           </a>
+        {% else %}
+          <div class="coins-inventory">
+            <img src="{% static 'assets/coins.png' %}" alt="Coins" style="width:30px !important; height:30px !important; margin-right:5px;">
+            <span class="coin-count" style="margin-left: -6px;">{{ request.user.student.coins | default:"0" }}</span>
+            <a href="{% url "coins" %}" class="add-coins">
+              <i class="bi bi-plus-circle-fill"></i>
+            </a>
+          </div>
         {% endif %}
-        
         <div class="notification-bedge">
           <a href="{% url 'notifications' %}"><i class="bi bi-bell"></i></a>
         </div>
         
-        <a href="{% url 'user_profile' username=request.user.username %}" class="profile" style="text-decoration: none;">
+        <div class="profile" id="pfpToggle" style="cursor:pointer;">
           {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
             <img src="{{ request.user.teacher.pfp.url }}" alt="Profile" style="width:40px !important; height:40px !important; border-radius:50% !important; object-fit:cover !important;">
           {% elif request.user.profile.role == "student" and request.user.student.pfp %}
@@ -153,11 +160,54 @@
               {{ request.user.first_name|first }}{{ request.user.last_name|first }}
             </div>
           {% endif %}
-        </a>
+        </div>
       </div>
     {% endif %}
   </header>
-
+  {%if request.user.is_authenticated %}
+    <div class="account-dropdown" id="accountDropdown">
+      <div class="account-header">
+        {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
+          <img src="{{ request.user.teacher.pfp.url }}" alt="Profile" style="width:60px !important; height:60px !important; border-radius:50% !important; object-fit:cover !important;">
+        {% elif request.user.profile.role == "student" and request.user.student.pfp %}
+          <img src="{{ request.user.student.pfp.url }}" alt="Profile" style="width:60px !important; height:60px !important; border-radius:50% !important; object-fit:cover !important;">
+        {% else %}
+          <div class="avatar-small" style="width:60px !important; height:60px !important; border-radius:50% !important; display:flex; align-items:center; object-fit:cover !important;;">
+            {{ request.user.first_name|first }}{{ request.user.last_name|first }}
+          </div>
+        {% endif %}
+        <div class="account-info">
+          <span class="account-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+          <span class="account-email">{{ request.user.email }}</span>
+          <br>
+          <a href="{% url 'user_profile' username=request.user.username %}" class="profile-link">
+            <i class="bi bi-person-circle"></i> View Profile
+          </a>
+        </div>
+      </div>
+      <div class="dropdown-section">
+        <p>Account</p>
+        <a href="{% url 'account_settings' %}">
+          <i class="bi bi-gear-fill"></i> Settings
+        </a>
+        <a href="{% url 'help' %}">
+          <i class="bi bi-question-circle-fill"></i> Help
+        </a>
+        <a href=""><i class="bi bi-database-fill"></i>Your Data in EdTube</a>
+      </div>
+      <div class="dropdown-section">
+        <a href="{% url 'logout' %}" style="color: red !important;">
+          <i class="bi bi-box-arrow-right"></i> Sign Out
+        </a>
+      </div>
+      <div class="dropdown-section">
+        <p>More from EdTube</p>
+        <a href="{% url 'reviews' %}"><i class="bi bi-star-fill"></i> Reviews</a>
+        <a href="{% url 'contact' %}"><i class="bi bi-envelope-fill"></i> Contact Us</a>
+        <a href="{% url 'AboutUs' %}"><i class="bi bi-info-circle-fill"></i> About Us</a>
+      </div>
+    </div>
+  {% endif %}
   <div id="voiceOverlay" class="voice-overlay d-none">
     <div class="voice-box">
       <div class="voice-mic" id="voiceMic">

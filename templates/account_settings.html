@@ -36,8 +36,8 @@
 
                         <div class="content-wrapper" style="display: flex; flex-direction: column; gap: 15px;">
                             
-                            <div class="profile-detail" style="display: flex; align-items: center; cursor: pointer;">
-                                <a href="{% url 'user_profile' username=request.user.username %}" style="text-decoration: none;color: var(--text-color);">
+                            <div class="profile-detail" style="display: inline-flex !important; align-items: center; cursor: pointer;">
+                                <a href="{% url 'user_profile' username=request.user.username %}" style="text-decoration: none;color: var(--text-color);display: flex; align-items: center; gap: 15px;">
                                     {% if request.user.profile.role == "tutor" and request.user.teacher.pfp %}
                                         <img src="{{ request.user.teacher.pfp.url }}" alt="Profile" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--text-color); object-fit: cover;">
                                     {% elif request.user.profile.role == "student" and request.user.student.pfp %}
@@ -47,7 +47,7 @@
                                             {{ request.user.first_name|first }}{{ request.user.last_name|first }}
                                         </div>
                                     {% endif %}
-                                    <strong style="margin-left: 15px; font-size: 1.1rem;">{{request.user.first_name}} {{request.user.last_name}}</strong>
+                                    <strong style="font-size: 1.1rem;">{{request.user.first_name}} {{request.user.last_name}}</strong>
                                 </a>
                             </div>
 

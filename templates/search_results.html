@@ -95,7 +95,7 @@
                             @{{ teacher.username }} • {{ teacher.nos }} Followers
                         </div>
                         <p class="description-text" style="-webkit-line-clamp: 1;">
-                            {{ teacher.bio|default:"No bio available." }}
+                            {{ teacher.profile.bio|default:"No bio available." }}
                         </p>
                     </div>
                     <a href="{% url 'user_profile' username=teacher.username %}" style="text-decoration: none !important;">

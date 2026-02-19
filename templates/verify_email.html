@@ -44,15 +44,20 @@
             {% endif %}
             
             <!-- Single input method (simpler) -->
-            <input type="text" 
-                   name="otp" 
-                   class="single-otp-input" 
-                   placeholder="Enter 6-digit code" 
-                   pattern="\d{6}" 
-                   maxlength="6"
-                   required
-                   autocomplete="off"
-                   autofocus>
+            <div class="otp-container">
+                <div class="otp-inputs">
+                    <input id="otpInputs" type="text" maxlength="1" class="otp-box" required>
+                    <input id="otpInputs" type="text" maxlength="1" class="otp-box" required>
+                    <input id="otpInputs" type="text" maxlength="1" class="otp-box" required>
+                    <input id="otpInputs" type="text" maxlength="1" class="otp-box" required>
+                    <input id="otpInputs" type="text" maxlength="1" class="otp-box" required>
+                    <input id="otpInputs" type="text" maxlength="1" class="otp-box" required>
+                </div>
+
+                <!-- hidden field for backend -->
+                <input type="hidden" name="otp" id="final-otp">
+            </div>
+
             
             <button type="submit" class="verify-btn-primary">Verify Email</button>
         </form>
@@ -73,6 +78,6 @@
             </a>
         </p>
     </div>
-    
+    <script src="{% static 'js/verify_email.js' %}" defer></script>
 </body>
 </html>

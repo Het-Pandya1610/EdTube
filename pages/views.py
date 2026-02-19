@@ -1,5 +1,5 @@
-from django.shortcuts import get_object_or_404, render
-from django.db.models import Q
+from django.shortcuts import get_object_or_404, render, redirect
+from django.db.models import Q, Sum
 from teacher.models import Teacher, Follower
 from video.models import Video
 from video.utils import save_to_history
@@ -13,8 +13,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 import imghdr
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib import messages
 from accounts.models import SearchHistory
 from PIL import Image
+from student.models import DailyQuizCoinsRedemption, CoinTransaction, QuizAttempt
 from student.utils import get_quiz_heatmap
 
 def index(request):
@@ -34,6 +38,142 @@ def notifications(request):
 def faqs(request):
     return render(request, "faqs.html")
 
+
+def coinsInventory(request):
+    student = request.user.student
+    
+    # Calculate total coins balance
+    credits = CoinTransaction.objects.filter(
+        student=student, 
+        transaction_type='credit'
+    ).aggregate(total=Sum('amount'))['total'] or 0
+    
+    debits = CoinTransaction.objects.filter(
+        student=student, 
+        transaction_type='debit'
+    ).aggregate(total=Sum('amount'))['total'] or 0
+    
+    coins_balance = credits - debits
+    
+    # Get recent transactions (last 5-10)
+    recent_transactions = CoinTransaction.objects.filter(
+        student=student
+    ).order_by('-created_at')[:10]
+    
+    # Calculate progress to next reward
+    next_reward_threshold = 100
+    coins_to_next_reward = next_reward_threshold - (coins_balance % next_reward_threshold)
+    progress_percentage = (coins_balance % next_reward_threshold) / next_reward_threshold * 100
+    
+    # Determine next reward title
+    if coins_balance < 100:
+        next_reward_title = "Basic Quiz Pack"
+    elif coins_balance < 250:
+        next_reward_title = "Premium Quiz"
+    elif coins_balance < 500:
+        next_reward_title = "Video Lesson"
+    else:
+        next_reward_title = "Certificate"
+    
+    # Check daily quiz coins redemption status
+    today = timezone.now().date()
+    last_24h = timezone.now() - timedelta(hours=24)
+    
+    # Check if user has taken a quiz today
+    has_quiz_today = QuizAttempt.objects.filter(
+        student=student,
+        created_at__date=today
+    ).exists()
+    
+    # Check last redemption
+    last_redeem = DailyQuizCoinsRedemption.objects.filter(
+        student=student,
+        redeemed_at__gte=last_24h
+    ).first()
+    
+    can_redeem = has_quiz_today and not last_redeem
+    
+    # Calculate timer if redemption exists
+    timer_display = "24h"
+    if last_redeem:
+        time_left = last_redeem.redeemed_at + timedelta(hours=24) - timezone.now()
+        if time_left.total_seconds() > 0:
+            hours = int(time_left.total_seconds() // 3600)
+            minutes = int((time_left.total_seconds() % 3600) // 60)
+            timer_display = f"{hours}h {minutes}m"
+    
+    context = {
+        'coins_balance': coins_balance,
+        'recent_transactions': recent_transactions,
+        'progress_percentage': round(progress_percentage),
+        'coins_to_next_reward': coins_to_next_reward,
+        'next_reward_title': next_reward_title,
+        'can_redeem': can_redeem,
+        'has_quiz_today': has_quiz_today,
+        'timer_display': timer_display,
+        'last_redeem': last_redeem,
+    }
+    
+    return render(request, 'coins.html', context)
+
+
+def daily_quiz_coins_redeem(request):
+    if request.method == 'POST':
+        student = request.user.student
+        today = timezone.now().date()
+        
+        # Check if user has taken at least one quiz today
+        quiz_today = QuizAttempt.objects.filter(
+            student=student,
+            created_at__date=today
+        ).count()
+        
+        if quiz_today == 0:
+            messages.error(request, "You need to complete at least one quiz today first!")
+            return redirect('coins')
+        
+        # Check if already redeemed in last 24 hours
+        last_24h = timezone.now() - timedelta(hours=24)
+        recent_redeem = DailyQuizCoinsRedemption.objects.filter(
+            student=student,
+            redeemed_at__gte=last_24h
+        ).exists()
+        
+        if recent_redeem:
+            # Get the last redemption to calculate remaining time
+            last_redeem = DailyQuizCoinsRedemption.objects.filter(
+                student=student
+            ).latest('redeemed_at')
+            
+            time_left = last_redeem.redeemed_at + timedelta(hours=24) - timezone.now()
+            hours = time_left.seconds // 3600
+            minutes = (time_left.seconds % 3600) // 60
+            
+            messages.error(
+                request, 
+                f"Already claimed! Try again in {hours}h {minutes}m"
+            )
+            return redirect('coins')
+        
+        # Give coins
+        CoinTransaction.objects.create(
+            student=student,
+            amount=10,
+            transaction_type='credit',
+            title='Daily Quiz Coins Reward'
+        )
+        
+        student.coins += 10
+        student.save()
+
+
+        # Record redemption
+        DailyQuizCoinsRedemption.objects.create(student=student)
+        
+        messages.success(request, "10 coins added to your balance!")
+        return redirect('coins')
+    
+    return redirect('coins')
 
 def terms(request):
     return render(request, "terms.html")

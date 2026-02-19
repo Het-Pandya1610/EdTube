@@ -445,6 +445,43 @@ body{
     margin-top: -40px;
 }
 
+.video-actions{
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+
+.btn-notes{
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-notes:hover{
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
+.btn-quiz{
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #2563eb;   /* blue */
+    color: white;
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-quiz:hover{
+    background: #1e4ed8;
+}
+
 .timestamp {
     color: #3ea6ff;
     background: #0300b5a7;

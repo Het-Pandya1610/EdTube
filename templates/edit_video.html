@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Video | {{ video.title }}</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}?v=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/edit_video.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="edit-container">
+        <div class="edit-header">
+            <h2><i class="bi bi-pencil-square"></i> Edit Video</h2>
+            <a href="{% url 'user_profile' username=request.user.username %}" class="back-btn">
+                <i class="bi bi-arrow-left"></i> Back to Profile
+            </a>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" id="edit-video-form">
+            {% csrf_token %}
+            
+            <div class="edit-grid">
+                <!-- Left Column - Basic Info -->
+                <div class="basic-info-section">
+                    <h3><i class="bi bi-info-circle"></i> Basic Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="title">Title <span class="required">*</span></label>
+                        <input type="text" 
+                               name="title" 
+                               id="title" 
+                               value="{{ video.title }}" 
+                               placeholder="Enter video title"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea name="description" 
+                                  id="description" 
+                                  rows="5" 
+                                  placeholder="Describe your video...">{{ video.description }}</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Subject as text input -->
+                        <div class="form-group half">
+                            <label for="subject">Subject <span class="required">*</span></label>
+                            <input type="text" 
+                                   name="subject" 
+                                   id="subject" 
+                                   value="{{ video.subject }}" 
+                                   placeholder="e.g., Mathematics, Physics, History"
+                                   required>
+                            <small class="field-hint">Enter the subject/topic of your video</small>
+                        </div>
+
+                        <!-- Language dropdown with English, Hindi, Gujarati -->
+                        <div class="form-group half">
+                            <label for="language">Language <span class="required">*</span></label>
+                            <select name="language" id="language" required>
+                                <option value="" disabled {% if not video.language %}selected{% endif %}>Select Language</option>
+                                <option value="English" {% if video.language == 'English' %}selected{% endif %}>English</option>
+                                <option value="Hindi" {% if video.language == 'Hindi' %}selected{% endif %}>Hindi</option>
+                                <option value="Gujarati" {% if video.language == 'Gujarati' %}selected{% endif %}>Gujarati</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="thumbnail">Thumbnail</label>
+                        <div class="thumbnail-upload">
+                            <div class="current-thumbnail">
+                                {% if video.thumbnail %}
+                                    <img src="{{ video.thumbnail.url }}" alt="Current thumbnail" id="current-thumbnail">
+                                {% else %}
+                                    <div class="no-thumbnail">
+                                        <i class="bi bi-image"></i>
+                                        <span>No thumbnail</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="thumbnail-input">
+                                <input type="file" 
+                                       name="thumbnail" 
+                                       id="thumbnail" 
+                                       accept="image/*">
+                                <label for="thumbnail" class="file-label">
+                                    <i class="bi bi-upload"></i> Upload New Thumbnail
+                                </label>
+                                <small>Leave empty to keep current thumbnail</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Video Editing -->
+                <div class="video-edit-section">
+                    <h3><i class="bi bi-film"></i> Video Content</h3>
+                    
+                    <!-- Video Source Info -->
+                    <div class="video-source-info">
+                        {% if video.video_file %}
+                            <div class="info-badge">
+                                <i class="bi bi-file-play"></i>
+                                <span>Uploaded Video File</span>
+                            </div>
+                            <div class="video-preview">
+                                <video controls class="preview-video" id="video-preview">
+                                    <source src="{{ video.video_file.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            
+                            <!-- Video Trimming Section -->
+                            <div class="trim-section" id="trim-section">
+                                <h4><i class="bi bi-scissors"></i> Trim Video</h4>
+                                
+                                <div class="trim-controls">
+                                    <div class="time-inputs">
+                                        <div class="time-input">
+                                            <label>Start Time (MM:SS)</label>
+                                            <input type="text" 
+                                                   id="start-time" 
+                                                   placeholder="00:00" 
+                                                   value="00:00">
+                                        </div>
+                                        <div class="time-input">
+                                            <label>End Time (MM:SS)</label>
+                                            <input type="text" 
+                                                   id="end-time" 
+                                                   placeholder="--:--" 
+                                                   value="{{ video.duration|default:'10:00' }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="trim-actions">
+                                        <button type="button" class="preview-trim-btn" id="preview-trim">
+                                            <i class="bi bi-play-circle"></i> Preview Trim
+                                        </button>
+                                        <button type="button" class="apply-trim-btn" id="apply-trim">
+                                            <i class="bi bi-check-circle"></i> Apply Trim
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="trim-note">
+                                        <i class="bi bi-info-circle"></i>
+                                        <small>Trimming will create a new version of your video. The original will be preserved.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Replace Video Option -->
+                            <div class="replace-section">
+                                <h4><i class="bi bi-arrow-repeat"></i> Replace Video</h4>
+                                <div class="file-upload">
+                                    <input type="file" 
+                                           name="video_file" 
+                                           id="video_file" 
+                                           accept="video/*">
+                                    <label for="video_file" class="file-label">
+                                        <i class="bi bi-cloud-upload"></i>
+                                        <span>Upload New Video</span>
+                                    </label>
+                                    <small>Upload a new video to replace the current one (MP4, MOV, AVI)</small>
+                                </div>
+                            </div>
+                            
+                        {% elif video.youtube_id %}
+                            <div class="info-badge youtube">
+                                <i class="bi bi-youtube"></i>
+                                <span>YouTube Video</span>
+                            </div>
+                            <div class="youtube-preview">
+                                <iframe width="100%" 
+                                        height="315" 
+                                        src="https://www.youtube.com/embed/{{ video.youtube_id }}" 
+                                        frameborder="0" 
+                                        allowfullscreen></iframe>
+                            </div>
+                            <div class="youtube-note">
+                                <i class="bi bi-info-circle"></i>
+                                <small>To change YouTube video, please upload a new video file instead.</small>
+                            </div>
+                            
+                            <!-- Convert to File Upload -->
+                            <div class="replace-section">
+                                <h4><i class="bi bi-arrow-repeat"></i> Replace with Upload</h4>
+                                <div class="file-upload">
+                                    <input type="file" 
+                                           name="video_file" 
+                                           id="video_file" 
+                                           accept="video/*">
+                                    <label for="video_file" class="file-label">
+                                        <i class="bi bi-cloud-upload"></i>
+                                        <span>Upload Video File</span>
+                                    </label>
+                                    <small>Upload a video file to replace the YouTube link</small>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="save-btn" id="save-btn">
+                    <i class="bi bi-check-lg"></i> Save Changes
+                </button>
+                <a href="{% url 'user_profile' username=request.user.username %}" class="cancel-btn">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Trim Preview Modal -->
+    {% if video.video_file %}
+        <div class="modal" id="trim-preview-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Preview Trim</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <video controls id="preview-video" style="width: 100%;">
+                        <source src="{{ video.video_file.url }}" type="video/mp4">
+                    </video>
+                    <div class="preview-times">
+                        <span>Start: <span id="preview-start">00:00</span></span>
+                        <span>End: <span id="preview-end">--:--</span></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="close-btn">Close</button>
+                    <button class="apply-trim-from-preview">Apply Trim</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <script src="{% static 'js/loader.js' %}"></script>
+    <script src="{% static 'js/edit_video.js' %}"></script>
+</body>
+</html>

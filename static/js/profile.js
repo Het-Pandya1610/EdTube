@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all functionality
     initImageUpload();
     initVideoOptions();
-    
+    initVideoActions();
     // Initialize cropper if not already loaded
     if (typeof ImageCropper === 'undefined') {
         loadCropperScript();
@@ -126,6 +126,329 @@ function initVideoOptions() {
         }
     });
 }
+function initVideoActions(){
+    document.querySelectorAll('.dropdown-item:has(.bi-pencil)').forEach(editBtn => {
+        editBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Find the video card container
+            const videoCard = this.closest('.video-card-container');
+            if (videoCard) {
+                const videoId = videoCard.querySelector('.video-options-btn')?.getAttribute('data-video-id');
+                if (videoId) {
+                    openVideoEditor(videoId);
+                }
+            }
+        });
+    });
+    document.querySelectorAll('.dropdown-item.delete-opt, .dropdown-item:has(.bi-trash)').forEach(deleteBtn => {
+        deleteBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Find the video card container
+            const videoCard = this.closest('.video-card-container');
+            if (videoCard) {
+                const videoId = videoCard.querySelector('.video-options-btn')?.getAttribute('data-video-id');
+                const videoTitle = videoCard.querySelector('.v-title')?.textContent || 'this video';
+                if (videoId) {
+                    confirmDeleteVideo(videoId, videoTitle);
+                }
+            }
+        });
+    });
+}
+
+// Open video editor modal/page
+function openVideoEditor(videoId) {
+    // Option 1: Redirect to edit page
+    window.location.href = `/video/edit/${videoId}/`;
+    
+    // Option 2: Open modal (if you prefer inline editing)
+    // loadEditModal(videoId);
+}
+
+// Confirm delete with modal
+function confirmDeleteVideo(videoId, videoTitle) {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.className = 'delete-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="bi bi-exclamation-triangle"></i> Delete Video</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>"${videoTitle}"</strong>?</p>
+                <p class="warning-text">This action cannot be undone. All video data, comments, and analytics will be permanently removed.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn">Cancel</button>
+                <button class="delete-btn" id="confirm-delete-btn">Delete Permanently</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Add modal styles
+    addModalStyles();
+    
+    // Show modal with animation
+    setTimeout(() => modal.classList.add('show'), 10);
+    
+    // Handle close
+    modal.querySelector('.modal-close').addEventListener('click', () => {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    });
+    
+    modal.querySelector('.cancel-btn').addEventListener('click', () => {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    });
+    
+    // Handle delete confirmation
+    modal.querySelector('#confirm-delete-btn').addEventListener('click', async () => {
+        // Show loading state
+        const deleteBtn = modal.querySelector('#confirm-delete-btn');
+        deleteBtn.innerHTML = '<i class="bi bi-arrow-repeat spinning"></i> Deleting...';
+        deleteBtn.disabled = true;
+        
+        try {
+            await deleteVideo(videoId);
+            
+            // Show success message
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+            
+            // Remove video card from UI
+            const videoCard = document.querySelector(`[data-video-id="${videoId}"]`)?.closest('.video-card-container');
+            if (videoCard) {
+                videoCard.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => videoCard.remove(), 300);
+            }
+            
+            // Update video count if exists
+            updateVideoCount();
+            
+            showNotification('Video deleted successfully', 'success');
+        } catch (error) {
+            console.error('Delete error:', error);
+            showNotification('Failed to delete video: ' + error.message, 'error');
+            
+            // Reset button
+            deleteBtn.innerHTML = 'Delete Permanently';
+            deleteBtn.disabled = false;
+        }
+    });
+    
+    // Close on click outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+        }
+    });
+}
+
+// Delete video API call
+async function deleteVideo(videoId) {
+    const csrfToken = getCsrfToken();
+    
+    const response = await fetch(`/video/delete/${videoId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Delete failed');
+    }
+    
+    return await response.json();
+}
+
+// Update video count after deletion
+function updateVideoCount() {
+    const videoCountElement = document.querySelector('.stat-item:has(.stat-count) .stat-count');
+    if (videoCountElement) {
+        const currentCount = parseInt(videoCountElement.textContent) || 0;
+        videoCountElement.textContent = currentCount - 1;
+    }
+}
+
+// Add modal styles
+function addModalStyles() {
+    if (document.getElementById('modal-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'modal-styles';
+    style.textContent = `
+        .delete-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .delete-modal.show {
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: var(--bg-color) !important;
+            border-radius: 16px;
+            width: 90%;
+            padding: 40px 40px;
+            max-width: 500px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 60px var(--srch-bg-color);
+            border: 1px solid var(--srch-bg-color);
+        }
+        
+        .delete-modal.show .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #dc3545;
+        }
+        
+        .modal-header i {
+            font-size: 1.5rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+        
+        .modal-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-body p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+        
+        .warning-text {
+            color: #dc3545 !important;
+            font-size: 0.95rem !important;
+            background: rgba(220, 53, 69, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--text-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .modal-footer button {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .cancel-btn {
+            background: none;
+            border: 2 px solid (--text-color) !important;
+            color: var(--text-color);
+            transition: 0.3s all;
+        }
+        
+        .cancel-btn:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+        
+        .delete-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        @keyframes slideOut {
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        .spinning {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
 
 function toggleOptionsMenu(event, menuId) {
     event.preventDefault();
@@ -384,7 +707,6 @@ function loadCropperScript() {
     document.head.appendChild(script);
 }
 
-// OPTIMIZED FOLLOW TOGGLE HANDLER
 // OPTIMIZED FOLLOW TOGGLE HANDLER - FIXED VERSION
 document.addEventListener('click', function (event) {
     const followBtn = event.target.closest('#follow-btn');
@@ -393,16 +715,16 @@ document.addEventListener('click', function (event) {
         event.preventDefault();
         
         // Prevent multiple rapid clicks
-        if (followBtn.classList.contains('btn-loading')) {
+        if (followBtn.disabled || followBtn.classList.contains('btn-loading')) {
             return;
         }
 
         const username = followBtn.getAttribute('data-teacher-username');
         
-        // Debounce check - prevent duplicate requests for same user
+        // Debounce check
         if (followRequests.has(username)) {
             const lastRequest = followRequests.get(username);
-            if (Date.now() - lastRequest < 1500) { // 1.5 second debounce
+            if (Date.now() - lastRequest < 2000) { // Increased to 2 seconds
                 showNotification('Please wait...', 'info');
                 return;
             }
@@ -416,38 +738,27 @@ document.addEventListener('click', function (event) {
         // Store original state for rollback
         const originalState = {
             html: followBtn.innerHTML,
-            class: isCurrentlyFollowing ? 'following-active' : '',
-            count: currentCount,
-            isFollowing: isCurrentlyFollowing
+            isFollowing: isCurrentlyFollowing,
+            count: currentCount
         };
         
-        // Show loading state
+        // DISABLE BUTTON COMPLETELY
+        followBtn.disabled = true;
         followBtn.classList.add('btn-loading');
+        
+        // Show loading state
         followBtn.innerHTML = '<i class="bi bi-arrow-repeat spinning"></i>';
         
-        // Calculate optimistic update based on current state
-        const optimisticCount = isCurrentlyFollowing ? currentCount - 1 : currentCount + 1;
-        
-        // Apply optimistic update
+        // DON'T update the count optimistically - wait for server
+        // Only update the button text to show intent
         if (isCurrentlyFollowing) {
-            followBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Follow';
-            followBtn.classList.remove('following-active');
+            followBtn.innerHTML = '<i class="bi bi-arrow-repeat spinning"></i> Unfollowing...';
         } else {
-            followBtn.innerHTML = '<i class="bi bi-check2"></i> Following';
-            followBtn.classList.add('following-active');
+            followBtn.innerHTML = '<i class="bi bi-arrow-repeat spinning"></i> Following...';
         }
-        
-        // Update count optimistically
-        if (nosCount) {
-            nosCount.innerText = optimisticCount;
-        }
-        
-        // Remove loading state
-        followBtn.classList.remove('btn-loading');
 
         const csrftoken = getCsrfToken();
 
-        // Actual server request (happens in background)
         fetch(`/teacher/toggle-follow/${username}/`, {
             method: 'POST',
             headers: {
@@ -463,12 +774,12 @@ document.addEventListener('click', function (event) {
         })
         .then(data => {
             if (data.status === 'success') {
-                // Server confirmed - update with server's count
+                // Update with server's count (always accurate)
                 if (nosCount && data.new_count !== undefined) {
                     nosCount.innerText = data.new_count;
                 }
                 
-                // Ensure button state matches server action
+                // Update button based on server response
                 if (data.action === 'followed') {
                     followBtn.innerHTML = '<i class="bi bi-check2"></i> Following';
                     followBtn.classList.add('following-active');
@@ -476,6 +787,11 @@ document.addEventListener('click', function (event) {
                     followBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Follow';
                     followBtn.classList.remove('following-active');
                 }
+                
+                showNotification(
+                    data.action === 'followed' ? `Followed @${username}` : `Unfollowed @${username}`, 
+                    'success'
+                );
             } else {
                 throw new Error(data.message || 'Failed to update follow status');
             }
@@ -494,17 +810,20 @@ document.addEventListener('click', function (event) {
                 nosCount.innerText = originalState.count;
             }
             
-            showNotification('Error updating follow status: ' + error.message, 'error');
+            showNotification('Error updating follow status', 'error');
         })
         .finally(() => {
-            // Clean up debounce after a delay
+            // Re-enable button
+            followBtn.disabled = false;
+            followBtn.classList.remove('btn-loading');
+            
+            // Clean up debounce
             setTimeout(() => {
                 followRequests.delete(username);
-            }, 1500);
+            }, 2000);
         });
     }
 });
-
 
 document.addEventListener('touchstart', function (event) {
     const followBtn = event.target.closest('#follow-btn');

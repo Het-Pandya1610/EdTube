@@ -39,6 +39,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+const toggle = document.getElementById("pfpToggle");
+const menu = document.getElementById("accountDropdown");
+
+toggle.addEventListener("click", () => {
+  menu.style.display =
+    menu.style.display === "block" ? "none" : "block";
+});
+
+window.addEventListener("click", (e) => {
+  if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+    menu.style.display = "none";
+  }
+});
+
 // UPDATED: Load search history from database
 function loadSearchHistory() {
   const suggestionsBox = document.getElementById("suggestionsBox");
@@ -50,16 +64,18 @@ function loadSearchHistory() {
       .then(searches => {
         if (searches.length > 0) {
           suggestionsBox.style.display = "block";
+          const isDark = window.isDarkMode ? window.isDarkMode() : document.body.classList.contains('dark-mode');
+          const mode = isDark ? 'dark' : 'light';
           suggestionsBox.innerHTML = `
             <div class="suggestions-header">
               <span>Recent searches</span>
               <button class="clear-history-btn" onclick="clearSearchHistory()">
-                <i class="bi bi-trash"></i> Clear
+                Clear
               </button>
             </div>
             ${searches.map(query => `
               <div class="suggestion-item" onclick="selectSuggestion('${query}')">
-                <i class="bi bi-clock-history"></i>
+                <img src="/static/assets/history ${mode}.png" alt="History Icon" class="history-icon" style="width: 16px !important; height: 16px !important; object-fit: contain;">
                 <span>${query}</span>
                 <button class="delete-suggestion" onclick="deleteSearch('${query}', event)">
                   <i class="bi bi-x-lg"></i>

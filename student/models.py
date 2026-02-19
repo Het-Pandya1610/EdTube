@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from cloudinary_storage.storage import RawMediaCloudinaryStorage
 from cloudinary_storage.validators import validate_image
-from video.models import Quiz
+from video.models import Quiz, Video
 from django.db.models import Max
 from datetime import date, timedelta
 
@@ -27,13 +27,11 @@ class Student(models.Model):
         validators=[validate_image],
         help_text="Profile picture (max 10MB - Cloudinary Free limit)"
     )
-    
-    bio = models.TextField(max_length=500, blank=True)
 
     no_of_quiz_given = models.PositiveIntegerField(default=0)
     no_of_points_earned = models.PositiveIntegerField(default=0)
     rank_in_leaderboard = models.PositiveIntegerField(null=True, blank=True)
-
+    coins = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -58,48 +56,89 @@ class Student(models.Model):
             return self.pfp.url
         return None
     
+    @property
+    def total_quizzes(self):
+        return self.quiz_attempts.count()
+    
+    @property
+    def best_percentage(self):
+        return self.quiz_attempts.aggregate(Max("percentage"))["percentage__max"] or 0
+    
+    @property
+    def best_score(self):
+        return self.quiz_attempts.aggregate(Max("score"))["score__max"] or 0
+
+    @property
+    def current_streak(self):
+        days = (
+            self.quiz_attempts
+            .dates("created_at", "day", order="DESC")
+        )
+
+        streak = 0
+        today = date.today()
+
+        for i, day in enumerate(days):
+            if day == today - timedelta(days=i):
+                streak += 1
+            else:
+                break
+
+        return streak
+    
 class QuizAttempt(models.Model):
     student = models.ForeignKey(
         Student,
         on_delete=models.CASCADE,
         related_name="quiz_attempts"
     )
-
-    quiz = models.ForeignKey(
-        Quiz,
-        on_delete=models.CASCADE
-    )
-
-    score = models.PositiveIntegerField()
+    quiz_id = models.CharField(max_length=50, default=None)
+    score = models.PositiveIntegerField(default=0)
+    total_questions = models.IntegerField(default=0)
+    percentage = models.FloatField(default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("student", "quiz_id")
 
     def __str__(self):
         return f"{self.student.student_id} - {self.quiz.id}"
 
-@property
-def total_quizzes(self):
-    return self.quiz_attempts.count()
-
-
-@property
-def best_score(self):
-    return self.quiz_attempts.aggregate(Max("score"))["score__max"] or 0
-
-
-@property
-def current_streak(self):
-    days = (
-        self.quiz_attempts
-        .dates("created_at", "day", order="DESC")
+class CoinTransaction(models.Model):
+    TRANSACTION_TYPES = (
+        ("credit", "Credit"),
+        ("debit", "Debit"),
     )
 
-    streak = 0
-    today = date.today()
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="coin_transactions"
+    )
 
-    for i, day in enumerate(days):
-        if day == today - timedelta(days=i):
-            streak += 1
-        else:
-            break
+    amount = models.IntegerField()
+    transaction_type = models.CharField(
+        max_length=10,
+        choices=TRANSACTION_TYPES
+    )
 
-    return streak
+    title = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.student_id} - {self.amount}"
+
+class DailyQuizCoinsRedemption(models.Model):
+    student = models.ForeignKey(
+        Student, 
+        on_delete=models.CASCADE,
+        related_name="daily_quiz_coins_redemptions"
+    )
+    redeemed_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-redeemed_at']
+        
+    def is_expired(self):
+        """Check if 24 hours have passed since redemption"""
+        return timezone.now() > self.redeemed_at + timedelta(hours=24)

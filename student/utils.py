@@ -1,6 +1,13 @@
+
+import calendar
 from .models import Student
-from datetime import date, timedelta
+from datetime import timedelta
 from django.db.models import Count
+import math
+from datetime import timedelta
+from django.utils import timezone
+from datetime import date
+from .models import QuizAttempt
 
 def generate_student_id(fullname):
     parts = fullname.strip().split()
@@ -18,13 +25,12 @@ def generate_student_id(fullname):
     return f"STU-{initials}-{new_number:04d}"
 
 def get_quiz_heatmap(student):
-
-    today = date.today()
-    start = today - timedelta(days=364)
+    start_date = date(2026, 2, 1)
+    end_date = date.today()
 
     attempts = (
-        student.quiz_attempts
-        .filter(created_at__date__gte=start)
+        QuizAttempt.objects
+        .filter(student=student, created_at__date__range=[start_date, end_date])
         .values("created_at__date")
         .annotate(count=Count("id"))
     )
@@ -35,11 +41,14 @@ def get_quiz_heatmap(student):
     }
 
     heatmap = []
+    months = []
+    last_month = None
 
     for i in range(365):
-        d = start + timedelta(days=i)
+        d = start_date + timedelta(days=i)
         count = attempt_dict.get(d, 0)
 
+        # activity level
         if count == 0:
             level = 0
         elif count == 1:
@@ -57,5 +66,29 @@ def get_quiz_heatmap(student):
             "level": level
         })
 
-    return heatmap
+        # month tracking
+        if d.month != last_month:
+            months.append(calendar.month_abbr[d.month])
+            last_month = d.month
+        else:
+            months.append("")
 
+    weekdays = ["Sun", "", "Tue", "", "Thu", "", "Sat"]
+
+    return {
+        "days": heatmap,
+        "months": months,
+        "weekdays": weekdays,
+    }
+
+
+def calculate_coins(score, total_questions):
+    if total_questions == 0:
+        return 0
+
+    accuracy = score / total_questions
+    base = score * 2
+
+    bonus = math.exp(accuracy * 2)
+
+    return int(base * bonus) 

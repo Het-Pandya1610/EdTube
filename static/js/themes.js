@@ -17,8 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    suns.forEach(sun => sun.classList.toggle("d-none", !isDark));
-    moons.forEach(moon => moon.classList.toggle("d-none", isDark));
+    suns.forEach(sun => sun.classList.toggle("d-flex", !isDark));
+    moons.forEach(moon => moon.classList.toggle("d-flex", isDark));
 
     if (logo) {
       logo.src = isDark
@@ -38,3 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+window.isDarkMode = function() {
+  return document.body.classList.contains('dark-mode');
+}
