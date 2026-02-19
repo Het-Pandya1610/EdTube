@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from django.urls import reverse
-from .models import Video,Comment, CommentReply, Quiz, VideoHistory
+from .models import Video,Comment, CommentReply, Quiz, VideoHistory, WatchLater
 from teacher.models import Teacher
 from .utils import save_to_history
 from django.contrib import messages
@@ -227,7 +227,47 @@ def submit_quiz(request, quiz_id):
 
     return redirect("index")
 
+@login_required
+def save_to_watch_later(request, video_id):
+    """Save a video to watch later playlist"""
+    video = get_object_or_404(Video, pk=video_id)
+    
+    # Save to watch later
+    WatchLater.objects.get_or_create(
+        user=request.user,
+        video=video
+    )
+    
+    messages.success(request, f"'{video.title}' saved to Watch Later!")
+    
+    # Redirect back to the page user came from
+    return redirect(request.META.get('HTTP_REFERER', 'index'))
 
+@login_required
+def watch_later_playlist(request):
+    """Display user's watch later playlist"""
+    saved_videos = WatchLater.objects.filter(
+        user=request.user
+    ).select_related('video__teacher').order_by('-added_at')
+    
+    context = {
+        'saved_videos': saved_videos,
+        'total_videos': saved_videos.count()
+    }
+    return render(request, 'watch_later.html', context)
+
+@login_required
+def remove_from_watch_later(request, video_id):
+    """Remove a video from watch later playlist"""
+    if request.method == 'POST':
+        video = get_object_or_404(Video, pk=video_id)
+        WatchLater.objects.filter(
+            user=request.user,
+            video=video
+        ).delete()
+        messages.success(request, "Removed from Watch Later")
+    
+    return redirect('watch_later_playlist')
 
 def watchVideo(request):
     video_id = request.GET.get('v')

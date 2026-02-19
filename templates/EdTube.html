@@ -122,14 +122,10 @@
               </button>
           
               <div class="options-dropdown" id="menu-{{ video.video_id }}">
-                <div class="dropdown-item"><i class="bi bi-clock"></i> Watch Later</div>
-                <div class="dropdown-item"><i class="bi bi-bookmarks"></i> Save</div>
+                <div class="dropdown-item"><a href="{% url 'save_to_watch_later' video.video_id %}" style="text-decoration: none;">
+    <i class="bi bi-bookmarks"></i> Save
+</a></div>
                 <div class="dropdown-item openShare" data-video-id="{{ video.video_id }}"><i class="bi bi-share"></i> Share</div>
-                {% if video.teacher.user == request.user %}
-                  <hr style="border:0; border-top:2px solid var(--bg-color); margin:5px 0;">
-                  <div class="dropdown-item"><i class="bi bi-pencil"></i> Edit</div>
-                  <div class="dropdown-item delete-opt"><i class="bi bi-trash"></i> Delete</div>
-                {% endif %}
               </div>
 
               <a href="{% url 'watch_video'%}?v={{video.video_id}}" class="video-card">

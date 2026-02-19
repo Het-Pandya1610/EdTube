@@ -38,7 +38,7 @@
           <a href="{% url 'video_history' %}">
             <i class="bi bi-clock-history"></i>Watch history
           </a>          
-          <a href=""><i class="bi bi-bookmarks"></i>Saved Videos</a>
+          <a href="{% url "watch_later_playlist" %}"><i class="bi bi-bookmarks"></i>Saved Videos</a>
           
           {% if request.user.profile.role == "tutor" %}
             <a href="{% url 'user_profile' username=request.user.username %}">

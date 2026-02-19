@@ -176,6 +176,16 @@ class Video(models.Model):
             return urlparse.parse_qs(parsed_url.query).get('v', [None])[0]
         return None
 
+    def is_in_watch_later(self, user):
+        """Check if video is in user's watch later list"""
+        if not user or not user.is_authenticated:
+            return False
+        return WatchLater.objects.filter(user=user, video=self).exists()
+
+    def get_watch_later_count(self):
+        """Get number of users who saved this video to watch later"""
+        return self.watch_later_users.count()
+
     def __str__(self):
         return f"{self.video_id} - {self.title}"
 
@@ -261,3 +271,24 @@ class Quiz(models.Model):
 
     def __str__(self):
         return f"Quiz for {self.video.title}"
+
+class WatchLater(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='watch_later_videos'
+    )
+    video = models.ForeignKey(
+        'Video', 
+        on_delete=models.CASCADE, 
+        related_name='watch_later_users'
+    )
+    added_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-added_at']
+        unique_together = ['user', 'video']
+        verbose_name_plural = "Watch Later"
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.video.title}"

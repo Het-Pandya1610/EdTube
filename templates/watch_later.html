@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Later | EdTube</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}?v=1">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/watch_later.css' %}">
+</head>
+<body>
+    {% include "navbar.html" %}
+    <!-- Main Content -->
+    <div class="watch-later-container">
+        <!-- Header Section -->
+        <div class="playlist-header">
+            <h1 class="playlist-title">
+                <i class="fas fa-clock"></i>
+                Watch Later
+            </h1>
+            <p class="playlist-stats" id="playlistStats">{{ total_videos }} video{{ total_videos|pluralize }}</p>
+        </div>
+
+        <!-- Layout -->
+        <div class="playlist-layout">
+            <!-- Sidebar -->
+            <aside class="playlist-sidebar">
+                <div class="sidebar-content">
+                    <div class="clock-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h2 class="sidebar-title">Watch Later</h2>
+                    <p class="video-count" id="videoCount">{{ total_videos }} video{{ total_videos|pluralize }}</p>
+                    {% if total_videos > 0 %}
+                        <button class="clear-all-btn" id="clearAllBtn">
+                            <i class="fas fa-trash"></i>
+                            Clear All
+                        </button>
+                    {% endif %}
+                </div>
+            </aside>
+
+            <!-- Videos List -->
+            <main class="videos-list" id="videosList">
+                {% if saved_videos %}
+                    {% for item in saved_videos %}
+                        <div class="video-card" data-video-id="{{ item.video.video_id }}" data-added="{{ item.added_at|date:'U' }}">
+                            <div class="video-thumbnail">
+                                {% if item.video.thumbnail %}
+                                    <img src="{{ item.video.thumbnail.url }}" alt="{{ item.video.title }}">
+                                {% else %}
+                                    <div class="thumbnail-placeholder">
+                                        <i class="fas fa-video"></i>
+                                    </div>
+                                {% endif %}
+                                <span class="video-duration">{{ item.video.duration }}</span>
+                            </div>
+                            
+                            <div class="video-info">
+                                <h3 class="video-title">{{ item.video.title }}</h3>
+                                <p class="video-meta">
+                                    <span class="teacher-name">
+                                        <i class="fas fa-user"></i> {{ item.video.teacher.name }}
+                                    </span>
+                                    <span class="saved-time" data-time="{{ item.added_at|date:'c' }}">
+                                        <i class="far fa-clock"></i> {{ item.added_at|timesince }} ago
+                                    </span>
+                                </p>
+                                <p class="video-description">{{ item.video.description|truncatechars:120 }}</p>
+                            </div>
+                            
+                            <div class="video-actions">
+                                <a href="/watch/?v={{ item.video.video_id }}" class="watch-btn" title="Watch now">
+                                    <i class="fas fa-play"></i>
+                                </a>
+                                <button class="remove-btn" data-video-id="{{ item.video.video_id }}" title="Remove from Watch Later">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>Your Watch Later list is empty</h3>
+                        <p>Save videos to watch them later!</p>
+                        <a href="{% url 'index' %}" class="browse-btn">Browse Videos</a>
+                    </div>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Hidden CSRF Token for AJAX requests -->
+    <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/watch_later.js' %}"></script>
+</body>
+</html>

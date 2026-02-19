@@ -108,14 +108,13 @@
           <h3 class="section-title"><i class="bi bi-collection-play"></i> Uploads</h3>
         {%endif%}
         <div class="video-grid">
-          {% for video in profile_user.teacher.videos.all %}
+          {% for video in profile_user.teacher.videos.all|dictsortreversed:"created_at" %}
             <div class="video-card-container">
               <button class="video-options-btn" data-video-id="{{ video.video_id }}">
                 <i class="bi bi-three-dots-vertical"></i>
               </button>
 
               <div class="options-dropdown" id="menu-{{ video.video_id }}">
-                <div class="dropdown-item"><i class="bi bi-clock"></i> Watch Later</div>
                 <div class="dropdown-item"><i class="bi bi-bookmarks"></i> Save</div>
                 <div class="dropdown-item openShare" data-video-id="{{ video.video_id }}"><i class="bi bi-share"></i> Share</div>
                 
