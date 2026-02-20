@@ -556,7 +556,7 @@ SOFTWARE.
 
 - **Version**: 1.0.0
 - **Status**: Active Development
-- **Last Updated**: January 2026
+- **Last Updated**: <!-- LAST_UPDATED_START -->$(date +'%B %Y')<!-- LAST_UPDATED_END -->
 
 ## 🔗 Links
 
