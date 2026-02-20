@@ -1,5 +1,5 @@
 """
-ASGI config for EduNex project.
+ASGI config for EdTube project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

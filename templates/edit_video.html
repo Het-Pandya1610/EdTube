@@ -12,7 +12,6 @@
 </head>
 <body>
     {% include 'navbar.html' %}
-    
     <div class="edit-container">
         <div class="edit-header">
             <h2><i class="bi bi-pencil-square"></i> Edit Video</h2>
@@ -23,7 +22,7 @@
 
         <form method="POST" enctype="multipart/form-data" id="edit-video-form">
             {% csrf_token %}
-            
+            <input type="hidden" name="action" value="update">
             <div class="edit-grid">
                 <!-- Left Column - Basic Info -->
                 <div class="basic-info-section">
@@ -32,19 +31,19 @@
                     <div class="form-group">
                         <label for="title">Title <span class="required">*</span></label>
                         <input type="text" 
-                               name="title" 
-                               id="title" 
-                               value="{{ video.title }}" 
-                               placeholder="Enter video title"
-                               required>
+                            name="title" 
+                            id="title" 
+                            value="{{ video.title }}" 
+                            placeholder="Enter video title"
+                            required>
                     </div>
 
                     <div class="form-group">
                         <label for="description">Description</label>
                         <textarea name="description" 
-                                  id="description" 
-                                  rows="5" 
-                                  placeholder="Describe your video...">{{ video.description }}</textarea>
+                                id="description" 
+                                rows="5" 
+                                placeholder="Describe your video...">{{ video.description }}</textarea>
                     </div>
 
                     <div class="form-row">
@@ -52,11 +51,11 @@
                         <div class="form-group half">
                             <label for="subject">Subject <span class="required">*</span></label>
                             <input type="text" 
-                                   name="subject" 
-                                   id="subject" 
-                                   value="{{ video.subject }}" 
-                                   placeholder="e.g., Mathematics, Physics, History"
-                                   required>
+                                name="subject" 
+                                id="subject" 
+                                value="{{ video.subject }}" 
+                                placeholder="e.g., Mathematics, Physics, History"
+                                required>
                             <small class="field-hint">Enter the subject/topic of your video</small>
                         </div>
 
@@ -87,9 +86,9 @@
                             </div>
                             <div class="thumbnail-input">
                                 <input type="file" 
-                                       name="thumbnail" 
-                                       id="thumbnail" 
-                                       accept="image/*">
+                                    name="thumbnail" 
+                                    id="thumbnail" 
+                                    accept="image/*">
                                 <label for="thumbnail" class="file-label">
                                     <i class="bi bi-upload"></i> Upload New Thumbnail
                                 </label>
@@ -126,16 +125,16 @@
                                         <div class="time-input">
                                             <label>Start Time (MM:SS)</label>
                                             <input type="text" 
-                                                   id="start-time" 
-                                                   placeholder="00:00" 
-                                                   value="00:00">
+                                                id="start-time" 
+                                                placeholder="00:00" 
+                                                value="00:00">
                                         </div>
                                         <div class="time-input">
                                             <label>End Time (MM:SS)</label>
                                             <input type="text" 
-                                                   id="end-time" 
-                                                   placeholder="--:--" 
-                                                   value="{{ video.duration|default:'10:00' }}">
+                                                id="end-time" 
+                                                placeholder="--:--" 
+                                                value="{{ video.duration|default:'10:00' }}">
                                         </div>
                                     </div>
                                     
@@ -160,9 +159,9 @@
                                 <h4><i class="bi bi-arrow-repeat"></i> Replace Video</h4>
                                 <div class="file-upload">
                                     <input type="file" 
-                                           name="video_file" 
-                                           id="video_file" 
-                                           accept="video/*">
+                                        name="video_file" 
+                                        id="video_file" 
+                                        accept="video/*">
                                     <label for="video_file" class="file-label">
                                         <i class="bi bi-cloud-upload"></i>
                                         <span>Upload New Video</span>
@@ -177,11 +176,11 @@
                                 <span>YouTube Video</span>
                             </div>
                             <div class="youtube-preview">
-                                <iframe width="100%" 
-                                        height="315" 
-                                        src="https://www.youtube.com/embed/{{ video.youtube_id }}" 
+                                <img height="315" 
+                                        src="https://img.youtube.com/vi/{{ video.youtube_id }}/maxresdefault.jpg"
+                                        onerror="this.src='https://img.youtube.com/vi/{{ video.youtube_id }}/0.jpg';" 
                                         frameborder="0" 
-                                        allowfullscreen></iframe>
+                                        allowfullscreen></img>
                             </div>
                             <div class="youtube-note">
                                 <i class="bi bi-info-circle"></i>
@@ -193,9 +192,9 @@
                                 <h4><i class="bi bi-arrow-repeat"></i> Replace with Upload</h4>
                                 <div class="file-upload">
                                     <input type="file" 
-                                           name="video_file" 
-                                           id="video_file" 
-                                           accept="video/*">
+                                        name="video_file" 
+                                        id="video_file" 
+                                        accept="video/*">
                                     <label for="video_file" class="file-label">
                                         <i class="bi bi-cloud-upload"></i>
                                         <span>Upload Video File</span>

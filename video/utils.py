@@ -17,8 +17,7 @@ file_lock = threading.Lock()
 HISTORY_FILE = os.path.join(settings.BASE_DIR, 'user_history.json')
 
 REQUIRED_COLUMNS = [
-    "question_id",
-    "question_number",
+    "question_text",
     "option_a",
     "option_b",
     "option_c",
@@ -84,7 +83,7 @@ def get_user_video_history(user, limit=10):
     cache.set(cache_key, videos, 3600)
     
     return videos
-        
+
 def validate_quiz_csv(file):
     """
     Validates quiz CSV file format and content.
@@ -103,13 +102,13 @@ def validate_quiz_csv(file):
         decoded_file = file.read().decode("utf-8").splitlines()
         reader = csv.DictReader(decoded_file)
 
-        # Validate headers
+        # Validate headers - should match what's expected (no question_id)
         if reader.fieldnames != REQUIRED_COLUMNS:
             raise ValidationError(
                 f"CSV headers must be exactly: {', '.join(REQUIRED_COLUMNS)}"
             )
 
-        question_ids = set()
+        question_texts = set()  # To check for duplicate questions (optional)
 
         for row_number, row in enumerate(reader, start=2):
 
@@ -121,18 +120,18 @@ def validate_quiz_csv(file):
                     )
 
             # Correct option validation
-            if row["correct_option"].upper() not in ["A", "B", "C", "D"]:
+            if row["correct_option"].strip().upper() not in ["A", "B", "C", "D"]:
                 raise ValidationError(
                     f"Invalid correct_option at row {row_number}. Must be A, B, C or D."
                 )
 
-            # Duplicate question_id
-            if row["question_id"] in question_ids:
+            # Optional: Check for duplicate question text
+            if row["question_text"] in question_texts:
                 raise ValidationError(
-                    f"Duplicate question_id '{row['question_id']}' at row {row_number}"
+                    f"Duplicate question_text at row {row_number}"
                 )
 
-            question_ids.add(row["question_id"])
+            question_texts.add(row["question_text"])
 
     except UnicodeDecodeError:
         raise ValidationError("Invalid file encoding. Use UTF-8.")

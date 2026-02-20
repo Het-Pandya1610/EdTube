@@ -1,8 +1,8 @@
 /* edit_video.css */
 
 :root {
-    --primary-color: #4CAF50;
-    --primary-dark: #45a049;
+    --primary-color: rgba(3, 3, 121, 1);
+    --primary-dark: rgba(22, 22, 164, 1);
     --danger-color: #dc3545;
     --danger-dark: #c82333;
     --success-color: #28a745;
@@ -27,13 +27,15 @@
     
     --transition: all 0.3s ease;
 }
-
+body{
+    background: var(--bg-color) !important;
+}
 /* Main Container */
 .edit-container {
     width: 100%;
-    margin-top: 60px;
+    margin: 60px auto;
     height: 100%;
-    padding: 0 20px;
+    padding: 0 40px;
     background: var(--bg-color);
 }
 
@@ -77,7 +79,7 @@
 .back-btn:hover {
     background: var(--hover-bg);
     transform: translateX(-5px);
-    border-color: var(--primary-color);
+    border-color: var(--text-color);
 }
 
 .back-btn i {
@@ -116,7 +118,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--primary-color);
+    color: var(--text-color);
     font-size: 1.3rem;
 }
 
@@ -156,14 +158,14 @@
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: var(--text-color);
     box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
 .form-group input[type="text"]:hover,
 .form-group textarea:hover,
 .form-group select:hover {
-    border-color: var(--primary-color);
+    border-color: var(--text-color);
 }
 
 .form-group textarea {
@@ -189,7 +191,7 @@
 .field-hint {
     display: block;
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--text-color);
     margin-top: 5px;
     font-style: italic;
 }
@@ -239,8 +241,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: var(--text-muted);
-    background: var(--hover-bg);
+    color: var(--text-color);
+    background: var(--bg-color);
 }
 
 .no-thumbnail i {
@@ -262,7 +264,7 @@
     gap: 8px;
     padding: 12px 24px;
     background: var(--primary-color);
-    color: white;
+    color: white !important;
     border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: 500;
@@ -283,7 +285,7 @@
 .thumbnail-input small {
     display: block;
     margin-top: 8px;
-    color: var(--text-muted);
+    color: var(--text-color);
     font-size: 0.85rem;
 }
 
@@ -318,7 +320,7 @@
 
 .info-badge i {
     font-size: 1.2rem;
-    color: var(--primary-color);
+    color: var(--text-color);
 }
 
 .info-badge.youtube {
@@ -374,7 +376,7 @@
 
 .trim-section h4 i,
 .replace-section h4 i {
-    color: var(--primary-color);
+    color: var(--text-color);
 }
 
 .trim-controls {
@@ -408,7 +410,7 @@
 
 .time-input input:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: var(--text-color);
 }
 
 .trim-actions {
@@ -444,7 +446,7 @@
 
 .preview-trim-btn:hover {
     background: var(--hover-bg);
-    border-color: var(--primary-color);
+    border-color: var(--text-color);
 }
 
 .apply-trim-btn:hover {
@@ -476,7 +478,7 @@
 
 /* File Upload */
 .file-upload {
-    background: var(--hover-bg);
+    background: var(--bg-color);
     padding: 20px;
     border-radius: var(--radius-md);
     text-align: center;
@@ -508,7 +510,7 @@
 
 .file-upload small {
     display: block;
-    color: var(--text-muted);
+    color: var(--text-color);
     font-size: 0.85rem;
 }
 
@@ -619,7 +621,7 @@
 
 .modal-header h3 {
     margin: 0;
-    color: var(--primary-color);
+    color: var(--text-color);
     font-size: 1.3rem;
 }
 

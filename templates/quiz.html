@@ -13,8 +13,7 @@
     {%include 'navbar.html'%}
     <div id="pageContent">
         <div class="quiz-container">
-            <h1>Quiz Title</h1>
-            <p class="quiz-description">This is a sample quiz description. It provides an overview of the quiz content and instructions.</p>
+            <h1>{{video.subject}} Quiz by {{video.teacher.name}}</h1>
             <form class="quiz-form" id="quizForm" action="{% url 'submit_quiz' video.quiz_id %}" method="POST">
                 {% csrf_token %}
                     {% for q in questions %}

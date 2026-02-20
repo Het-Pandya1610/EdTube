@@ -1,6 +1,7 @@
 from pathlib import Path
 import subprocess
 import uuid
+from django.core.files.base import ContentFile
 from notifications.models import Notification
 from teacher.models import Follower
 from EdTube import settings
@@ -20,6 +21,7 @@ from django.db import transaction
 import csv
 from django.db.models import F
 from student.models import Student, QuizAttempt, CoinTransaction
+import cloudinary.api
 
 @login_required
 def videoUpload(request):
@@ -118,8 +120,10 @@ def upload_quiz_file_in_database(video, csv_file):
 
         quiz_objects = []
 
-        # Extract video suffix for question_id
-        video_suffix = video.video_id.replace("VID-", "")
+        # Make sure quiz_id exists
+        if not video.quiz_id:
+            video.quiz_id = f"{video.video_id}-QUIZ"
+            video.save(update_fields=["quiz_id"])
 
         with transaction.atomic():
             # Delete old quiz for this video
@@ -130,9 +134,9 @@ def upload_quiz_file_in_database(video, csv_file):
                 if correct_option not in ["A", "B", "C", "D"]:
                     raise ValueError(f"Invalid correct_option at row {idx}")
 
-                # Auto-generate question_id
+                # Auto-generate question_id using quiz_id + question number
                 question_number = str(idx).zfill(4)  # 0001, 0002, ...
-                question_id = f"QUE-{video_suffix}{question_number}"
+                question_id = f"{video.quiz_id}-{question_number}"  # Changed to use quiz_id
 
                 quiz_objects.append(
                     Quiz(
@@ -165,7 +169,7 @@ def submit_quiz(request, quiz_id):
     # Prevent multiple attempts early
     if QuizAttempt.objects.filter(student=student, quiz_id=quiz_id).exists():
         messages.error(request, "You have already attempted this quiz.")
-        return redirect("quiz_summary", quiz_id=quiz_id)
+        return redirect("watch_video") + f"?v={video.video_id}"
 
     # Quiz questions stored in session
     questions = request.session.get("quiz_questions", [])
@@ -184,6 +188,11 @@ def submit_quiz(request, quiz_id):
         if selected_option and correct_option and selected_option.upper() == correct_option.upper():
             correct_answers += 1
 
+    if total_questions > 0:
+        percentage = round((correct_answers / total_questions) * 100, 2)  # 2 digits after decimal
+    else:
+        percentage = 0.0
+
     # Total points earned
     total_points = correct_answers  # 1 point per correct answer
     accuracy = correct_answers / total_questions if total_questions else 0
@@ -192,12 +201,13 @@ def submit_quiz(request, quiz_id):
     base_coins = total_points * 2
     accuracy_bonus = round(base_coins * accuracy)
     total_coins = base_coins + accuracy_bonus
-
     # Save **single QuizAttempt**
     QuizAttempt.objects.create(
         student=student,
         quiz_id=quiz_id,
-        score=total_points
+        score=total_points,
+        total_questions=total_questions,
+        percentage = percentage
     )
 
     # Update student stats
@@ -492,7 +502,7 @@ def edit_video(request, video_id):
             if action == 'trim':
                 return handle_video_trim(request, video)
             elif action == 'update':
-                return handle_video_update(request, video)
+                return handle_video_update(request, video)  # This will now work
             else:
                 return JsonResponse({'error': 'Invalid action'}, status=400)
                 
@@ -511,44 +521,113 @@ def edit_video(request, video_id):
     return render(request, 'edit_video.html', {'video': video})
 
 def handle_video_update(request, video):
-    """Handle basic video information update"""
-    
-    # Update basic info
-    video.title = request.POST.get('title', video.title)
-    video.description = request.POST.get('description', video.description)
-    video.subject = request.POST.get('subject', video.subject)
-    video.language = request.POST.get('language', video.language)
-    
-    # Handle thumbnail update
-    if 'thumbnail' in request.FILES:
-        # Delete old thumbnail
-        if video.thumbnail:
-            video.thumbnail.delete(save=False)
-        video.thumbnail = request.FILES['thumbnail']
-    
-    # Handle video file update
-    if 'video_file' in request.FILES:
-        # Delete old video file
-        if video.video_file:
-            video.video_file.delete(save=False)
+    """Handle video metadata update"""
+    try:
+        print("=" * 60)
+        print("HANDLE VIDEO UPDATE CALLED")
+        print("=" * 60)
         
-        # Save new video file
-        video_file = request.FILES['video_file']
-        video.video_file = video_file
-        video.youtube_id = None  # Remove YouTube ID if exists
+        # Print ALL POST data
+        print("POST data keys:", list(request.POST.keys()))
+        for key, value in request.POST.items():
+            print(f"POST[{key}] = '{value}'")
         
-        # Get video duration
-        video.duration = get_video_duration(video_file.temporary_file_path() if hasattr(video_file, 'temporary_file_path') else None)
-    
-    video.save()
-    
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({
-            'status': 'success',
-            'message': 'Video updated successfully',
-            'redirect_url': reverse('profile')
+        # Print ALL FILES data
+        print("FILES data keys:", list(request.FILES.keys()))
+        for key, file in request.FILES.items():
+            print(f"FILES[{key}] = {file.name} ({file.size} bytes)")
+        
+        # Before update - print current values
+        print(f"BEFORE UPDATE - Title: '{video.title}'")
+        print(f"BEFORE UPDATE - Description: '{video.description[:50]}...'")
+        print(f"BEFORE UPDATE - Subject: '{video.subject}'")
+        print(f"BEFORE UPDATE - Language: '{video.language}'")
+        
+        # Update basic fields - with fallbacks
+        new_title = request.POST.get('title')
+        if new_title:
+            print(f"Updating title from '{video.title}' to '{new_title}'")
+            video.title = new_title
+        else:
+            print("No title in POST data")
+        
+        new_description = request.POST.get('description')
+        if new_description is not None:
+            print(f"Updating description from '{video.description[:50]}...' to '{new_description[:50]}...'")
+            video.description = new_description
+        else:
+            print("No description in POST data")
+        
+        new_subject = request.POST.get('subject')
+        if new_subject:
+            print(f"Updating subject from '{video.subject}' to '{new_subject}'")
+            video.subject = new_subject
+        else:
+            print("No subject in POST data")
+        
+        new_language = request.POST.get('language')
+        if new_language:
+            print(f"Updating language from '{video.language}' to '{new_language}'")
+            video.language = new_language
+        else:
+            print("No language in POST data")
+        
+        # Handle thumbnail upload
+        if request.FILES.get('thumbnail'):
+            print(f"Updating thumbnail with: {request.FILES['thumbnail'].name}")
+            if video.thumbnail:
+                video.thumbnail.delete(save=False)
+            video.thumbnail = request.FILES.get('thumbnail')
+        else:
+            print("No thumbnail file in request")
+        
+        # Handle video file replacement
+        if request.FILES.get('video_file'):
+            print(f"Updating video file with: {request.FILES['video_file'].name}")
+            if video.video_file:
+                video.video_file.delete(save=False)
+            video.video_file = request.FILES.get('video_file')
+        else:
+            print("No video file in request")
+        
+        print("Saving video...")
+        video.save()
+        print("Video saved successfully!")
+        
+        # After update - verify changes
+        video.refresh_from_db()
+        print(f"AFTER UPDATE - Title: '{video.title}'")
+        print(f"AFTER UPDATE - Description: '{video.description[:50]}...'")
+        print(f"AFTER UPDATE - Subject: '{video.subject}'")
+        print(f"AFTER UPDATE - Language: '{video.language}'")
+        
+        # Check if AJAX request
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Video updated successfully',
+                'redirect_url': reverse('user_profile', args=[request.user.username])
+            })
+        
+        messages.success(request, 'Video updated successfully!')
+        return redirect('user_profile', username=request.user.username)
+        
+    except Exception as e:
+        print(f"ERROR in handle_video_update: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+        
+        messages.error(request, f'Error updating video: {str(e)}')
+        return render(request, 'edit_video.html', {
+            'video': video,
+            'error': str(e)
         })
-    return redirect('profile')
 
 def handle_video_trim(request, video):
     """Handle video trimming operation"""

@@ -345,43 +345,86 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                const formData = new FormData(this);
+                // MANUALLY create FormData and add ALL fields
+                const formData = new FormData();
+                
+                // Get CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                formData.append('csrfmiddlewaretoken', csrfToken);
+                
+                // MANUALLY add all form fields with values
+                formData.append('title', document.getElementById('title').value);
+                formData.append('description', document.getElementById('description').value);
+                formData.append('subject', document.getElementById('subject').value);
+                formData.append('language', document.getElementById('language').value);
+                formData.append('action', 'update');
+                
+                // Add thumbnail if selected
+                const thumbnailFile = document.getElementById('thumbnail').files[0];
+                if (thumbnailFile) {
+                    formData.append('thumbnail', thumbnailFile);
+                }
+                
+                // Add video file if selected
+                const videoFile = document.getElementById('video_file').files[0];
+                if (videoFile) {
+                    formData.append('video_file', videoFile);
+                }
                 
                 // Add video type info
                 const hasVideoFile = document.querySelector('.info-badge span')?.textContent === 'Uploaded Video File';
                 formData.append('has_video_file', hasVideoFile ? 'true' : 'false');
                 
+                // DEBUG: Log what we're sending
+                console.log('=== SENDING FORM DATA ===');
+                for (let pair of formData.entries()) {
+                    if (pair[0] !== 'csrfmiddlewaretoken') {
+                        console.log(pair[0] + ':', pair[1] instanceof File ? pair[1].name : pair[1]);
+                    }
+                }
+                
                 const response = await fetch(window.location.href, {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRFToken': getCsrfToken()
+                        'X-CSRFToken': csrfToken
                     }
                 });
 
-                const data = await response.json();
-
-                if (response.ok && data.status === 'success') {
-                    // Update progress
+                if (response.redirected) {
                     if (typeof pageLoader !== 'undefined') {
-                        pageLoader.updateProgress(100, 'Changes saved!');
+                        pageLoader.updateProgress(100, 'Changes saved! Redirecting...');
                     }
-                    
                     showNotification('Video updated successfully', 'success');
-                    
-                    // Redirect after success
-                    setTimeout(() => {
-                        window.location.href = data.redirect_url || '/profile/';
-                    }, 1500);
-                } else {
-                    throw new Error(data.message || data.error || 'Failed to save changes');
+                    window.location.href = response.url;
+                    return;
                 }
+
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        showNotification('Video updated successfully', 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirect_url || '/profile/';
+                        }, 1500);
+                    } else {
+                        throw new Error(data.message || 'Failed to save');
+                    }
+                } else {
+                    // If HTML response, something went wrong
+                    const text = await response.text();
+                    console.error('Unexpected HTML response:', text.substring(0, 200));
+                    throw new Error('Server error - check console');
+                }
+                
             } catch (error) {
                 console.error('Save error:', error);
                 if (typeof pageLoader !== 'undefined') {
                     pageLoader.hide();
                 }
-                showNotification(error.message, 'error');
+                showNotification(error.message || 'Failed to save changes', 'error');
             }
         });
     }
@@ -478,13 +521,28 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// CSRF Token helper
+// CSRF Token helper - IMPROVED VERSION
 function getCsrfToken() {
+    // Try to get from cookie first
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('csrftoken='))
         ?.split('=')[1];
-    return cookieValue || '';
+    
+    if (cookieValue) {
+        console.log('CSRF from cookie:', cookieValue);
+        return cookieValue;
+    }
+    
+    // Fallback: get from hidden input
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) {
+        console.log('CSRF from input:', csrfInput.value);
+        return csrfInput.value;
+    }
+    
+    console.error('CSRF token not found!');
+    return '';
 }
 
 // Notification helper

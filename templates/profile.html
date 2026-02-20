@@ -229,7 +229,7 @@
 
           <h4 class="mt-4">Recent Attempts</h4>
           <div class="recent-quiz-list">
-            {% for attempt in profile_user.student.quiz_attempts.all|slice:":5" %}
+            {% for attempt in profile_user.student.quiz_attempts.all|dictsortreversed:"created_at" %}
               <div class="recent-quiz-item">
                 <span class="quiz-title">
                   {{ attempt.quiz.video.title }}

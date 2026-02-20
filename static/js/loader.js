@@ -75,7 +75,7 @@ class PageLoader {
                     height: 80px;
                     border: 5px solid rgba(255, 255, 255, 0.2);
                     border-top: 5px solid #fff;
-                    border-right: 5px solid #4CAF50;
+                    border-right: 5px solid #4c59af;
                     border-radius: 50%;
                     animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
                     box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);

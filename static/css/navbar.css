@@ -215,7 +215,7 @@ header img {
 /* Desktop behavior */
 @media (min-width: 768px) {
     body.nav-open #pageContent{
-    margin-left: 250px;
+        margin-left: 250px;
     }
 }
 
