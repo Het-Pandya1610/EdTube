@@ -99,69 +99,206 @@ Open browser and visit: `http://localhost:8000`
 
 ```
 EdTube/
-├── accounts/                # User authentication
-│   ├── models.py            # User & Profile models
-│   ├── views.py             # Auth views
-│   └── urls.py              # Auth URLs
-├── video/                   # Video functionality
-│   ├── models.py            # Video model
-│   ├── views.py             # Video views
-│   ├── urls.py              # Video URLs
-│   └── templatetags/        # Custom template tags
-├── teacher/                 # Teacher features
-│   ├── models.py            # Teacher model
-│   └── views.py             # Teacher views
-├── student/                 # Student features
-│   ├── models.py            # Student model
-│   └── views.py             # Student views
-├── courses/                 # Course management
-│   ├── models.py            # Course model
-│   └── views.py             # Course views
-├── blog/                    # Educational blog
-│   ├── models.py            # Blog model
-│   └── views.py             # Blog views
-├── pages/                   # Static pages
-│   └── views.py             # Static page views
-├── security_tests/          # Dedicated Security Testing Suite
-|   ├── __init__.py
-|   ├── security_summary.py
-|   ├── test_api_security.py
-|   ├── test_authentication.py
-|   ├── test_configuration.py
-|   ├── test_csrf.py
-|   ├── test_data_exposure.py
-|   ├── test_file_upload.py
-|   ├── test_sql_injection.py
-|   └── test_xss.py
-├── templates/               # HTML templates
-│   ├── video_player.html    # Video player template
-│   ├── search_results.html  # Search results template
-│   ├── login.html           # Login template
-│   ├── register.html        # Register template
-│   └── dashboard.html       # Dashboard template
-├── static/                  # Static files
-│   ├── assets/              # Images and logos
-│   ├── js/                  # JavaScript files
-│   └── css/                 # CSS files
-├── media/                   # User uploads
-│   ├── teacher_profiles/    # Teacher profile pictures
-│   ├── videos/              # Uploaded videos
-│   ├── video_thumbnails/    # Video thumbnails
-│   ├── video_notes/         # Video notes
-│   └── video_quizzes/       # Video quizzes
-├── EdTube/                  # Project settings
-│   ├── settings.py          # Django settings
-|   ├── test_runner.py       # test case checking
-│   ├── urls.py              # Main URLs
-│   ├── wsgi.py              # WSGI config
-│   └── asgi.py              # ASGI config
-├── manage.py                # Django management script
-├── requirements.txt         # Python dependencies
-├── .env.example             # Environment template
-├── factories.py             # Factory Boy classes for generating test data
-├── test_search.py           # Root level search functionality tests
-├── .gitignore               # Git ignore rules
-└── README.md                # This file
+│
+├── manage.py                    # Django's command-line utility for administrative tasks
+├── Requirements.txt             # Project dependencies list
+├── pytest.ini                   # Pytest configuration settings
+├── factories.py                 # Test factories for generating test data
+├── test_search.py               # Search functionality tests
+├── README.md                    # Project documentation and setup instructions
+├── .gitignore                   # Specifies intentionally untracked files to ignore
+│
+├── EdTube/                       # Project configuration directory
+│   ├── __init__.py              # Marks directory as Python package
+│   ├── settings.py              # Project settings and configuration
+│   ├── urls.py                  # Main URL routing configuration
+│   ├── wsgi.py                   # WSGI configuration for deployment
+│   ├── asgi.py                   # ASGI configuration for async support
+│   ├── test_runner.py            # Custom test runner configuration
+│   └── migrations/               # Database migrations directory
+│
+├── accounts/                      # User account management app
+│   ├── __init__.py               # Marks directory as Python package
+│   ├── admin.py                   # Admin interface configurations
+│   ├── apps.py                    # App configuration class
+│   ├── models.py                  # User profile and account models
+│   ├── views.py                   # Account-related views (login, register, profile)
+│   ├── urls.py                    # Account-specific URL patterns
+│   ├── utils.py                   # Helper functions for accounts
+│   ├── mail_utils.py              # Email sending utilities
+│   ├── signals.py                  # Django signals for account events
+│   ├── tests.py                    # Account app tests
+│   ├── data/                       # Static data files
+│   │   └── surnames.csv            # CSV file containing surnames for testing
+│   └── migrations/                  # Database migrations directory
+│
+├── video/                           # Video management app
+│   ├── __init__.py                 # Marks directory as Python package
+│   ├── admin.py                     # Admin interface for video management
+│   ├── apps.py                      # App configuration class
+│   ├── models.py                    # Video, comment, quiz models
+│   ├── views.py                     # Video playback and management views
+│   ├── urls.py                      # Video-specific URL patterns
+│   ├── utils.py                     # Video processing utilities
+│   ├── analytics.py                  # Video analytics and tracking
+│   ├── tests.py                      # Video app tests
+│   ├── templatetags/                 # Custom template tags
+│   │   ├── __init__.py
+│   │   └── hashtag_helper.py         # Template tags for hashtag processing
+│   ├── management/                    # Custom management commands
+│   │   └── commands/
+│   │       └── migrate_history.py     # Command to migrate video history
+│   └── migrations/                    # Database migrations directory
+│
+├── teacher/                          # Teacher functionality app
+│   ├── __init__.py                   # Marks directory as Python package
+│   ├── admin.py                       # Admin interface for teachers
+│   ├── apps.py                        # App configuration class
+│   ├── models.py                      # Teacher profile and content models
+│   ├── views.py                       # Teacher dashboard and content management
+│   ├── urls.py                        # Teacher-specific URL patterns
+│   ├── utils.py                       # Teacher helper functions
+│   ├── tests.py                       # Teacher app tests
+│   ├── templatetags/                   # Custom template tags for teachers
+│   │   ├── __init__.py
+│   │   └── teacher_tags.py             # Template tags for teacher features
+│   └── migrations/                      # Database migrations directory
+│
+├── student/                           # Student functionality app
+│   ├── __init__.py                    # Marks directory as Python package
+│   ├── admin.py                        # Admin interface for students
+│   ├── apps.py                         # App configuration class
+│   ├── models.py                       # Student profile and progress models
+│   ├── views.py                        # Student dashboard and learning views
+│   ├── utils.py                        # Student helper functions
+│   ├── tests.py                        # Student app tests
+│   └── migrations/                      # Database migrations directory
+│
+├── notifications/                      # Notification system app
+│   ├── __init__.py                     # Marks directory as Python package
+│   ├── admin.py                         # Admin interface for notifications
+│   ├── apps.py                          # App configuration class
+│   ├── models.py                        # Notification models
+│   ├── views.py                         # Notification views
+│   ├── context_processors.py             # Context processor for notifications
+│   ├── tests.py                         # Notification app tests
+│   └── migrations/                       # Database migrations directory
+│
+├── pages/                              # Static pages app
+│   ├── __init__.py                     # Marks directory as Python package
+│   ├── admin.py                         # Admin interface for pages
+│   ├── apps.py                          # App configuration class
+│   ├── models.py                        # Page models (if dynamic content)
+│   ├── views.py                         # Static page views
+│   ├── urls.py                          # Page-specific URL patterns
+│   ├── tests.py                         # Pages app tests
+│   └── migrations/                       # Database migrations directory
+│
+├── security_tests/                      # Security testing module
+│   ├── __init__.py                      # Marks directory as Python package
+│   ├── security_summary.py               # Security test summary generator
+│   ├── test_api_security.py              # API security tests
+│   ├── test_authentication.py            # Authentication security tests
+│   ├── test_configuration.py             # Configuration security tests
+│   ├── test_csrf.py                      # CSRF protection tests
+│   ├── test_data_exposure.py             # Data exposure tests
+│   ├── test_file_upload.py                # File upload security tests
+│   ├── test_sql_injection.py              # SQL injection tests
+│   └── test_xss.py                        # XSS vulnerability tests
+│
+├── static/                               # Static files directory
+│   ├── assets/                           # Images, icons, and media assets
+│   │
+│   ├── css/                              # Stylesheet files
+│   │   ├── EdTube.css
+│   │   ├── about-us.css
+│   │   ├── account_settings.css
+│   │   ├── advanced_settings.css
+│   │   ├── coins.css
+│   │   ├── contact.css
+│   │   ├── cropper.css
+│   │   ├── dashboard.css
+│   │   ├── delete_account.css
+│   │   ├── edit_video.css
+│   │   ├── faqs.css
+│   │   ├── footer.css
+│   │   ├── help-center.css
+│   │   ├── login.css
+│   │   ├── navbar.css
+│   │   ├── notifications.css
+│   │   ├── privacy-policy.css
+│   │   ├── profile.css
+│   │   ├── quiz.css
+│   │   ├── register.css
+│   │   ├── report-issue.css
+│   │   ├── reviews.css
+│   │   ├── search_results.css
+│   │   ├── share_modal.css
+│   │   ├── terms.css
+│   │   ├── verify_email.css
+│   │   ├── video_history.css
+│   │   ├── video_player.css
+│   │   ├── video_upload.css
+│   │   └── watch_later.css
+│   ├── js/                               # JavaScript files
+│   │   ├── advanced_settings.js
+│   │   ├── cropper.js
+│   │   ├── edit_video.js
+│   │   ├── loader.js
+│   │   ├── navbar.js
+│   │   ├── password-toggle.js
+│   │   ├── profile.js
+│   │   ├── quiz.js
+│   │   ├── register.js
+│   │   ├── reviews.js
+│   │   ├── share_modal.js
+│   │   ├── themes.js
+│   │   ├── toggle_option_menu.js
+│   │   ├── verify_email.js
+│   │   ├── video_player.js
+│   │   ├── video_upload.js
+│   │   └── watch_later.js
+│   ├── sample/                            # Sample data files
+│   │   └── quiz_sample.csv                 # Sample quiz data
+│   └── sounds/                             # Sound effects
+│       ├── mic-error.mp3
+│       ├── mic-off.mp3
+│       └── mic-on.mp3
+│
+└── templates/                             # HTML templates directory
+    ├── EdTube.html
+    ├── about-us.html
+    ├── account_settings.html
+    ├── advanced_settings.html
+    ├── coins.html
+    ├── contact.html
+    ├── dashboard.html
+    ├── delete_account.html
+    ├── edit_video.html
+    ├── faqs.html
+    ├── footer.html
+    ├── forgot_password.html
+    ├── help-center.html
+    ├── login.html
+    ├── navbar.html
+    ├── notifications.html
+    ├── privacy-policy.html
+    ├── profile.html
+    ├── quiz.html
+    ├── register.html
+    ├── report-issue.html
+    ├── reviews.html
+    ├── search_results.html
+    ├── set_new_password.html
+    ├── terms.html
+    ├── verify_email.html
+    ├── verify_reset_otp.html
+    ├── video_history.html
+    ├── video_player.html
+    ├── video_upload.html
+    ├── watch_later.html
+    └── components/                          # Reusable template components
+        └── share_modal.html
 ```
 
 ## ⚙️ Configuration
