@@ -10,6 +10,12 @@ const defaultReviews = [
 // Load from localStorage OR default
 let reviews = JSON.parse(localStorage.getItem("reviews")) || defaultReviews;
 
+// Fix old EduNex references automatically
+reviews = reviews.map(r => ({
+  ...r,
+  message: r.message.replace(/EduNex/g, "EdTube")
+}));
+
 function displayReviews() {
     const container = document.getElementById("reviewsList");
     container.innerHTML = "<h2>What Students Say</h2>";
