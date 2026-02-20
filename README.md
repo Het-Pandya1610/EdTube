@@ -556,7 +556,7 @@ SOFTWARE.
 
 - **Version**: 1.0.0
 - **Status**: Active Development
-- **Last Updated**: ![Last Commit](https://img.shields.io/github/last-commit/Het-Pandya1610/EdTube?color=blue&label=)
+- **Last Updated**: February 2026
 
 ## 🔗 Links
 
