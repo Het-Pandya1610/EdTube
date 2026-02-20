@@ -340,13 +340,13 @@ def resend_otp(request):
         EmailVerification.objects.create(
             user=user,
             otp=otp,
-            otp_purpose=purpose   # ✅ required
+            otp_purpose=purpose   # required
         )
 
         send_otp_email(email, otp, purpose)
 
         request.session["pending_email"] = email
-        request.session["otp_purpose"] = purpose   # ✅ correct key
+        request.session["otp_purpose"] = purpose   # correct key
 
         return render(request, "verify_email.html", {
             "email": email,
@@ -454,7 +454,7 @@ def forgot_password(request):
             is_used=False
         ).update(is_used=True)
 
-        # ✅ Generate new OTP
+        # Generate new OTP
         otp = EmailVerification.generate_otp()
 
         EmailVerification.objects.create(
@@ -469,7 +469,7 @@ def forgot_password(request):
         request.session["reset_email"] = email
 
         messages.success(request, "OTP sent to your email for password reset.")
-        return redirect("verify_reset_otp")   # 🔥 IMPORTANT
+        return redirect("verify_reset_otp")   #  IMPORTANT
 
     return render(request, "forgot_password.html")
 
@@ -544,64 +544,6 @@ def set_new_password(request):
 
 @login_required
 def account_settings(request):
-
-    # user = request.user
-    # profile = user.profile
-    
-    # teacher = None
-    # student = None
-    
-    # try:
-    #     if hasattr(user, 'teacher'):
-    #         teacher = user.teacher
-    # except Teacher.DoesNotExist:
-    #     teacher = None
-        
-    # try:
-    #     if hasattr(user, 'student'):
-    #         student = user.student
-    # except Student.DoesNotExist:
-    #     student = None
-    
-    # suggestions = None
-
-    # if request.method == 'POST':
-    #     new_username = request.POST.get('username').strip().lower()
-    #     if new_username != user.username:
-    #         if User.objects.filter(username=new_username).exists():
-    #             full_name = f"{user.first_name} {user.last_name}"
-    #             suggestions = generate_suggestions_by_name(full_name)
-    #             messages.error(request, f"The username @{new_username} is already taken.")
-    #             return render(request, 'account_settings.html', {'suggestions': suggestions})
-    #         else:
-    #             user.username = new_username
-                
-    #     user.first_name = request.POST.get('first_name')
-    #     user.last_name = request.POST.get('last_name')
-    #     user.email = request.POST.get('email')
-
-    #     new_pass = request.POST.get('new_password')
-    #     confirm_pass = request.POST.get('confirm_password')
-    #     if new_pass:
-    #         if new_pass == confirm_pass:
-    #             user.set_password(new_pass)
-    #             update_session_auth_hash(request, user) # Don't log out
-    #         else:
-    #             messages.error(request, "Passwords do not match!")
-    #             return redirect('account_settings')
-
-    #     user.save()
-
-    #     profile.bio = request.POST.get('bio')
-    #     teacher.center_address = request.POST.get('center_address')
-    #     teacher.degree_pursued = request.POST.get('degree_pursued')
-    #     teacher.experience_years = request.POST.get('experience_years') or 0
-    #     teacher.save()
-
-        
-    #     messages.success(request, "Your settings have been updated successfully!")
-    #     return redirect('account_settings')
-
     return render(request, 'account_settings.html')
 
 @login_required
@@ -947,7 +889,7 @@ def get_formatted_name(user, format_code):
 @login_required
 @require_POST
 def upgrade_to_teacher(request):
-    user = request.user   # ✅ get logged-in user properly
+    user = request.user   # get logged-in user properly
 
     profile = Profile.objects.get(user=user)
     profile.role = 'tutor'
