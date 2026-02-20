@@ -171,15 +171,24 @@ Create a `.env` file in the project root:
 
 ```env
 # Django Settings
-DEBUG=True
-SECRET_KEY=your-secret-key-here
-ALLOWED_HOSTS=localhost,127.0.0.1
+SECRET_KEY = your_secret_key
+DEBUG = True
+DB_NAME= your_db_name
+DB_USER= your_db_user
+DB_PASS = your_db_pass
+DB_HOST= your_db_host
+DB_PORT= your_db_port
+EMAIL_HOST_USER= your_email_host_user
+EMAIL_HOST_PASSWORD = your_email_host_password
+CLOUDINARY_CLOUD_NAME = your_cloudinary_cloud_name
+CLOUDINARY_API_KEY = your_cloudinary_api_key
+CLOUDINARY_API_SECRET = your_cloudinary_api_secret
 
 # Database (SQLite for development)
-DATABASE_URL=sqlite:///db.sqlite3
+DATABASE_URL= your_db_url
 
 # Optional Settings
-# YOUTUBE_API_KEY=your-youtube-api-key
+# YOUTUBE_API_KEY=your_youtube_api_key
 ```
 
 ### Settings Overview
