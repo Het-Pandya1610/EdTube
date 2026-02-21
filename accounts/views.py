@@ -679,6 +679,43 @@ def update_username(request):
 
 @login_required
 @require_POST
+def update_full_name(request):
+    """Update user's full name"""
+    user = request.user
+    new_full_name = request.POST.get('full_name', '').strip()
+    
+    if not new_full_name:
+        messages.error(request, "Full name cannot be empty.")
+        return redirect('advanced_settings')
+
+    if len(new_full_name) > 100:
+        messages.error(request, "Full name cannot exceed 100 characters.")
+        return redirect('advanced_settings')
+
+    first_name, last_name = split_name(new_full_name)
+
+    user.first_name = first_name
+    user.last_name = last_name
+    user.save()
+
+    # Update teacher/student name
+    try:
+        teacher = Teacher.objects.get(user=user)
+        teacher.name = new_full_name
+        teacher.save()
+    except Teacher.DoesNotExist:
+        try:
+            student = Student.objects.get(user=user)
+            student.name = new_full_name
+            student.save()
+        except Student.DoesNotExist:
+            pass
+
+    messages.success(request, "Full name updated successfully!")
+    return redirect('advanced_settings')
+
+@login_required
+@require_POST
 def update_name_appearance(request):
     """Update name display format"""
     try:

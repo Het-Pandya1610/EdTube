@@ -106,6 +106,30 @@
 
                 <hr style="border:2px solid var(--text-color) !important;"></hr>
 
+                <form id="updateFullName" action="{% url 'update_full_name' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="settings-section">
+                        <div class="section-header">
+                            <h3>Full Name</h3>
+                            <p class="section-subtitle">Update your full name displayed on your profile</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label" for="first_name">First Name</label>
+                            <div class="setting-control">
+                                <input type="text" 
+                                       id="full_name" 
+                                       name="full_name" 
+                                       placeholder="Full Name"
+                                       value="{{ request.user.first_name }} {{ request.user.last_name }}"
+                                       class="setting-input">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Update Full Name</button>
+                        </div>
+                    </div>
+                </form>
                 <!-- Name Appearance Section -->
                 <div class="settings-section">
                     <div class="section-header">

@@ -108,7 +108,7 @@ class Video(models.Model):
                 raise ValidationError("Thumbnail must be under 10MB")
 
         for field, name in [(self.notes, "Notes"), (self.quiz, "Quiz")]:
-            if field and hasattr(field, "size"):
+            if field and hasattr(field, "size") and field.size is not None:
                 if field.size > 10 * 1024 * 1024:
                     raise ValidationError(f"{name} must be under 10MB")
 

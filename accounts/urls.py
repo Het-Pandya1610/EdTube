@@ -15,6 +15,7 @@ urlpatterns = [
     path("advanced-settings/", views.advanced_settings, name="advanced_settings"),
     path("update-bio/", views.update_bio, name="update_bio"),
     path("update-username/", views.update_username, name="update_username"),
+    path("update-full-name/", views.update_full_name, name="update_full_name"),
     path("update-name-appearance/", views.update_name_appearance, name="update_name_appearance"),
     path("update-teacher-info/", views.update_teacher_info, name="update_teacher_info"),
     path("check-username/", views.check_username, name="check_username"),

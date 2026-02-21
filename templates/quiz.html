@@ -35,7 +35,12 @@
                         </div>
                         
                     {% endfor %}
-                <button class="submit-btn" id="submitBtn">Submit Quiz</button>
+                {% if request.user.is_authenticated and request.user.profile.role == "student" %}
+                    <button class="submit-btn" id="submitBtn">Submit Quiz</button>
+                {% else %}
+                
+                    <p>Please log in as a student to take the quiz.</p> 
+                {% endif %}
             </form>
         </div>
     </div>

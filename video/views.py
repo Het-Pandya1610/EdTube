@@ -39,7 +39,7 @@ def videoUpload(request):
 
         try:
             with transaction.atomic():
-                # ✅ Create video object WITHOUT saving to DB yet
+                #  Create video object WITHOUT saving to DB yet
                 video = Video(
                     teacher=teacher,
                     title=request.POST.get("title"),
@@ -48,7 +48,7 @@ def videoUpload(request):
                     subject=request.POST.get("subject"),
                 )
 
-                # ✅ Assign ALL fields BEFORE first save
+                #  Assign ALL fields BEFORE first save
                 if video_url:
                     video.video_link = video_url
                 if video_file:
@@ -60,7 +60,7 @@ def videoUpload(request):
                 if quiz_file:
                     video.quiz = quiz_file
                 
-                # ✅ NOW save once with everything populated
+                #  NOW save once with everything populated
                 video.save()  # This will trigger duration fetch
 
                 if quiz_file:
@@ -102,7 +102,7 @@ def videoUpload(request):
 def upload_quiz_file_in_database(video, csv_file):
     try:
         csv_file.seek(0)
-        decoded_file = csv_file.read().decode("utf-8").splitlines()
+        decoded_file = csv_file.read().decode("utf-8-sig").splitlines()
         reader = csv.DictReader(decoded_file)
 
         required_columns = {
@@ -118,40 +118,38 @@ def upload_quiz_file_in_database(video, csv_file):
             missing = required_columns - set(reader.fieldnames)
             raise ValueError(f"Missing columns: {', '.join(missing)}")
 
-        quiz_objects = []
-
         # Make sure quiz_id exists
         if not video.quiz_id:
             video.quiz_id = f"{video.video_id}-QUIZ"
             video.save(update_fields=["quiz_id"])
 
-        with transaction.atomic():
-            # Delete old quiz for this video
-            Quiz.objects.filter(video=video).delete()
+        # Delete old quiz
+        Quiz.objects.filter(video=video).delete()
 
-            for idx, row in enumerate(reader, start=1):
-                correct_option = row.get("correct_option", "").strip().upper()
-                if correct_option not in ["A", "B", "C", "D"]:
-                    raise ValueError(f"Invalid correct_option at row {idx}")
+        quiz_objects = []
 
-                # Auto-generate question_id using quiz_id + question number
-                question_number = str(idx).zfill(4)  # 0001, 0002, ...
-                question_id = f"{video.quiz_id}-{question_number}"  # Changed to use quiz_id
+        for idx, row in enumerate(reader, start=1):
+            correct_option = row.get("correct_option", "").strip().upper()
+            if correct_option not in ["A", "B", "C", "D"]:
+                raise ValueError(f"Invalid correct_option at row {idx}")
 
-                quiz_objects.append(
-                    Quiz(
-                        video=video,
-                        question_id=question_id,
-                        question_text=row.get("question_text", "").strip(),
-                        option_a=row.get("option_a", "").strip(),
-                        option_b=row.get("option_b", "").strip(),
-                        option_c=row.get("option_c", "").strip(),
-                        option_d=row.get("option_d", "").strip(),
-                        correct_option=correct_option,
-                    )
+            question_number = str(idx).zfill(4)
+            question_id = f"{video.quiz_id}-{question_number}"
+
+            quiz_objects.append(
+                Quiz(
+                    video=video,
+                    question_id=question_id,
+                    question_text=row.get("question_text", "").strip(),
+                    option_a=row.get("option_a", "").strip(),
+                    option_b=row.get("option_b", "").strip(),
+                    option_c=row.get("option_c", "").strip(),
+                    option_d=row.get("option_d", "").strip(),
+                    correct_option=correct_option,
                 )
+            )
 
-            Quiz.objects.bulk_create(quiz_objects)
+        Quiz.objects.bulk_create(quiz_objects)
 
         return True, f"{len(quiz_objects)} questions uploaded successfully."
 

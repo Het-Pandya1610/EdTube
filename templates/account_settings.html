@@ -52,7 +52,7 @@
                             </div>
 
                             <div class="choices" style="display: flex; flex-direction: column; gap: 10px; margin-left: 0px;">
-                                <a href="" style="text-decoration: none; color: #3ea6ff; font-size: 0.9rem;">Create a new channel</a>
+                                {% comment %} <a href="" style="text-decoration: none; color: #3ea6ff; font-size: 0.9rem;">Create a new channel</a> {% endcomment %}
                                 <a href="{% url "advanced_settings" %}" style="text-decoration: none; color: #3ea6ff; font-size: 0.9rem;">View advanced settings</a>
                                 <a href="{% url "logout" %}" style="text-decoration: none; color: #ff0000; font-size: 0.9rem;">Sign out</a>
                                 <a href="{% url "delete_account" %}" style="text-decoration: none; background: #ff0000; padding: 10px; border-radius: 10px; color: #fff; font-size: 0.9rem;width: fit-content">Delete account</a>
