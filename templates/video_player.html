@@ -37,12 +37,48 @@
 
                             <div class="buttons-row">
                                 <div class="left-controls">
-                                    <button class="btn-ctrl" title="Previous"><i class="bi bi-skip-start-fill"></i></button>
-                                    <button class="btn-ctrl" id="rewind"><i class="bi bi-arrow-counterclockwise"></i></button>
-                                    <button class="btn-ctrl" id="playBtn"><i class="bi bi-play-fill"></i></button>
-                                    <button class="btn-ctrl" id="forward"><i class="bi bi-arrow-clockwise"></i></button>
-                                    <button class="btn-ctrl" title="Next"><i class="bi bi-skip-end-fill"></i></button>
-                                    <span class="time-text" id="timeDisplay">0:00 / {{video.duration}}</span>
+
+                                    <!-- Previous -->
+                                    {% if has_previous %}
+                                        <a href="{% url 'previous_video' video.video_id %}" class="btn-ctrl" title="Previous">
+                                            <i class="bi bi-skip-start-fill"></i>
+                                        </a>
+                                    {% else %}
+                                        <button class="btn-ctrl disabled-btn" title="No Previous" disabled>
+                                            <i class="bi bi-skip-start-fill"></i>
+                                        </button>
+                                    {% endif %}
+
+                                    <!-- Rewind -->
+                                    <button class="btn-ctrl" id="rewind">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </button>
+
+                                    <!-- Play -->
+                                    <button class="btn-ctrl" id="playBtn">
+                                        <i class="bi bi-play-fill"></i>
+                                    </button>
+
+                                    <!-- Forward -->
+                                    <button class="btn-ctrl" id="forward">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+
+                                    <!-- Next -->
+                                    {% if has_next %}
+                                        <a href="{% url 'next_video' video.video_id %}" class="btn-ctrl" title="Next">
+                                            <i class="bi bi-skip-end-fill"></i>
+                                        </a>
+                                    {% else %}
+                                        <button class="btn-ctrl disabled-btn" title="No Next" disabled>
+                                            <i class="bi bi-skip-end-fill"></i>
+                                        </button>
+                                    {% endif %}
+
+                                    <span class="time-text" id="timeDisplay">
+                                        0:00 / {{ video.duration }}
+                                    </span>
+
                                 </div>
 
                                 <div class="right-controls">

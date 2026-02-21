@@ -344,7 +344,14 @@ def watchVideo(request):
                 status=400
             )
     is_owner = request.user.is_authenticated and request.user == video.teacher.user
+    teacher_videos = list(
+        video.teacher.videos.all().order_by('video_id')
+    )
 
+    video_index = teacher_videos.index(video)
+
+    has_previous = video_index > 0
+    has_next = video_index < len(teacher_videos) - 1
     comments = Comment.objects.filter(
         video=video,
         is_reply=False
@@ -353,8 +360,44 @@ def watchVideo(request):
     return render(request, 'video_player.html', {
         'video': video,
         'comments': comments,
-        'is_owner': is_owner
+        'is_owner': is_owner,
+        'has_previous': has_previous,
+        'has_next': has_next,
     })
+
+def nextVideo(request, video_id):
+    current_video = get_object_or_404(Video, video_id=video_id)
+
+    teacher_videos = list(current_video.teacher.videos.all().order_by('video_id'))
+
+    for index, vid in enumerate(teacher_videos):
+        if vid.video_id == current_video.video_id:
+            if index + 1 < len(teacher_videos):
+                next_video = teacher_videos[index + 1]
+                return redirect(
+                    f"{reverse('watch_video')}?v={next_video.video_id}"
+                )
+            else:
+                return redirect(
+                    f"{reverse('watch_video')}?v={current_video.video_id}"
+                )
+
+def previousVideo(request, video_id):
+    current_video = get_object_or_404(Video, video_id=video_id)
+
+    teacher_videos = list(current_video.teacher.videos.all().order_by('video_id'))
+
+    for index, vid in enumerate(teacher_videos):
+        if vid.video_id == current_video.video_id:
+            if index > 0:
+                prev_video = teacher_videos[index - 1]
+                return redirect(
+                    f"{reverse('watch_video')}?v={prev_video.video_id}"
+                )
+            else:
+                return redirect(
+                    f"{reverse('watch_video')}?v={current_video.video_id}"
+                )
 
 
 @login_required
