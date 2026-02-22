@@ -412,57 +412,6 @@ python manage.py collectstatic
 python manage.py clear_cache
 ```
 
-## 🚢 Deployment
-
-### Preparation
-1. Set `DEBUG=False` in production
-2. Generate a strong `SECRET_KEY`
-3. Configure `ALLOWED_HOSTS` with your domain
-4. Use PostgreSQL for production database
-5. Set up proper static file serving
-
-### Deployment Options
-
-#### Option 1: Render (Recommended)
-1. Create a new Web Service on Render
-2. Connect your GitHub repository
-3. Add environment variables:
-   - `DATABASE_URL` (from Render PostgreSQL)
-   - `SECRET_KEY` (generate a strong one)
-   - `DEBUG=False`
-   - `ALLOWED_HOSTS=your-render-url.onrender.com`
-
-#### Option 2: Railway
-```bash
-# Install Railway CLI
-npm i -g @railway/cli
-
-# Deploy
-railway up
-```
-
-#### Option 3: Heroku
-```bash
-# Install Heroku CLI
-# Create Procfile with:
-web: gunicorn EdTube.wsgi:application
-
-# Deploy
-git push heroku main
-heroku run python manage.py migrate
-```
-
-### Production Checklist
-- [ ] `DEBUG=False`
-- [ ] Strong `SECRET_KEY`
-- [ ] Configured `ALLOWED_HOSTS`
-- [ ] PostgreSQL database
-- [ ] Static files served via CDN/Whitenoise
-- [ ] Media files served via cloud storage
-- [ ] HTTPS enabled
-- [ ] Security headers configured
-- [ ] Error logging setup
-
 ## 🤝 Contributing
 
 We welcome contributions! Here's how you can help:
